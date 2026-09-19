@@ -162,7 +162,7 @@ export const UserDetailsPage = memo(function UserDetailsPage({
 
   const analyticsCards = [
     {
-      label: labels.totalBookings as string || 'Total Bookings',
+      label: labels.totalBookings as string || 'Total Reservations',
       value: totalReservations.toString(),
       icon: '📅',
     },
@@ -172,7 +172,7 @@ export const UserDetailsPage = memo(function UserDetailsPage({
       icon: '💰',
     },
     {
-      label: labels.lastBooking as string || 'Last Booking',
+      label: labels.lastBooking as string || 'Last Reservation',
       value: lastBooking ? lastBooking.checkIn : '-',
       icon: '📆',
     },

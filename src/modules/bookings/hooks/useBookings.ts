@@ -9,7 +9,7 @@ import type { Booking } from '../types'
 const ACTIVE_BOOKINGS_KEY = '/api/reservations/board?scope=active'
 
 function reportLoadError(e: unknown): never {
-  toast.error('Network error', { description: e instanceof Error ? e.message : 'Failed to fetch bookings' })
+  toast.error('Network error', { description: e instanceof Error ? e.message : 'Failed to fetch reservations' })
   throw e
 }
 

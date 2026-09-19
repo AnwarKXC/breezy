@@ -238,7 +238,7 @@ export function BookingsPage() {
               const invoices = listJson.data ?? []
               const first = Array.isArray(invoices) ? invoices[0] : invoices
               if (!first?.id) {
-                console.error('No invoice found for booking', booking.id)
+                console.error('No invoice found for reservation', booking.id)
                 break
               }
               const detailRes = await fetch(`/api/accounting/invoices/${first.id}`)
@@ -305,7 +305,7 @@ export function BookingsPage() {
       }
       await Promise.all([fetchBookings(), fetchRooms()])
     } catch {
-      toast.error('Failed to delete booking')
+      toast.error('Failed to delete reservation')
     } finally {
       setConfirmDeleting(false)
       setConfirmAction(null)
@@ -335,7 +335,7 @@ export function BookingsPage() {
       setConfirmAction(null)
       await Promise.all([fetchBookings(), fetchRooms()])
     } catch {
-      toast.error('Failed to cancel booking')
+      toast.error('Failed to cancel reservation')
     } finally {
       setBookingCancelLoading(false)
     }
@@ -375,7 +375,7 @@ export function BookingsPage() {
       }
       await Promise.all([fetchBookings(), fetchRooms()])
     } catch {
-      toast.error('Failed to delete booking')
+      toast.error('Failed to delete reservation')
     } finally {
       setDeleteBookingInvoiceLoading(false)
       setDeleteBookingInvoiceOpen(false)
@@ -445,7 +445,7 @@ export function BookingsPage() {
 
   return (
     <main className="w-full">
-      <div className="py-6 sm:px-6 lg:px-8">
+      <div>
         <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight text-[#1A1A1A]">

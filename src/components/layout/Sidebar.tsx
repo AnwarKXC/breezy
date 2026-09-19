@@ -70,10 +70,11 @@ export const Sidebar = memo(function Sidebar() {
   }, [logout, localePrefix, router, t]);
 
   return (
-    <aside className="hidden w-64 shrink-0 flex-col border-e border-[#EAEAEA] bg-white px-5 py-6 text-[#1A1A1A] lg:flex lg:min-h-full">
+    <aside className="hidden w-64 shrink-0 flex-col border-e border-line bg-white px-5 pb-6 text-ink lg:flex lg:min-h-full">
       <Link
         href={localePrefix}
-        className="mb-7 flex items-center gap-3 rounded-xl px-2 text-base font-semibold tracking-tight text-[#1A1A1A]"
+        // Same height and bottom border as the top bar, so they read as one line.
+        className="-mx-5 mb-6 flex h-16 shrink-0 items-center gap-3 border-b border-line px-7 text-base font-semibold tracking-tight text-ink"
       >
 <span className="grid h-10 w-10 place-items-center">
   <Image

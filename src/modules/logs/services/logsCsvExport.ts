@@ -26,14 +26,15 @@ function escapeCsvCell(value: string | undefined | null) {
 export function buildLogsCsv(
   logs: LogEntry[],
   labels: ExportLabels,
+  t: (key: string) => string,
 ) {
   const header = [labels.user, labels.action, labels.module, labels.entity, labels.description, labels.createdAt]
   const rows = logs.map((log) => [
     getActorLabel(log),
-    getActionLabel(log.action),
-    getModuleLabel(log.module),
+    getActionLabel(log.action, t),
+    getModuleLabel(log.module, t),
     getTargetLabel(log),
-    getLogDescription(log),
+    getLogDescription(log, t),
     formatLogDate(log.createdAt),
   ])
 

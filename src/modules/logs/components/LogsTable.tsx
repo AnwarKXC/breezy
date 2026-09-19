@@ -64,15 +64,15 @@ export const LogsTable = memo(function LogsTable({
       label: labels.action,
       render: (_value, log) => (
           <span className="rounded-md border border-[#EAEAEA] bg-[#F9F9F8] px-2.5 py-1 text-xs font-medium text-[#333333]">
-          {getActionLabel(log.action)}
+          {getActionLabel(log.action, t)}
         </span>
       ),
     },
-    { key: "module", label: labels.module, render: (_value, log) => getModuleLabel(log.module) },
+    { key: "module", label: labels.module, render: (_value, log) => getModuleLabel(log.module, t) },
     {
       key: "description",
       label: labels.description,
-      render: (_value, log) => getLogDescription(log),
+      render: (_value, log) => getLogDescription(log, t),
     },
     {
       key: "target",
@@ -84,7 +84,7 @@ export const LogsTable = memo(function LogsTable({
       ),
     },
     { key: "createdAt", label: labels.createdAt, render: (_value, log) => formatLogDate(log.createdAt, locale) },
-  ], [labels, locale]);
+  ], [labels, locale, t]);
 
   return (
     <Table

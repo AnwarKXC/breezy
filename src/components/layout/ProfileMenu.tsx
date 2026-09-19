@@ -9,13 +9,11 @@ import { ChevronIcon } from "./LayoutIcons";
 import Image from "next/image";
 
 interface ProfileMenuProps {
-  isRTL: boolean;
   localePrefix: string;
   t: (key: string) => string;
 }
 
 export const ProfileMenu = memo(function ProfileMenu({
-  isRTL,
   localePrefix,
   t,
 }: ProfileMenuProps) {
@@ -43,15 +41,15 @@ export const ProfileMenu = memo(function ProfileMenu({
       <button
         aria-expanded={open}
         aria-label={t("layout.profile")}
-        className="flex h-10 items-center gap-2 rounded-xl bg-white pe-2 ps-1 text-[#1A1A1A] transition-colors hover:bg-[#F5F5F5]"
+        className="flex h-9 items-center gap-2 rounded-lg border border-line bg-white pe-2 ps-1 text-sm font-medium text-ink transition-colors hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
         onClick={() => setOpen((value) => !value)}
         type="button"
       >
-        <span className="grid h-8 w-8 place-items-center rounded-full bg-ink text-xs font-bold text-white">
+        <span className="grid h-7 w-7 place-items-center overflow-hidden rounded-full bg-ink text-xs font-bold text-white">
           {role === "admin" ? (
             <Image
               alt={t("layout.profile")}
-              className="h-8 w-8 rounded-full object-cover"
+              className="h-7 w-7 rounded-full object-cover"
               height={32}
               src="/Profile Picture Green.jpg"
               width={32}
@@ -59,21 +57,21 @@ export const ProfileMenu = memo(function ProfileMenu({
           ) : (
             <Image
               alt={t("layout.profile")}
-              className="h-8 w-8 rounded-full object-cover"
+              className="h-7 w-7 rounded-full object-cover"
               height={32}
               src="/Profile Picture White.jpg"
               width={32}
             />
           )}
         </span>
-        <span className="hidden max-w-24 truncate text-sm font-medium sm:block">
-          {user?.email ?? t("layout.admin")}
+        <span className="hidden max-w-40 truncate sm:block" title={user?.email ?? undefined}>
+          {user?.displayName || user?.email || t("layout.admin")}
         </span>
         <span className="hidden text-[#787774] sm:block"><ChevronIcon /></span>
       </button>
 
       {open ? (
-        <div className={`absolute top-12 w-48 overflow-hidden rounded-xl border border-[#EAEAEA] bg-white p-2 text-sm ${isRTL ? "left-0" : "right-0"}`}>
+        <div className="absolute end-0 top-12 z-40 w-48 overflow-hidden rounded-xl border border-line bg-white p-2 text-sm shadow-lg">
           <button
             className="block w-full rounded-md px-3 py-2 text-start font-bold text-[#1A1A1A] transition-colors hover:bg-[#F5F5F5] disabled:cursor-not-allowed disabled:opacity-50"
             disabled={loading}

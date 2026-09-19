@@ -1,6 +1,7 @@
 ﻿import { AnalyticsCard } from '@/shared/components/AnalyticsCard'
 import { Skeleton } from '@/shared/components/Skeleton'
 import type { LogsAnalytics as LogsAnalyticsData } from '../types'
+import { useTranslation } from '@/i18n/hooks/useTranslation'
 import { getModuleLabel } from '../utils/logDisplay'
 
 interface LogsAnalyticsProps {
@@ -20,12 +21,13 @@ interface LogCard {
 }
 
 export function LogsAnalytics({ analytics, loading = false, labels }: LogsAnalyticsProps) {
+  const { t } = useTranslation()
   const cards: LogCard[] = [
     { label: labels.totalToday, value: String(analytics?.totalActionsToday ?? 0), accent: 'indigo' },
     { label: labels.mostActiveUser, value: analytics?.mostActiveUser || '-', accent: 'amber' },
     {
       label: labels.mostUsedModule,
-      value: analytics?.mostUsedModule ? getModuleLabel(analytics.mostUsedModule) : '-',
+      value: analytics?.mostUsedModule ? getModuleLabel(analytics.mostUsedModule, t) : '-',
       accent: 'violet',
     },
   ]

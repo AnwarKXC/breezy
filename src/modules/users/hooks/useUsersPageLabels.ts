@@ -50,9 +50,9 @@ export function useUsersPageLabels(page: number) {
   }
   const roleLabels: Record<UserRole | 'all', string> = {
     all: t('users.roles.all'),
-    admin: 'admin',
-    accountant: 'accountant',
-    front_desk: 'front_desk',
+    admin: t('users.roles.admin'),
+    accountant: t('users.roles.accountant'),
+    front_desk: t('users.roles.frontDesk'),
   }
   const paginationLabel = t('users.pagination').replace('{page}', String(page))
 

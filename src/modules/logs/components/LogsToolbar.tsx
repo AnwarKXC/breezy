@@ -6,6 +6,8 @@ import { FloatingInput } from '@/shared/components/FloatingField'
 import { ToolbarSearch, ToolbarFilterSelect, ToolbarExportGroup } from '@/shared/components/toolbar'
 import { LOG_ACTIONS, LOG_MODULES } from '@/types/logs'
 import type { LogAction, LogModule, LogsFilters } from '../types'
+import { useTranslation } from '@/i18n/hooks/useTranslation'
+import { getActionLabel, getModuleLabel } from '../utils/logDisplay'
 
 interface LogsToolbarProps {
   filters: LogsFilters
@@ -29,20 +31,21 @@ const actionValues = Object.values(LOG_ACTIONS)
 const moduleValues = Object.values(LOG_MODULES)
 
 export function LogsToolbar({ filters, labels, onChange, onExportCsv, onExportPdf }: LogsToolbarProps) {
+  const { t } = useTranslation()
   const moduleOptions = useMemo(
     () => [
       { label: labels.allModules, value: '' },
-      ...moduleValues.map((m) => ({ label: m, value: m })),
+      ...moduleValues.map((m) => ({ label: getModuleLabel(m, t), value: m })),
     ],
-    [labels.allModules],
+    [labels.allModules, t],
   )
 
   const actionOptions = useMemo(
     () => [
       { label: labels.allActions, value: '' },
-      ...actionValues.map((a) => ({ label: a, value: a })),
+      ...actionValues.map((a) => ({ label: getActionLabel(a, t), value: a })),
     ],
-    [labels.allActions],
+    [labels.allActions, t],
   )
 
   return (

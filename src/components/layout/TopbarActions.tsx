@@ -5,21 +5,19 @@ import { ProfileMenu } from "./ProfileMenu";
 import { QuickActionsMenu } from "./QuickActionsMenu";
 
 interface TopbarActionsProps {
-  isRTL: boolean;
   localePrefix: string;
   t: (key: string) => string;
 }
 
 export const TopbarActions = memo(function TopbarActions({
-  isRTL,
   localePrefix,
   t,
 }: TopbarActionsProps) {
   return (
     <>
-      <QuickActionsMenu isRTL={isRTL} localePrefix={localePrefix} t={t} />
+      <QuickActionsMenu localePrefix={localePrefix} t={t} />
       <LanguageSwitcher />
-      <ProfileMenu isRTL={isRTL} localePrefix={localePrefix} t={t} />
+      <ProfileMenu localePrefix={localePrefix} t={t} />
     </>
   );
 });

@@ -13,9 +13,9 @@ const ACTION_MAP: Record<ContactAction, LogAction> = {
 }
 
 const DESCRIPTION_MAP: Record<ContactAction, string> = {
-  contact_created: 'contacts/log/created',
-  contact_updated: 'contacts/log/updated',
-  contact_deleted: 'contacts/log/deleted',
+  contact_created: 'logs.contacts.created',
+  contact_updated: 'logs.contacts.updated',
+  contact_deleted: 'logs.contacts.deleted',
 }
 
 function buildTarget(contact: Pick<Contact, 'id' | 'name' | 'type'>) {

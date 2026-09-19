@@ -164,9 +164,9 @@ function AnalyticsCards({ stats, labels }: { stats: ReservationStats; labels: Re
   const { formatCurrency } = useCurrency()
 
   const cards = [
-    { label: details.totalBookings || 'Total Bookings', value: stats.total.toString(), icon: '📅' },
+    { label: details.totalBookings || 'Total Reservations', value: stats.total.toString(), icon: '📅' },
     { label: details.totalSpent || 'Total Spent', value: formatCurrency(stats.revenue), icon: '💰' },
-    { label: details.lastBooking || 'Last Booking', value: stats.lastCheckIn ?? '-', icon: '📆' },
+    { label: details.lastBooking || 'Last Reservation', value: stats.lastCheckIn ?? '-', icon: '📆' },
   ]
 
   return (

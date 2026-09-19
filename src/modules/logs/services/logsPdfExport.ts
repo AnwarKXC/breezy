@@ -2,6 +2,7 @@ import type { Locale } from '@/i18n/config'
 import { buildAndDownloadPdf } from '@/shared/utils/pdfMake'
 import { formatDateTime } from '@/shared/utils/date'
 import type { LogEntry } from '../types'
+import { getActionLabel, getLogDescription, getModuleLabel } from '../utils/logDisplay'
 
 type ExportLabels = Record<'action' | 'createdAt' | 'description' | 'entity' | 'module' | 'title' | 'user', string>
 
@@ -10,15 +11,16 @@ export async function exportLogsPdf(
   labels: ExportLabels,
   locale: Locale,
   fileName: string,
+  t: (key: string) => string,
 ): Promise<void> {
   if (!logs.length) return
 
   const rows = logs.map((log) => [
     log.actor.displayName ?? log.actor.name ?? log.actor.id,
-    log.action,
-    log.module,
+    getActionLabel(log.action, t),
+    getModuleLabel(log.module, t),
     log.target?.id ?? log.target?.type ?? '',
-    log.description,
+    getLogDescription(log, t),
     formatDateTime(new Date(log.createdAt.seconds * 1000 + log.createdAt.nanoseconds / 1e6).toISOString(), locale),
   ])
 

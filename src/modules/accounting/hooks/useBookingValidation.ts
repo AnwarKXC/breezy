@@ -39,7 +39,7 @@ export function useBookingValidation(options?: UseBookingValidationOptions) {
       warnings.push({
         type: 'no_show',
         severity: 'warning',
-        message: 'This is a no-show booking. A no-show charge will be auto-filled.',
+        message: 'This is a no-show reservation. A no-show charge will be auto-filled.',
         actions: [
           { label: 'Auto-fill no-show charge', action: 'auto_fill_no_show', payload: { bookingId: booking.id } },
         ],
@@ -51,7 +51,7 @@ export function useBookingValidation(options?: UseBookingValidationOptions) {
       warnings.push({
         type: 'existing_invoice',
         severity: 'error',
-        message: `This booking already has ${existingIds.length} invoice(s). Creating another may duplicate charges.`,
+        message: `This reservation already has ${existingIds.length} invoice(s). Creating another may duplicate charges.`,
         actions: [
           { label: 'View existing', action: 'view_existing', payload: { bookingId: booking.id } },
           { label: 'Create additional', action: 'create_additional', payload: { bookingId: booking.id } },
@@ -63,7 +63,7 @@ export function useBookingValidation(options?: UseBookingValidationOptions) {
       warnings.push({
         type: 'missing_price',
         severity: 'warning',
-        message: 'This booking has no room price configured. You will need to set charges manually.',
+        message: 'This reservation has no room price configured. You will need to set charges manually.',
         actions: [
           { label: 'Use default price', action: 'use_default_price', payload: { bookingId: booking.id } },
           { label: 'Set manually', action: 'set_manually', payload: { bookingId: booking.id } },
@@ -75,7 +75,7 @@ export function useBookingValidation(options?: UseBookingValidationOptions) {
       warnings.push({
         type: 'missing_guest_data',
         severity: 'warning',
-        message: 'Guest contact information is missing. Consider updating the booking record.',
+        message: 'Guest contact information is missing. Consider updating the reservation record.',
       })
     }
 
@@ -83,7 +83,7 @@ export function useBookingValidation(options?: UseBookingValidationOptions) {
       warnings.push({
         type: 'has_deposit',
         severity: 'info',
-        message: `Booking has a deposit of ${formatCurrency(booking.paidAmount)}. Apply to invoice?`,
+        message: `Reservation has a deposit of ${formatCurrency(booking.paidAmount)}. Apply to invoice?`,
         actions: [
           { label: 'Apply deposit', action: 'apply_deposit', payload: { bookingId: booking.id, amount: booking.paidAmount } },
           { label: 'Skip', action: 'skip_deposit', payload: { bookingId: booking.id } },

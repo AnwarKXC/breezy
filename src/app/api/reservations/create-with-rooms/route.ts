@@ -205,7 +205,7 @@ export async function POST(request: Request) {
                   night_date: dbDate(input.checkIn),
                   old_rate: room.nightlyRate,
                   new_rate: override,
-                  reason: 'Manual rate set at booking creation',
+                  reason: 'Manual rate set at reservation creation',
                   actor_id: session.id,
                   // CHECK constraint allows only 'admin' | 'front_desk' ('manual' used to fail silently).
                   permission_level: auditPermissionLevel(session.role),

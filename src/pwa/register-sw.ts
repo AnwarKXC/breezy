@@ -24,6 +24,14 @@ export function useRegisterSW(options: RegisterSWOptions = {}) {
       return
     }
 
+    // A caching worker in development serves stale bundles and assets after edits.
+    if (process.env.NODE_ENV !== 'production') {
+      void navigator.serviceWorker.getRegistrations().then((registrations) => {
+        for (const registration of registrations) void registration.unregister()
+      })
+      return
+    }
+
     async function register() {
       try {
         const swUrl = '/sw.js'

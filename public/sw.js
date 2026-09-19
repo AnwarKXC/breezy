@@ -1,7 +1,8 @@
-// src/pwa/service-worker.js - Service Worker with caching strategies
+// public/sw.js - Service Worker with caching strategies (registered in production only)
 
-const STATIC_CACHE = 'hotel-ms-static-v1'
-const DYNAMIC_CACHE = 'hotel-ms-dynamic-v1'
+// Bump the version to drop every previously cached response on activate.
+const STATIC_CACHE = 'hotel-ms-static-v2'
+const DYNAMIC_CACHE = 'hotel-ms-dynamic-v2'
 
 const PRECACHE_URLS = [
   '/',
@@ -98,7 +99,9 @@ async function networkFirstWithOffline(request) {
 async function cacheFirstStrategy(request) {
   const cachedResponse = await caches.match(request)
   if (cachedResponse) {
-    void fetchAndCache(request)
+    // Background refresh: a failure (offline, server restart) must not surface
+    // as an unhandled rejection; the cached response was already served.
+    fetchAndCache(request).catch(() => {})
     return cachedResponse
   }
   return fetchAndCache(request)
@@ -109,7 +112,9 @@ async function staleWhileRevalidate(request) {
   const cachedResponse = await cache.match(request)
 
   if (cachedResponse) {
-    void fetchAndCache(request)
+    // Background refresh: a failure (offline, server restart) must not surface
+    // as an unhandled rejection; the cached response was already served.
+    fetchAndCache(request).catch(() => {})
     return cachedResponse
   }
 

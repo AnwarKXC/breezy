@@ -21,7 +21,6 @@ interface QuickAction {
 }
 
 interface QuickActionsMenuProps {
-  isRTL: boolean;
   localePrefix: string;
   t: (key: string) => string;
 }
@@ -31,7 +30,7 @@ function isTypingTarget(target: EventTarget | null) {
   return target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName);
 }
 
-export function QuickActionsMenu({ isRTL, localePrefix, t }: QuickActionsMenuProps) {
+export function QuickActionsMenu({ localePrefix, t }: QuickActionsMenuProps) {
   const router = useRouter();
   const { role } = useAuth();
   const hydrated = useIsHydrated();
@@ -141,7 +140,7 @@ export function QuickActionsMenu({ isRTL, localePrefix, t }: QuickActionsMenuPro
         aria-haspopup="menu"
         aria-label={t("layout.quickActions.title")}
         data-tooltip={`${t("layout.quickActions.title")} (Ctrl+K)`}
-        className="flex h-10 items-center gap-2 rounded-xl bg-[#1A1A1A] px-3 text-sm font-semibold text-white transition-colors hover:bg-[#333333] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1A1A1A]"
+        className="flex h-9 items-center gap-2 rounded-lg border border-line bg-white px-3 text-sm font-medium text-ink transition-colors hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
         onClick={() => setOpen((value) => !value)}
         type="button"
       >
@@ -156,7 +155,7 @@ export function QuickActionsMenu({ isRTL, localePrefix, t }: QuickActionsMenuPro
           role="menu"
           aria-label={t("layout.quickActions.title")}
           onKeyDown={onMenuKeyDown}
-          className={`absolute top-12 z-40 w-72 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-[#EAEAEA] bg-white p-1.5 text-sm shadow-lg animate-fade-in-fast ${isRTL ? "left-0" : "right-0"}`}
+          className={`absolute top-12 z-40 w-72 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-[#EAEAEA] bg-white p-1.5 text-sm shadow-lg animate-fade-in-fast end-0`}
         >
           <p className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-[#787774]">
             {t("layout.quickActions.title")}

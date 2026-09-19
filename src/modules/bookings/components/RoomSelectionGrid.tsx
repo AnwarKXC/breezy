@@ -154,7 +154,7 @@ export function RoomSelectionGrid({
  const hasOverduePending = overduePendingRooms.has(room.id)
  const dirtySince = dirtyRoomsMap.get(room.id) ?? null
  const tooltipText = hasOverduePending
- ? 'This room has pending bookings'
+ ? 'This room has pending reservations'
  : dirtySince
  ? 'This room is being cleaned'
  : `${room.number} — ${label} — ${derived.displayPricePerNight}`

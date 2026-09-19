@@ -88,7 +88,7 @@ export function MonthCalendarCard({
               key={iso}
               type="button"
               data-day={iso}
-              aria-label={`${cell.dayNumber} ${monthName} — ${bookings.length} bookings`}
+              aria-label={`${cell.dayNumber} ${monthName} — ${bookings.length} reservations`}
               onMouseEnter={(e) => onDayEnter(iso!, e.currentTarget.getBoundingClientRect())}
               onFocus={(e) => onDayEnter(iso!, e.currentTarget.getBoundingClientRect())}
               onMouseLeave={onDayLeave}

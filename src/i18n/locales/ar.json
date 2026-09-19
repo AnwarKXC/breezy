@@ -133,6 +133,10 @@
       "activityLog": "سجل النشاط",
       "activityLogHint": "من غيّر ماذا ومتى",
       "footer": "نصيحة: اضغط Ctrl+K في أي مكان لفتح هذه القائمة."
+    },
+    "breadcrumb": {
+      "label": "مسار التنقل",
+      "details": "التفاصيل"
     }
   },
   "dashboard": {
@@ -910,7 +914,7 @@
       "viewSheet": "جدول"
     },
     "title": "الحجوزات",
-    "subtitle": "إدارة الحجوزات والإلغاءات ونشاط الحجز",
+    "subtitle": "إدارة الحجوزات والإلغاءات وحالة الغرف",
     "roomStatusTitle": "حالة الغرف",
     "bookingList": "قائمة الحجوزات",
     "thisWeek": "هذا الأسبوع",
@@ -1545,34 +1549,83 @@
     "invalidSession": "سجل الدخول مرة أخرى لمراجعة سجلات التدقيق.",
     "genericError": "حدث خطأ ما. حاول مرة أخرى.",
     "actions": {
-      "CREATE": "إنشاء",
-      "UPDATE": "تحديث",
-      "DELETE": "حذف",
-      "LOGIN": "تسجيل دخول",
-      "LOGOUT": "تسجيل خروج",
+      "accounting_created": "إنشاء سجل محاسبي",
+      "accounting_updated": "تحديث سجل محاسبي",
+      "accounting_deleted": "حذف سجل محاسبي",
+      "contact_created": "إنشاء جهة اتصال",
+      "contact_updated": "تحديث جهة اتصال",
+      "contact_deleted": "حذف جهة اتصال",
+      "login": "تسجيل الدخول",
+      "logout": "تسجيل الخروج",
+      "reservation_created": "إنشاء حجز",
+      "reservation_updated": "تحديث حجز",
+      "reservation_deleted": "حذف حجز",
+      "reservation_held": "حجز مبدئي",
+      "reservation_confirmed": "تأكيد حجز",
+      "reservation_cancelled": "إلغاء حجز",
+      "reservation_checked_in": "تسجيل وصول",
+      "reservation_checked_out": "تسجيل مغادرة",
+      "reservation_no_show": "تسجيل عدم حضور",
+      "reservation_extended": "تمديد الإقامة",
+      "reservation_room_changed": "تغيير الغرفة",
+      "reservation_price_override": "تعديل السعر يدويًا",
+      "reservation_note_added": "إضافة ملاحظة",
+      "reservation_payment_recorded": "تسجيل دفعة",
+      "reservation_refund_recorded": "تسجيل استرداد",
       "user_created": "إنشاء مستخدم",
       "user_updated": "تحديث مستخدم",
-      "user_deleted": "حذف مستخدم"
+      "user_deleted": "حذف مستخدم",
+      "user_viewed": "عرض مستخدم"
     },
     "modules": {
-      "users": "المستخدمون",
+      "accounting": "المحاسبة",
+      "auth": "تسجيل الدخول",
       "contacts": "جهات الاتصال",
       "reservations": "الحجوزات",
-      "accounting": "المحاسبة",
-      "auth": "المصادقة"
-    },
-    "descriptions": {
-      "logs.users.created": "User created",
-      "logs.users.updated": "User updated",
-      "logs.users.deleted": "User deleted",
-      "logs.auth.login": "User signed in",
-      "logs.auth.logout": "User signed out"
+      "users": "المستخدمون"
     },
     "analytics": {
       "totalToday": "إجمالي إجراءات اليوم",
       "mostActiveUser": "أكثر مستخدم نشاطا",
       "mostUsedModule": "أكثر قسم استخداما",
       "none": "لا يوجد"
+    },
+    "auth": {
+      "login": "سجّل المستخدم الدخول",
+      "logout": "سجّل المستخدم الخروج"
+    },
+    "users": {
+      "created": "تم إنشاء مستخدم",
+      "updated": "تم تحديث مستخدم",
+      "deleted": "تم حذف مستخدم",
+      "viewed": "تم عرض مستخدم"
+    },
+    "contacts": {
+      "created": "تم إنشاء جهة اتصال",
+      "updated": "تم تحديث جهة اتصال",
+      "deleted": "تم حذف جهة اتصال"
+    },
+    "accounting": {
+      "paymentCreated": "تم تسجيل دفعة",
+      "paymentUpdated": "تم تحديث دفعة",
+      "paymentDeleted": "تم حذف دفعة",
+      "paymentRefunded": "تم استرداد دفعة",
+      "expenseCreated": "تم إنشاء مصروف",
+      "expenseUpdated": "تم تحديث مصروف",
+      "expenseDeleted": "تم حذف مصروف",
+      "expenseApproved": "تمت الموافقة على مصروف",
+      "expenseCategoryCreated": "تم إنشاء فئة مصروفات",
+      "expenseCategoryUpdated": "تم تحديث فئة مصروفات",
+      "invoiceCreated": "تم إنشاء فاتورة",
+      "invoiceUpdated": "تم تحديث فاتورة",
+      "invoiceIssued": "تم إصدار فاتورة",
+      "invoiceVoided": "تم إلغاء فاتورة",
+      "invoiceRefunded": "تم استرداد فاتورة",
+      "invoiceDeleted": "تم حذف فاتورة",
+      "ledgerEntryCreated": "تم إنشاء قيد في دفتر الأستاذ",
+      "ledgerReversalCreated": "تم عكس قيد في دفتر الأستاذ",
+      "settingUpdated": "تم تحديث إعداد",
+      "reportExported": "تم تصدير تقرير"
     }
   },
   "auth": {

@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import Link from 'next/link'
 import { useTranslation } from '@/i18n/hooks/useTranslation'
 import { DayDetailPopover, type DayPopoverLabels } from './DayDetailPopover'
 import { MonthCalendarCard } from './MonthCalendarCard'
@@ -169,7 +168,7 @@ export function YearOverviewPage() {
 
   return (
     <main className="w-full" data-year-view-root>
-      <div className="py-6 sm:px-6 lg:px-8">
+      <div>
         <header className="no-print mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <div className="flex items-center gap-3">
@@ -195,9 +194,6 @@ export function YearOverviewPage() {
               </div>
             </div>
             <p className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-medium text-[#787774]">
-              <Link href={`/${locale}/reservations`} className="underline-offset-2 hover:underline">
-                {t('common.back')}
-              </Link>
               {legend.map((item) => (
                 <span key={item.color} className="inline-flex items-center gap-1.5">
                   <span className={`inline-block h-3 w-3 rounded-sm ${item.color}`} />

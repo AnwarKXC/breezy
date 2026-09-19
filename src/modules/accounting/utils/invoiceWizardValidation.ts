@@ -58,7 +58,7 @@ export function validateStep(state: WizardState, step: number): ValidationResult
 
   if (step === 0) {
     if ((state.mode === 'from-booking' || state.mode === 'checkout') && !state.selectedBooking) {
-      errors.booking = 'Please select a booking'
+      errors.booking = 'Please select a reservation'
     }
     if (state.mode === 'manual' && !state.guestName.trim() && !state.companyName.trim() && !state.contactId) {
       errors.guestName = 'Guest or company is required'
@@ -100,7 +100,7 @@ export function validateSubmitPayload(state: WizardState): ValidationResult {
   const warnings: string[] = []
 
   if ((state.mode === 'from-booking' || state.mode === 'checkout') && !state.selectedBooking) {
-    errors.booking = 'Please select a booking'
+    errors.booking = 'Please select a reservation'
   }
 
   if (state.mode === 'manual' && !state.guestName.trim() && !state.companyName.trim() && !state.contactId) {
