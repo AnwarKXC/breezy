@@ -162,6 +162,7 @@ export function RoomGuestCard({ room, reservationId, guests, onGuestChange, room
             <button
               type="button"
               onClick={() => onEditPrice(room)}
+              data-tooltip={t('reservations.hints.editPrice')}
               className="rounded-lg border border-[#EAEAEA] bg-white px-3 py-1.5 text-xs font-medium text-[#333333] transition-colors hover:bg-[#F9F9F8]"
             >
               {t('reservations.editPriceLabel')}
@@ -171,6 +172,7 @@ export function RoomGuestCard({ room, reservationId, guests, onGuestChange, room
             <button
               type="button"
               onClick={() => onExtraCharge(room)}
+              data-tooltip={t('reservations.hints.extraCharge')}
               className="rounded-lg border border-[#EAEAEA] bg-white px-3 py-1.5 text-xs font-medium text-[#333333] transition-colors hover:bg-[#F9F9F8]"
             >
               {t('reservations.extraChargeLabel')}
@@ -180,6 +182,7 @@ export function RoomGuestCard({ room, reservationId, guests, onGuestChange, room
             <button
               type="button"
               onClick={() => onChangeRoom(room)}
+              data-tooltip={t('reservations.hints.changeRoom')}
               className="rounded-lg border border-[#EAEAEA] bg-white px-3 py-1.5 text-xs font-medium text-[#333333] transition-colors hover:bg-[#F9F9F8]"
             >
               {t('reservations.changeRoomLabel')}
@@ -189,6 +192,7 @@ export function RoomGuestCard({ room, reservationId, guests, onGuestChange, room
             <button
               type="button"
               onClick={() => onShorten(room)}
+              data-tooltip={t('reservations.hints.shorten')}
               className="rounded-lg border border-[#EAEAEA] bg-white px-3 py-1.5 text-xs font-medium text-[#333333] transition-colors hover:bg-[#F9F9F8]"
             >
               {t('reservations.shortenLabel')}
@@ -198,6 +202,7 @@ export function RoomGuestCard({ room, reservationId, guests, onGuestChange, room
             <button
               type="button"
               onClick={() => onExtend(room)}
+              data-tooltip={t('reservations.hints.extend')}
               className="rounded-lg border border-[#EAEAEA] bg-white px-3 py-1.5 text-xs font-medium text-[#333333] transition-colors hover:bg-[#F9F9F8]"
             >
               {t('reservations.extendLabel')}

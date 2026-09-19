@@ -6,6 +6,7 @@ import { ACTIONS } from '@/config/rbac'
 import { secureReadEndpoint } from '@/shared/secureEndpoint'
 import { prisma } from '@/services/db/prisma'
 import { dbDate, serializeRow, todayDate } from '@/services/db/rows'
+import { getEffectiveRate } from '@/modules/reservations/services/pricingService'
 
 const INACTIVE_ROOM_STATUSES: reservation_room_status[] = ['cancelled', 'released']
 
@@ -112,6 +113,11 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       }
     })
 
+    // Tonight's rate from the shared rate hierarchy (rooms have no price column).
+    const tonight = new Date().toISOString().slice(0, 10)
+    const tomorrow = new Date(Date.now() + 86_400_000).toISOString().slice(0, 10)
+    const { rate: nightlyRate } = await getEffectiveRate(room.id, tonight, tomorrow)
+
     return NextResponse.json({
       ok: true,
       data: {
@@ -121,7 +127,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
           floor: room.floor,
           status: room.status,
           capacity: room.capacity,
-          price: Number(room.price),
+          price: nightlyRate,
           amenities: room.amenities,
           roomType: room.room_types,
         },

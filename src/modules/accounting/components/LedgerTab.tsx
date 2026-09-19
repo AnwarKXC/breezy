@@ -126,7 +126,7 @@ export function LedgerTab({ t }: Props) {
       label: t('common.createdAt'),
       render: (v) => v ? formatDateTime(v as string, locale) : '',
     },
-  ], [t, formatCurrency, locale])
+  ], [t, printingId, handlePrintPdf, formatCurrency, locale])
 
   return (
     <div className="space-y-6">
@@ -142,14 +142,14 @@ export function LedgerTab({ t }: Props) {
           ))}
         </select>
         <FloatingInput
-          type="date"
+          type="date" max={toDate || undefined}
           label={t('accounting.finance.fromDate')}
           value={fromDate}
           onChange={(e) => setFromDate(e.target.value)}
           wrapperClassName="sm:max-w-40"
         />
         <FloatingInput
-          type="date"
+          type="date" min={fromDate || undefined}
           label={t('accounting.finance.toDate')}
           value={toDate}
           onChange={(e) => setToDate(e.target.value)}

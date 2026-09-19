@@ -1,11 +1,9 @@
-﻿'use client'
+'use client'
 
 import { useCurrency } from '@/shared/contexts/CurrencyContext'
 import { useTranslation } from '@/i18n/hooks/useTranslation'
-import type { CurrencyCode } from '@/shared/utils/types'
 import { CURRENCY_LABELS } from '@/shared/utils/types'
-
-const CURRENCIES: CurrencyCode[] = ['USD', 'EGP', 'EUR']
+import { CURRENCY_CODES } from '@/shared/static/currencies'
 
 export function CurrencyTab() {
   const { currencyCode, setCurrency, loading } = useCurrency()
@@ -23,7 +21,7 @@ export function CurrencyTab() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {CURRENCIES.map((code) => {
+        {CURRENCY_CODES.map((code) => {
           const active = currencyCode === code
           return (
             <button

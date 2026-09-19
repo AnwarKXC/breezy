@@ -2,9 +2,10 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { usePayments } from '../hooks'
-import { PAYMENT_TYPE_LABELS, type PaymentType } from '../types'
+import { PAYMENT_METHOD_LABELS, type PaymentMethod } from '../types'
 import { useCurrency } from '@/shared/contexts/CurrencyContext'
 import type { CurrencyCode } from '@/shared/utils/types'
+import { useEscapeKey } from '@/shared/hooks/useEscapeKey'
 
 interface InvoicePaymentsModalProps {
   invoiceId: string
@@ -22,11 +23,12 @@ export function InvoicePaymentsModal({ invoiceId, invoiceAmount, currency, conta
   const fmt = (n: number) => formatCurrency(n, from)
   const { payments, load, create, remove } = usePayments(invoiceId)
   const [amount, setAmount] = useState('')
-  const [type, setType] = useState<PaymentType>('cash')
+  const [type, setType] = useState<PaymentMethod>('cash')
   const [description, setDescription] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => { load() }, [load])
+  useEscapeKey(onClose, !submitting)
 
   const totalPaid = payments.reduce((sum, p) => sum + Number(p.amount), 0)
   const balance = invoiceAmount - totalPaid
@@ -52,7 +54,7 @@ export function InvoicePaymentsModal({ invoiceId, invoiceAmount, currency, conta
     if (!Number.isFinite(nextAmount) || nextAmount <= 0 || nextAmount > payableBalance) return
     setSubmitting(true)
     try {
-      await create({ invoice_id: invoiceId, amount: nextAmount, type, description: description || null })
+      await create({ invoice_id: invoiceId, amount: nextAmount, method: type, description: description || null })
       setAmount('')
       setDescription('')
       onPaymentChanged?.()
@@ -65,7 +67,7 @@ export function InvoicePaymentsModal({ invoiceId, invoiceAmount, currency, conta
     if (submitting) return
     setSubmitting(true)
     try {
-      await create({ invoice_id: invoiceId, amount: -balance, type: 'cash', description: 'Refund' })
+      await create({ invoice_id: invoiceId, amount: -balance, method: 'cash', description: 'Refund' })
       onPaymentChanged?.()
       onClose()
     } catch { /* handled */ }
@@ -74,7 +76,7 @@ export function InvoicePaymentsModal({ invoiceId, invoiceAmount, currency, conta
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50" onClick={onClose}>
-      <div className="bg-white rounded-xl p-6 w-full max-w-lg mx-4 " onClick={e => e.stopPropagation()}>
+      <div role="dialog" aria-modal="true" className="mx-4 max-h-[calc(100dvh-2rem)] w-full max-w-lg overflow-y-auto rounded-xl bg-white p-4 shadow-xl sm:p-6" onClick={e => e.stopPropagation()}>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold">
             {t('accounting.payments.title')} — {contactName}
@@ -106,7 +108,7 @@ export function InvoicePaymentsModal({ invoiceId, invoiceAmount, currency, conta
             <div>
               <label className="block text-sm font-medium text-[#333333] mb-1">{t('accounting.payments.amount')}</label>
               <input
-                type="number"
+                type="number" inputMode="decimal" onWheel={(event) => event.currentTarget.blur()}
                 step="0.01"
                 min="0.01"
                 max={payableBalance}
@@ -122,10 +124,10 @@ export function InvoicePaymentsModal({ invoiceId, invoiceAmount, currency, conta
               <select
                 className="w-full rounded-lg border border-[#D4D4D4] px-3 py-2 text-sm"
                 value={type}
-                onChange={e => setType(e.target.value as PaymentType)}
+                onChange={e => setType(e.target.value as PaymentMethod)}
               >
-                {(Object.keys(PAYMENT_TYPE_LABELS) as PaymentType[]).map(key => (
-                  <option key={key} value={key}>{PAYMENT_TYPE_LABELS[key]}</option>
+                {(Object.keys(PAYMENT_METHOD_LABELS) as PaymentMethod[]).map(key => (
+                  <option key={key} value={key}>{PAYMENT_METHOD_LABELS[key]}</option>
                 ))}
               </select>
             </div>
@@ -154,7 +156,7 @@ export function InvoicePaymentsModal({ invoiceId, invoiceAmount, currency, conta
           {payments.map(p => (
             <div key={p.id} className="flex justify-between items-center p-3 bg-[#F9F9F8] rounded-lg text-sm">
               <div>
-                <span className="font-medium">{PAYMENT_TYPE_LABELS[p.type]}</span>
+                <span className="font-medium">{PAYMENT_METHOD_LABELS[p.method]}</span>
                 {p.description && <span className="text-[#787774] ml-2">{p.description}</span>}
               </div>
               <div className="flex items-center gap-2">

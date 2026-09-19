@@ -2,16 +2,18 @@
 
 import { useState } from 'react'
 import { z } from 'zod'
+import { useLocale } from '@/i18n/components/LocaleContext'
+import { countryOptions, isCountryCode } from '@/shared/static/countries'
 
 const VALID_DOC_TYPES = ['passport', 'id_card', 'drivers_license'] as const
 
 const guestSchema = z.object({
-  full_name: z.string().trim().min(2, 'Name must be at least 2 characters').regex(/^[a-zA-Z\s'-]+$/, 'Name contains invalid characters'),
+  full_name: z.string().trim().min(2, 'Name must be at least 2 characters').regex(/^[\p{L}\p{M}\s'.-]+$/u, 'Name contains invalid characters'),
   email: z.string().email('Invalid email').or(z.literal('')).optional(),
   phone: z.string().optional(),
   document_type: z.string().min(1, 'Document type is required'),
   document_number: z.string().min(1, 'Document number is required'),
-  nationality: z.string().optional(),
+  nationality: z.string().refine((value): boolean => value === '' || isCountryCode(value), 'Select a valid nationality').optional(),
   role: z.enum(['primary_guest', 'additional_guest', 'company_guest', 'child']),
 }).superRefine((data, ctx) => {
   if (!VALID_DOC_TYPES.includes(data.document_type as typeof VALID_DOC_TYPES[number])) {
@@ -33,6 +35,7 @@ interface Props {
 }
 
 export function GuestForm({ initial, onSubmit, onCancel, loading }: Props) {
+  const locale = useLocale()
   const [form, setForm] = useState<GuestFormData>({
     full_name: initial?.full_name ?? '',
     email: initial?.email ?? '',
@@ -86,6 +89,11 @@ export function GuestForm({ initial, onSubmit, onCancel, loading }: Props) {
         <div>
           <label className="block text-xs font-medium uppercase tracking-wide text-[#787774]">Email</label>
           <input
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            dir="ltr"
+            spellCheck={false}
             value={form.email}
             onChange={(e) => set('email', e.target.value)}
             className={`mt-1 w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-[#1A1A1A] outline-none transition-colors focus:border-gray-400 ${errors.email ? 'border-rose-300' : 'border-[#EAEAEA]'}`}
@@ -95,6 +103,10 @@ export function GuestForm({ initial, onSubmit, onCancel, loading }: Props) {
         <div>
           <label className="block text-xs font-medium uppercase tracking-wide text-[#787774]">Phone</label>
           <input
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
+            dir="ltr"
             value={form.phone}
             onChange={(e) => set('phone', e.target.value)}
             className="mt-1 w-full rounded-lg border border-[#EAEAEA] bg-white px-3 py-2.5 text-sm text-[#1A1A1A] outline-none transition-colors focus:border-gray-400"
@@ -110,13 +122,16 @@ export function GuestForm({ initial, onSubmit, onCancel, loading }: Props) {
             <option value="" disabled>Select document type</option>
             <option value="passport">Passport</option>
             <option value="id_card">ID Card</option>
-            <option value="drivers_license">Driver's License</option>
+            <option value="drivers_license">Driver&apos;s License</option>
           </select>
           {errors.document_type && <p className="mt-1 text-xs text-rose-500">{errors.document_type}</p>}
         </div>
         <div>
           <label className="block text-xs font-medium uppercase tracking-wide text-[#787774]">Document number</label>
           <input
+            dir="ltr"
+            autoCapitalize="characters"
+            spellCheck={false}
             value={form.document_number}
             onChange={(e) => set('document_number', e.target.value)}
             className={`mt-1 w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-[#1A1A1A] outline-none transition-colors focus:border-gray-400 ${errors.document_number || errors.document_type ? 'border-rose-300' : 'border-[#EAEAEA]'}`}
@@ -125,11 +140,16 @@ export function GuestForm({ initial, onSubmit, onCancel, loading }: Props) {
         </div>
         <div>
           <label className="block text-xs font-medium uppercase tracking-wide text-[#787774]">Nationality</label>
-          <input
-            value={form.nationality}
+          <select
+            value={form.nationality ?? ''}
             onChange={(e) => set('nationality', e.target.value)}
             className="mt-1 w-full rounded-lg border border-[#EAEAEA] bg-white px-3 py-2.5 text-sm text-[#1A1A1A] outline-none transition-colors focus:border-gray-400"
-          />
+          >
+            <option value="">—</option>
+            {countryOptions(locale).map((option) => (
+              <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
+          </select>
         </div>
         <div>
           <label className="block text-xs font-medium uppercase tracking-wide text-[#787774]">Role</label>

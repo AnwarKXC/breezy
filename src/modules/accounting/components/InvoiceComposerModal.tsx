@@ -101,7 +101,7 @@ export function InvoiceComposerModal({
     setActiveMode('manual')
   }, [])
 
-  const handleSubmit = useCallback(async (issueNow: boolean) => {
+  const handleSubmit = async (issueNow: boolean) => {
     setError(null)
     const validation = actions.validateForSubmit()
     if (!validation.valid || hasErrorSeverity) {
@@ -149,7 +149,7 @@ export function InvoiceComposerModal({
     } finally {
       actions.setSaving(false)
     }
-  }, [actions, api, editableInvoice, hasErrorSeverity, isEdit, onClose, onSaved, state.payments, state.recordPayment])
+  }
 
   return (
     <Modal isOpen onClose={onClose} title={title} size="xl">

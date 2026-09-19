@@ -7,6 +7,9 @@
 // These helpers resolve the same system currency and FX rates the context uses,
 // so a PDF matches what the user saw when they clicked download.
 
+import { isCurrencyCode } from '@/shared/static/currencies'
+
+export { isCurrencyCode }
 import type { CurrencyCode } from '@/shared/utils/types'
 
 const STORAGE_KEY = 'hotel_currency'
@@ -28,10 +31,6 @@ let cached: { value: DisplayCurrency; ts: number } | null = null
  */
 export function invalidateDisplayCurrency() {
   cached = null
-}
-
-export function isCurrencyCode(value: unknown): value is CurrencyCode {
-  return value === 'USD' || value === 'EGP' || value === 'EUR'
 }
 
 function readStoredCurrency(): CurrencyCode | null {

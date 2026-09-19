@@ -23,6 +23,28 @@ export interface ValidatedSession {
   renewed: boolean;
 }
 
+// Every page navigation and API call validates the session (proxy, page, route
+// handler). A short in-process cache turns repeat lookups into zero DB round trips.
+// Revocations in this process are immediate (see invalidate*); other instances
+// converge within SESSION_CACHE_TTL_MS.
+const SESSION_CACHE_TTL_MS = 30_000;
+const SESSION_CACHE_MAX = 1000;
+const globalForSessions = globalThis as unknown as {
+  sessionCache?: Map<string, { session: ValidatedSession; cachedAt: number }>;
+};
+const sessionCache = (globalForSessions.sessionCache ??= new Map());
+
+function invalidateSessionId(id: string) {
+  sessionCache.delete(id);
+}
+
+/** Drops cached sessions of a user after a role change, deactivation or deletion. */
+export function invalidateUserSessionCache(userId: string) {
+  for (const [id, entry] of sessionCache) {
+    if (entry.session.user.id === userId) sessionCache.delete(id);
+  }
+}
+
 function hashToken(token: string) {
   return createHash("sha256").update(token).digest("hex");
 }
@@ -65,6 +87,15 @@ export async function validateSessionToken(token: string | undefined | null): Pr
   if (!token || token.length > 128) return null;
 
   const id = hashToken(token);
+  const cached = sessionCache.get(id);
+  if (cached) {
+    const now = Date.now();
+    if (now - cached.cachedAt < SESSION_CACHE_TTL_MS && cached.session.expiresAt.getTime() > now) {
+      return { ...cached.session, renewed: false };
+    }
+    sessionCache.delete(id);
+  }
+
   const session = await prisma.sessions.findUnique({
     where: { id },
     select: {
@@ -87,6 +118,7 @@ export async function validateSessionToken(token: string | undefined | null): Pr
   const now = Date.now();
 
   if (session.expires_at.getTime() <= now || !user.is_active || !profile || profile.deleted_at || !isUserRole(profile.role)) {
+    invalidateSessionId(id);
     await prisma.sessions.deleteMany({ where: { id } });
     return null;
   }
@@ -99,19 +131,25 @@ export async function validateSessionToken(token: string | undefined | null): Pr
     await prisma.sessions.update({ where: { id }, data: { expires_at: expiresAt, last_seen_at: new Date(now) } });
   }
 
-  return {
+  const result: ValidatedSession = {
     user: { id: user.id, email: user.email, name: profile.name, role: profile.role },
     expiresAt,
     renewed,
   };
+  if (sessionCache.size >= SESSION_CACHE_MAX) sessionCache.delete(sessionCache.keys().next().value!);
+  sessionCache.set(id, { session: result, cachedAt: now });
+  return result;
 }
 
 export async function deleteSession(token: string | undefined | null) {
   if (!token) return;
-  await prisma.sessions.deleteMany({ where: { id: hashToken(token) } });
+  const id = hashToken(token);
+  invalidateSessionId(id);
+  await prisma.sessions.deleteMany({ where: { id } });
 }
 
 export async function deleteUserSessions(userId: string) {
+  invalidateUserSessionCache(userId);
   await prisma.sessions.deleteMany({ where: { user_id: userId } });
 }
 

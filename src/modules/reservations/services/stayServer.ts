@@ -1,6 +1,7 @@
 import 'server-only'
 
-import type { reservation_room_status, reservation_status, room_status } from '@/generated/prisma/enums'
+import type { housekeeping_status, reservation_room_status, reservation_status } from '@/generated/prisma/enums'
+import type { room_status } from '@/generated/prisma/enums'
 import type { DbTransaction } from '@/services/db/prisma'
 
 /** Reservation-level status history row. */
@@ -24,7 +25,7 @@ export async function recordReservationStatus(
 export function assignedRooms(tx: DbTransaction, reservationId: string) {
   return tx.reservation_rooms.findMany({
     where: { reservation_id: reservationId, deleted_at: null },
-    select: { room_id: true, status: true },
+    select: { room_id: true, status: true, rooms: { select: { status: true } } },
   })
 }
 
@@ -38,25 +39,41 @@ export async function occupyRooms(tx: DbTransaction, reservationId: string, acto
     where: { reservation_id: reservationId, room_id: { in: roomIds }, deleted_at: null },
     data: { status: 'occupied' },
   })
-  for (const rr of rooms) {
-    if (!rr.room_id) continue
-    await tx.rooms.update({ where: { id: rr.room_id }, data: { status: 'occupied' } })
-    await tx.room_status_history.create({
-      data: {
+  await tx.rooms.updateMany({ where: { id: { in: roomIds } }, data: { occupancy_status: 'occupied' } })
+  await logRoomStatusChanges(tx, rooms, { reservationId, actorId, at })
+}
+
+/** Logs the derived rooms.status before/after a state change (skips unchanged rooms). */
+async function logRoomStatusChanges(
+  tx: DbTransaction,
+  before: Array<{ room_id: string | null; rooms: { status: room_status } | null }>,
+  input: { reservationId: string; actorId: string; at: Date; reason?: string },
+) {
+  const ids = before.map((rr) => rr.room_id).filter((id): id is string => Boolean(id))
+  if (ids.length === 0) return
+  const after = new Map(
+    (await tx.rooms.findMany({ where: { id: { in: ids } }, select: { id: true, status: true } })).map((r) => [r.id, r.status]),
+  )
+  await tx.room_status_history.createMany({
+    data: before.flatMap((rr) => {
+      const to = rr.room_id ? after.get(rr.room_id) : undefined
+      if (!rr.room_id || !to || to === rr.rooms?.status) return []
+      return [{
         room_id: rr.room_id,
-        from_status: rr.status ?? 'available',
-        to_status: 'occupied',
-        reservation_id: reservationId,
-        changed_by: actorId,
-        changed_at: at,
-      },
-    })
-  }
+        from_status: rr.rooms?.status ?? null,
+        to_status: to,
+        reservation_id: input.reservationId,
+        reason: input.reason ?? null,
+        changed_by: input.actorId,
+        changed_at: input.at,
+      }]
+    }),
+  })
 }
 
 /**
- * Sets every reservation_room of the reservation to `roomStatus` and frees the
- * physical rooms (rooms.status -> nextRoomStatus), logging room history.
+ * Sets every reservation_room of the reservation to `roomStatus` and vacates the
+ * physical rooms (optionally setting their housekeeping state), logging room history.
  */
 export async function releaseRooms(
   tx: DbTransaction,
@@ -65,13 +82,12 @@ export async function releaseRooms(
     actorId: string
     reason: string
     roomStatus: reservation_room_status
-    nextRoomStatus?: room_status
+    housekeeping?: housekeeping_status
     onlyIfOccupied?: boolean
     at?: Date
   },
 ) {
   const at = input.at ?? new Date()
-  const nextRoomStatus = input.nextRoomStatus ?? 'available'
   const rooms = await assignedRooms(tx, input.reservationId)
 
   await tx.reservation_rooms.updateMany({
@@ -79,24 +95,16 @@ export async function releaseRooms(
     data: { status: input.roomStatus },
   })
 
-  for (const rr of rooms) {
-    if (!rr.room_id) continue
-    const from = rr.status ?? 'held'
-    if (!input.onlyIfOccupied || from === 'occupied') {
-      await tx.rooms.update({ where: { id: rr.room_id }, data: { status: nextRoomStatus } })
-    }
-    await tx.room_status_history.create({
-      data: {
-        room_id: rr.room_id,
-        from_status: from,
-        to_status: nextRoomStatus,
-        reservation_id: input.reservationId,
-        reason: input.reason,
-        changed_by: input.actorId,
-        changed_at: at,
-      },
-    })
-  }
+  // onlyIfOccupied: only free rooms whose stay was checked in (reservation_rooms.status).
+  const released = rooms.filter(
+    (rr): rr is typeof rr & { room_id: string } =>
+      Boolean(rr.room_id) && (!input.onlyIfOccupied || rr.status === 'occupied'),
+  )
+  await tx.rooms.updateMany({
+    where: { id: { in: released.map((rr) => rr.room_id) } },
+    data: { occupancy_status: 'vacant', ...(input.housekeeping ? { housekeeping_status: input.housekeeping } : {}) },
+  })
+  await logRoomStatusChanges(tx, released, { reservationId: input.reservationId, actorId: input.actorId, at, reason: input.reason })
 }
 
 export function asReservationStatus(value: string): reservation_status {

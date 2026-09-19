@@ -1,3 +1,4 @@
+import { isCurrencyCode } from '@/shared/static/currencies'
 import { NextResponse } from 'next/server'
 import { ACTIONS } from '@/config/rbac'
 import { secureReadEndpoint } from '@/shared/secureEndpoint'
@@ -10,7 +11,7 @@ export async function GET(request: Request) {
     const requestedBase = (url.searchParams.get('base') ?? '').toUpperCase() as CurrencyCode
 
     let base: CurrencyCode = requestedBase
-    if (!['USD', 'EGP', 'EUR'].includes(base)) {
+    if (!isCurrencyCode(base)) {
       base = await getSystemCurrency()
     }
 

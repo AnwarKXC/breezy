@@ -8,7 +8,7 @@ import { prisma } from '@/services/db/prisma'
 import { dbDate, serializeRow, toRow, toRows } from '@/services/db/rows'
 import { isOverlapViolation } from '@/services/db/errors'
 import { getRoomAvailability } from '@/services/db/rpc'
-import { snapshotPricing, applyRoomPriceOverride } from '@/modules/reservations/services/pricingService'
+import { snapshotPricing, applyRoomPriceOverride, getEffectiveRate } from '@/modules/reservations/services/pricingService'
 import { ReservationUpdateSchema, zodErrorMessage } from '@/shared/validation'
 import { getSystemCurrency } from '@/shared/currency/server'
 
@@ -16,30 +16,31 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 
 async function syncInvoiceAfterPricing(reservationId: string) {
   const invoice = await prisma.invoices.findFirst({
-    where: { reservation_id: reservationId, deleted_at: null, status: { notIn: ['void', 'cancelled'] } },
+    where: { reservation_id: reservationId, deleted_at: null, status: { not: 'void' } },
     select: { id: true, status: true, paid_amount: true },
     orderBy: { created_at: 'asc' },
   })
   if (!invoice) return
 
-  const pricingItems = await prisma.reservation_pricing_items.findMany({
-    where: { reservation_id: reservationId },
-    select: { pricing_level: true, total_amount: true },
-  })
+  const [pricingItems, reservation, systemCurrency] = await Promise.all([
+    prisma.reservation_pricing_items.findMany({
+      where: { reservation_id: reservationId },
+      select: { pricing_level: true, total_amount: true },
+    }),
+    prisma.reservations.findUnique({
+      where: { id: reservationId },
+      select: { total_amount: true, check_in_date: true, check_out_date: true },
+    }),
+    getSystemCurrency(),
+  ])
   const sumLevel = (level: string) =>
     pricingItems.filter((i) => i.pricing_level === level).reduce((sum, i) => sum + Number(i.total_amount ?? 0), 0)
   const roomCharges = sumLevel('nightly_rate')
   const serviceCharge = sumLevel('service_charge')
   const taxAmount = sumLevel('tax')
 
-  const reservation = await prisma.reservations.findUnique({
-    where: { id: reservationId },
-    select: { total_amount: true, check_in_date: true, check_out_date: true },
-  })
-
   const totalAmount = Number(reservation?.total_amount ?? 0)
   const alreadyPaid = Number(invoice.paid_amount ?? 0)
-  const systemCurrency = await getSystemCurrency()
 
   const items = pricingItems.map((item, idx) => ({
     type: item.pricing_level === 'nightly_rate' ? 'room_charge'
@@ -102,13 +103,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       return NextResponse.json({ ok: false, error: { code: 'VALIDATION_ERROR', message: 'Invalid reservation id' } }, { status: 400 })
     }
 
-    const reservationRow = await prisma.reservations.findFirst({ where: { id, deleted_at: null } })
-    if (!reservationRow) {
-      return NextResponse.json({ ok: false, error: { code: 'NOT_FOUND', message: 'Reservation not found' } }, { status: 404 })
-    }
-    const reservation = toRow('reservations', reservationRow)
-
-    const [roomRows, guestRows, companyInfoRow, pricingRows, noteRows, historyRows] = await Promise.all([
+    // One parallel round trip; child rows of a missing reservation are just discarded.
+    const [reservationRow, roomRows, guestRows, companyInfoRow, pricingRows, noteRows, historyRows] = await Promise.all([
+      prisma.reservations.findFirst({ where: { id, deleted_at: null } }),
       prisma.reservation_rooms.findMany({
         where: { reservation_id: id, deleted_at: null },
         include: { rooms: { select: { number: true, capacity: true } }, room_types: { select: { name: true } } },
@@ -119,6 +116,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       prisma.reservation_notes.findMany({ where: { reservation_id: id } }),
       prisma.reservation_status_history.findMany({ where: { reservation_id: id }, orderBy: { changed_at: 'asc' } }),
     ])
+    if (!reservationRow) {
+      return NextResponse.json({ ok: false, error: { code: 'NOT_FOUND', message: 'Reservation not found' } }, { status: 404 })
+    }
+    const reservation = toRow('reservations', reservationRow)
     const rooms = roomRows.map((row) => {
       const { rooms: room, room_types: roomType, ...rest } = serializeRow('reservation_rooms', row)
       const roomInfo = room as { number: string; capacity: number } | null
@@ -237,7 +238,17 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
         }
       }
 
-      const primaryGuest = await prisma.reservation_guests.findFirst({ where: { reservation_id: id } })
+      // One lookup for every touched room instead of one query per room. Editing
+      // a reservation never changes rooms.status, so history records the
+      // unchanged status (as create_reservation_with_rooms does).
+      const [primaryGuest, touchedRooms] = await Promise.all([
+        prisma.reservation_guests.findFirst({ where: { reservation_id: id } }),
+        prisma.rooms.findMany({
+          where: { id: { in: [...toAdd, ...toRemove.map((rr) => rr.room_id)] } },
+          select: { id: true, number: true, room_type_id: true, capacity: true, status: true },
+        }),
+      ])
+      const roomsById = new Map(touchedRooms.map((room) => [room.id, room]))
 
       for (const rr of toRemove) {
         try {
@@ -247,8 +258,8 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
             prisma.room_status_history.create({
               data: {
                 room_id: rr.room_id,
-                from_status: 'reserved',
-                to_status: 'available',
+                from_status: roomsById.get(rr.room_id)?.status,
+                to_status: roomsById.get(rr.room_id)?.status ?? 'available',
                 reason: 'Room removed during reservation edit',
                 reservation_id: id,
                 changed_by: session.id,
@@ -263,14 +274,16 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       let addedCount = 0
 
       for (const roomId of toAdd) {
-        const roomData = await prisma.rooms.findUnique({ where: { id: roomId }, select: { number: true, room_type_id: true, price: true, capacity: true } })
+        const roomData = roomsById.get(roomId)
         if (!roomData) {
           addFailures.push(`${roomId}: room not found`)
           continue
         }
         const occ = roomOccupancies[roomId] ?? (roomData.capacity >= 3 ? 'T' : roomData.capacity === 2 ? 'D' : 'S')
         const override = roomOverrides[roomId]
-        const rate = override != null ? override : Number(roomData.price)
+        const rate = override != null
+          ? override
+          : (await getEffectiveRate(roomId, checkIn, checkOut, existing.company_id, occ as occupancy_code)).rate
 
         try {
           await prisma.$transaction(async (tx) => {
@@ -308,8 +321,8 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
             await tx.room_status_history.create({
               data: {
                 room_id: roomId,
-                from_status: 'available',
-                to_status: 'reserved',
+                from_status: roomData.status,
+                to_status: roomData.status,
                 reason: 'Room added during reservation edit',
                 reservation_id: id,
                 changed_by: session.id,

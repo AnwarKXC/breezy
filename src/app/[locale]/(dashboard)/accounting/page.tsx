@@ -1,14 +1,9 @@
-﻿import dynamic from "next/dynamic";
+import { AccountingPage as AccountingPageClient } from '@/modules/accounting/components/AccountingPage'
 import { AuthAccessError } from '@/services/auth/serverSession'
 import { checkLocale } from '@/i18n/config'
 import { requireAccountingRead } from '@/modules/accounting/services'
 import ar from '@/i18n/locales/ar.json'
 import en from '@/i18n/locales/en.json'
-
-const AccountingPageClient = dynamic(
-  () => import("@/modules/accounting/components/AccountingPage").then((m) => ({ default: m.AccountingPage })),
-  { loading: () => <div className="space-y-6 animate-pulse"><div className="grid grid-cols-4 gap-4"><div className="h-24 bg-[#F5F5F5] rounded-xl" /><div className="h-24 bg-[#F5F5F5] rounded-xl" /><div className="h-24 bg-[#F5F5F5] rounded-xl" /><div className="h-24 bg-[#F5F5F5] rounded-xl" /></div><div className="h-12 bg-[#F5F5F5] rounded-lg w-96" /><div className="h-96 bg-[#F5F5F5] rounded-xl" /></div> }
-);
 
 const translations: Record<string, Record<string, unknown>> = { ar, en }
 

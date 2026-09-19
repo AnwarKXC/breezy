@@ -1,7 +1,8 @@
-﻿'use client'
+'use client'
 
 import { useParams, useRouter } from 'next/navigation'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
+import { useResource } from '@/shared/data/useResource'
 import { SkeletonCard } from '@/shared/components/SkeletonCard'
 import { StatusBadge } from '@/shared/components/StatusBadge'
 import { Table } from '@/shared/table'
@@ -111,38 +112,27 @@ function PastelBadge({ status }: { status: RoomStatus }) {
   )
 }
 
+const EMPTY_HISTORY: StatusHistoryEntry[] = []
+
+async function fetchRoomDetail(id: string): Promise<RoomDetailData> {
+  const res = await fetch(`/api/rooms/${id}/history?limit=100&offset=0`)
+  const json = await res.json().catch(() => null)
+  if (json?.ok && json.data) return json.data as RoomDetailData
+  throw new Error(json?.error?.message ?? '')
+}
+
 export function RoomDetailPage() {
   const { t } = useTranslation()
   const { id, locale } = useParams<{ id: string; locale: string }>()
   const router = useRouter()
   const { formatCurrency } = useCurrency()
-  const [data, setData] = useState<RoomDetailData | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const roomDetail = useResource(`/api/rooms/${id}/history`, () => fetchRoomDetail(id))
+  const data = roomDetail.data ?? null
+  const history = data?.statusHistory ?? EMPTY_HISTORY
+  const loading = roomDetail.isLoading
+  const error = roomDetail.error ? roomDetail.error.message || t('rooms.detail.failedToLoad') : null
+  const fetchDetail = roomDetail.refresh
   const [changingStatus, setChangingStatus] = useState(false)
-  const [history, setHistory] = useState<StatusHistoryEntry[]>([])
-
-  const fetchDetail = useCallback(async () => {
-    setLoading(true)
-    try {
-      const res = await fetch(`/api/rooms/${id}/history?limit=100&offset=0`)
-      const json = await res.json()
-      if (json.ok && json.data) {
-        setData(json.data)
-        setHistory(json.data.statusHistory)
-        setError(null)
-      } else {
-        setError(json.error?.message ?? t('rooms.detail.failedToLoad'))
-      }
-    } catch {
-      setError(t('rooms.detail.failedToLoad'))
-    }
-    setLoading(false)
-  }, [id])
-
-  useEffect(() => {
-    fetchDetail()
-  }, [fetchDetail])
 
   const handleStatusChange = useCallback(async (nextStatus: RoomStatus) => {
     if (!data || changingStatus) return
@@ -207,7 +197,7 @@ export function RoomDetailPage() {
         )
       },
     },
-  ], [t])
+  ], [locale, router, t])
 
   const handleExportCsv = useCallback(() => {
     const headerRow = [t('rooms.detail.date'), t('rooms.detail.from'), t('rooms.detail.to'), t('rooms.detail.notes'), t('rooms.detail.guestName'), t('rooms.detail.reservation')].join(',')
@@ -222,7 +212,7 @@ export function RoomDetailPage() {
     link.download = `room-${data?.room.number}-history-${new Date().toISOString().slice(0, 10)}.csv`
     link.click()
     URL.revokeObjectURL(url)
-  }, [history, data])
+  }, [t, history, data?.room.number])
 
   const handleExportPdf = useCallback(() => {
     const headers = [t('rooms.detail.date'), t('rooms.detail.from'), t('rooms.detail.to'), t('rooms.detail.notes'), t('rooms.detail.guestName'), t('rooms.detail.reservation')]
@@ -242,7 +232,7 @@ export function RoomDetailPage() {
       locale: locale as 'ar' | 'en',
       fileName: `room-${roomNumber}-history-${new Date().toISOString().slice(0, 10)}.pdf`,
     })
-  }, [history, data, locale])
+  }, [t, history, data?.room.number, locale])
 
   if (loading) {
     return (
@@ -261,7 +251,7 @@ export function RoomDetailPage() {
     )
   }
 
-  if (error || !data) {
+  if (!data) {
     return (
       <div className="min-h-screen bg-[#F7F6F3] p-6">
         <div className="mx-auto max-w-lg rounded-xl border border-[#EAEAEA] bg-white p-8">

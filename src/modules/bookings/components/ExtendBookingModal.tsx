@@ -1,6 +1,6 @@
 ﻿'use client'
 
-import { useState, useEffect, type FormEvent } from 'react'
+import { useState, type FormEvent } from 'react'
 import { Modal } from '@/shared/components/Modal'
 import { checkExtensionConflict, getAlternativeRooms } from '@/services/checkExtensionConflict'
 import { useCurrency } from '@/shared/contexts/CurrencyContext'
@@ -20,7 +20,12 @@ function dayDiff(a: Date, b: Date): number {
   return Math.round((b.getTime() - a.getTime()) / 86400000)
 }
 
-export function ExtendBookingModal({ isOpen, onClose, booking, onExtend }: ExtendBookingModalProps) {
+// Content remounts on every open/close, so each opening starts from fresh state.
+export function ExtendBookingModal(props: ExtendBookingModalProps) {
+  return <ExtendBookingModalContent key={props.isOpen ? 'open' : 'closed'} {...props} />
+}
+
+function ExtendBookingModalContent({ isOpen, onClose, booking, onExtend }: ExtendBookingModalProps) {
   const { formatCurrency } = useCurrency()
   const [newCheckOut, setNewCheckOut] = useState('')
   const [checkState, setCheckState] = useState<CheckState>('idle')
@@ -28,17 +33,6 @@ export function ExtendBookingModal({ isOpen, onClose, booking, onExtend }: Exten
   const [alternativeRooms, setAlternativeRooms] = useState<AvailableRoom[]>([])
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
-
-  useEffect(() => {
-    if (!isOpen) {
-      setNewCheckOut('')
-      setCheckState('idle')
-      setConflictMessage('')
-      setAlternativeRooms([])
-      setSelectedRoomId(null)
-      setSaving(false)
-    }
-  }, [isOpen])
 
   if (!booking) return null
 

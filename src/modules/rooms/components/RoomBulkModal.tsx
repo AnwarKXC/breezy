@@ -38,14 +38,14 @@ export function RoomBulkModal({
   title={t('rooms.addRooms')}
   size="lg"> <form className="space-y-5 mt-[15px]" onSubmit={e => { e.preventDefault(); onCreate() }}> <FloatingInput
   label={t('rooms.totalRooms')}
-  type="number"
+  type="number" inputMode="numeric" step={1}
   min={1}
   value={bulkTotal}
   onChange={e => onBulkTotalChange(Number(e.target.value))}
   /> {roomTypes.items.length> 0 && (
   <div className="space-y-3">   <label className="block text-sm font-medium text-[#333333]">{t('rooms.roomTypeDistribution')}</label> <div className="space-y-2"> {roomTypes.items.map(rt => (
   <div key={rt.id} className="flex items-center justify-between gap-4"> <span className="text-sm text-[#1A1A1A] flex-1">{rt.name}</span> <input
-  type="number"
+  type="number" inputMode="numeric" step={1} onWheel={(event) => event.currentTarget.blur()}
   min={0}
   value={bulkDistribution[rt.id] ?? 0}
   onChange={e => onBulkDistChange(rt.id, Number(e.target.value))}

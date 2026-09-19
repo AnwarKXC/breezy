@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { useTranslation } from '@/i18n/hooks/useTranslation'
 import { toast } from '@/shared/toast/toastEvents'
+import { countryOptions } from '@/shared/static/countries'
+import { useEscapeKey } from '@/shared/hooks/useEscapeKey'
 
 interface ContactCreateData {
   type: 'individual' | 'company'
@@ -30,8 +32,9 @@ export function NewContactModal({ isOpen, onClose, onCreated }: NewContactModalP
   const [country, setCountry] = useState('')
   const [city, setCity] = useState('')
   const [responsiblePerson, setResponsiblePerson] = useState('')
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
   const [saving, setSaving] = useState(false)
+  useEscapeKey(onClose, isOpen && !saving)
 
   if (!isOpen) return null
 
@@ -94,10 +97,10 @@ export function NewContactModal({ isOpen, onClose, onCreated }: NewContactModalP
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20" onClick={onClose}>
-      <div className="mx-4 w-full max-w-lg rounded-xl border border-[#EAEAEA] bg-white p-6 " onClick={(e) => e.stopPropagation()}>
+      <div role="dialog" aria-modal="true" className="mx-4 max-h-[calc(100dvh-2rem)] w-full max-w-lg overflow-y-auto rounded-xl border border-[#EAEAEA] bg-white p-4 shadow-xl sm:p-6" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between">
           <h2 className="text-base font-semibold text-[#1A1A1A]">{t('reservations.newContactTitle')}</h2>
-          <button type="button" onClick={onClose} className="rounded-lg p-1 text-[#787774] hover:bg-[#F5F5F5] hover:text-[#555555]">
+          <button type="button" onClick={onClose} aria-label={t('common.close')} className="rounded-lg p-1 text-[#787774] hover:bg-[#F5F5F5] hover:text-[#555555]">
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -143,6 +146,8 @@ export function NewContactModal({ isOpen, onClose, onCreated }: NewContactModalP
               <label className="text-xs font-medium text-[#787774]">{t('reservations.phoneLabel')}</label>
               <input
                 type="tel"
+                autoComplete="tel"
+                dir="ltr"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder={t('reservations.placeholderPhoneNumber')}
@@ -153,6 +158,9 @@ export function NewContactModal({ isOpen, onClose, onCreated }: NewContactModalP
               <label className="text-xs font-medium text-[#787774]">{t('reservations.emailLabel')}</label>
               <input
                 type="email"
+                autoComplete="email"
+                dir="ltr"
+                spellCheck={false}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={t('reservations.placeholderEmailOptional')}
@@ -179,13 +187,16 @@ export function NewContactModal({ isOpen, onClose, onCreated }: NewContactModalP
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs font-medium text-[#787774]">{t('reservations.countryLabel')}</label>
-                  <input
-                    type="text"
+                  <select
                     value={country}
                     onChange={(e) => setCountry(e.target.value)}
-                    placeholder={t('reservations.placeholderCountry')}
                     className="mt-1 h-9 w-full rounded-lg border border-[#EAEAEA] bg-white px-3 text-sm text-[#1A1A1A] outline-none transition-colors focus:border-gray-400"
-                  />
+                  >
+                    <option value="">—</option>
+                    {countryOptions(locale).map((option) => (
+                      <option key={option.value} value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <label className="text-xs font-medium text-[#787774]">{t('reservations.cityLabel')}</label>

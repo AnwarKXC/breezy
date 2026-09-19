@@ -2,6 +2,7 @@ import { memo } from "react";
 
 import { LanguageSwitcher } from "@/i18n/components";
 import { ProfileMenu } from "./ProfileMenu";
+import { QuickActionsMenu } from "./QuickActionsMenu";
 
 interface TopbarActionsProps {
   isRTL: boolean;
@@ -16,6 +17,7 @@ export const TopbarActions = memo(function TopbarActions({
 }: TopbarActionsProps) {
   return (
     <>
+      <QuickActionsMenu isRTL={isRTL} localePrefix={localePrefix} t={t} />
       <LanguageSwitcher />
       <ProfileMenu isRTL={isRTL} localePrefix={localePrefix} t={t} />
     </>

@@ -103,7 +103,7 @@ export function useRoomManagement() {
 
   const [showPricingModal, setShowPricingModal] = useState(false)
   const [editingPricingId, setEditingPricingId] = useState<string | null>(null)
-  const [pricingForm, setPricingForm] = useState<PricingFormState>({ room_type_id: '', price: 0, currency: 'USD' as CurrencyCode, effective_from: '', effective_until: '' })
+  const [pricingForm, setPricingForm] = useState<PricingFormState>({ room_type_id: '', price: 0, currency: 'EGP' as CurrencyCode, effective_from: '', effective_until: '' })
   const [pricingError, setPricingError] = useState('')
 
   const [overViewMode, setOverViewMode] = useState<'row' | 'grid'>('row')
@@ -346,7 +346,7 @@ export function useRoomManagement() {
 
   const openCreatePricing = useCallback(() => {
     setEditingPricingId(null)
-    setPricingForm({ room_type_id: '', price: 0, currency: 'USD', effective_from: '', effective_until: '' })
+    setPricingForm({ room_type_id: '', price: 0, currency: 'EGP', effective_from: '', effective_until: '' })
     setShowPricingModal(true)
   }, [])
 
@@ -365,7 +365,7 @@ export function useRoomManagement() {
   const closePricingModal = useCallback(() => {
     setShowPricingModal(false)
     setEditingPricingId(null)
-    setPricingForm({ room_type_id: '', price: 0, currency: 'USD', effective_from: '', effective_until: '' })
+    setPricingForm({ room_type_id: '', price: 0, currency: 'EGP', effective_from: '', effective_until: '' })
     setPricingError('')
   }, [])
 

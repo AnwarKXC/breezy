@@ -1,6 +1,6 @@
 import type { Tables, TablesInsert, TablesUpdate, Enums } from '@/services/db/rowTypes'
 
-export type PaymentType = Enums<'payment_type'>
+export type PaymentMethod = Enums<'payment_method'>
 
 export type PaymentRow = Tables<'payments'>
 export type CreatePaymentInput = TablesInsert<'payments'>
@@ -37,7 +37,7 @@ export interface Payment {
   id: string
   invoiceId: string
   invoiceNumber: string | null
-  type: PaymentType
+  method: PaymentMethod
   amount: number
   description: string | null
   createdBy: string | null
@@ -319,7 +319,7 @@ export const INVOICE_STATUS_LABELS: Record<string, string> = {
   refunded: 'Refunded',
 }
 
-export const PAYMENT_TYPE_LABELS: Record<PaymentType, string> = {
+export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
   instapay: 'InstaPay',
   vodafone_cash: 'Vodafone Cash',
   cash: 'Cash',
@@ -380,7 +380,7 @@ export function mapPaymentRow(row: PaymentRow): Payment {
     id: row.id,
     invoiceId: row.invoice_id,
     invoiceNumber: joined.invoices?.invoice_number ?? null,
-    type: row.type,
+    method: row.method,
     amount: Number(row.amount),
     description: row.description,
     createdBy: row.created_by,
@@ -540,7 +540,7 @@ export interface WizardItem {
 
 export interface WizardPayment {
   amount: number
-  method: PaymentType
+  method: PaymentMethod
 }
 
 export interface WizardDiscount {

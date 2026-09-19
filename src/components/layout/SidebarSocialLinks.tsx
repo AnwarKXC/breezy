@@ -59,7 +59,6 @@ export function SidebarSocialLinks() {
             target="_blank"
             rel="noreferrer"
             aria-label={link.label}
-            title={link.label}
             className="grid h-8 w-8 place-items-center rounded-md border border-[#EAEAEA] text-[#787774] transition-colors hover:border-[#333333] hover:bg-[#333333] hover:text-white"
           >
             {link.icon}

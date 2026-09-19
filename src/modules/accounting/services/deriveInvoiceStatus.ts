@@ -2,6 +2,8 @@
 // Imported on both server (accountingService) and client (accountingSlice)
 // to keep the refund/paid status mapping consistent.
 
+import type { InvoiceStatus } from '@/modules/accounting/types'
+
 export interface DeriveInvoiceStatusInput {
   invoiceTotal: number
   grossPaid: number
@@ -9,7 +11,7 @@ export interface DeriveInvoiceStatusInput {
   currentStatus: string
 }
 
-export function deriveInvoiceStatus(input: DeriveInvoiceStatusInput): string {
+export function deriveInvoiceStatus(input: DeriveInvoiceStatusInput): InvoiceStatus {
   const grossPaid = Math.max(0, Number(input.grossPaid ?? 0))
   const totalRefunded = Math.max(0, Number(input.totalRefunded ?? 0))
   const total = Math.max(0, Number(input.invoiceTotal ?? 0))
@@ -17,7 +19,7 @@ export function deriveInvoiceStatus(input: DeriveInvoiceStatusInput): string {
   const balanceDue = Math.max(0, total - netPaid)
   const current = input.currentStatus ?? 'issued'
 
-  if (current === 'void' || current === 'cancelled') return current
+  if (current === 'void') return 'void'
 
   if (totalRefunded > 0 && grossPaid > 0 && totalRefunded >= grossPaid) return 'refunded'
   if (totalRefunded > 0 && totalRefunded < grossPaid) return 'partially_refunded'

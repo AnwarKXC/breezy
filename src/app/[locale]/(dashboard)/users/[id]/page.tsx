@@ -43,6 +43,14 @@ export default async function UserDetailsRoutePage({
   let user = null
   let errorMessage: string | null = null
 
+  // Fetched alongside the user instead of after it (only used when the user exists).
+  const reservationsPromise = prisma.reservations.findMany({
+    where: { created_by: id, deleted_at: null },
+    select: { id: true, created_by: true, reservation_number: true, check_in_date: true, check_out_date: true, status: true, total_amount: true },
+    orderBy: { created_at: 'desc' },
+  })
+  reservationsPromise.catch(() => undefined)
+
   try {
     user = await getUserById(id).catch(() => null)
 
@@ -77,11 +85,7 @@ export default async function UserDetailsRoutePage({
   let reservations: Reservation[] = []
 
   if (serializableUser) {
-    const dbReservations = await prisma.reservations.findMany({
-      where: { created_by: id, deleted_at: null },
-      select: { id: true, created_by: true, reservation_number: true, check_in_date: true, check_out_date: true, status: true, total_amount: true },
-      orderBy: { created_at: 'desc' },
-    })
+    const dbReservations = await reservationsPromise
 
     reservations = dbReservations.map((r) => ({
       id: r.id,

@@ -2,6 +2,7 @@ import 'server-only'
 
 import { prisma } from '@/services/db/prisma'
 import { hashPassword } from '@/services/auth/password'
+import { invalidateUserSessionCache } from '@/services/auth/sessionStore'
 import type { UpdateUserInput } from '../types'
 import { AuthServiceError } from './authErrors'
 
@@ -26,4 +27,5 @@ export async function syncAuthUser(id: string, data: Omit<UpdateUserInput, 'id'>
       await tx.sessions.deleteMany({ where: { user_id: id } })
     }
   })
+  invalidateUserSessionCache(id)
 }

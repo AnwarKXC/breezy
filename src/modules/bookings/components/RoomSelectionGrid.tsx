@@ -64,7 +64,7 @@ export function RoomSelectionGrid({
  return (
  <div className="rounded-xl border border-[#EAEAEA] p-5"> <div className="mb-4 flex flex-wrap items-end justify-between gap-3"> <div> <p className="text-xs font-bold uppercase tracking-wider text-[#787774]">Room distribution</p> <p className="mt-0.5 text-sm font-medium text-[#1A1A1A]">Choose by type</p> </div> <div className="w-32"> <FloatingInput
   label={t('reservations.new.totalRooms')}
- type="number"
+ type="number" inputMode="numeric" step={1}
  min={1}
  value={String(totalRooms)}
  onChange={(e) => onTotalRoomsChange(e.target.value)}
@@ -125,7 +125,7 @@ export function RoomSelectionGrid({
  return (
  <> <div className="grid grid-cols-2 gap-3"> <FloatingInput
   label={t('reservations.new.totalRooms')}
- type="number"
+ type="number" inputMode="numeric" step={1}
  min={1}
  value={String(roomCount)}
  onChange={(e) => onRoomCountChange(Math.max(1, parseInt(e.target.value) || 1))}

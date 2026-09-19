@@ -1,7 +1,8 @@
 import 'server-only'
 
 import type { Prisma } from '@/generated/prisma/client'
-import type { payment_type } from '@/generated/prisma/enums'
+import type { payment_method } from '@/generated/prisma/enums'
+import { lockInvoice as lockInvoiceSql } from '@/generated/prisma/sql'
 import { prisma, type DbTransaction } from '@/services/db/prisma'
 import { fromRow, serializeRow } from '@/services/db/rows'
 import type { CreatePaymentInput, Payment } from '../types'
@@ -20,7 +21,7 @@ const toPayment = (row: unknown) => mapPaymentRow(serializeRow('payments', row) 
 
 /** Serialize concurrent payments/refunds on one invoice (balance checks read-then-write). */
 async function lockInvoice(tx: DbTransaction, invoiceId: string) {
-  await tx.$executeRaw`select 1 from public.invoices where id = ${invoiceId}::uuid for update`
+  await tx.$queryRawTyped(lockInvoiceSql(invoiceId))
 }
 
 function paymentTotals(amounts: Array<{ amount: Prisma.Decimal | number | null }>) {
@@ -49,7 +50,7 @@ export async function getAllPayments(params?: { fromDate?: string; toDate?: stri
       ...(params?.toDate ? { lte: new Date(`${params.toDate.slice(0, 10)}T23:59:59.999Z`) } : {}),
     }
   }
-  if (params?.method) where.type = params.method as payment_type
+  if (params?.method) where.method = params.method as payment_method
 
   const rows = await prisma.payments.findMany({
     where,
@@ -69,7 +70,7 @@ export async function createPayment(input: CreatePaymentInput) {
       select: { id: true, status: true, amount: true },
     })
     if (!invoice) throw new Error('Invoice not found')
-    if (invoice.status === 'void' || invoice.status === 'refunded' || invoice.status === 'cancelled') {
+    if (invoice.status === 'void' || invoice.status === 'refunded') {
       throw new Error('Cannot record payment for a void or refunded invoice')
     }
 
@@ -95,7 +96,7 @@ export async function createPayment(input: CreatePaymentInput) {
     return created
   })
 
-  void logPaymentCreated({ id: payment.id, invoiceId: payment.invoiceId, amount: payment.amount, type: payment.type })
+  void logPaymentCreated({ id: payment.id, invoiceId: payment.invoiceId, amount: payment.amount, type: payment.method })
   return payment
 }
 
@@ -116,7 +117,7 @@ export async function refundPayment(id: string, reason?: string) {
     const row = await tx.payments.create({
       data: {
         invoice_id: original.invoice_id,
-        type: original.type,
+        method: original.method,
         amount: -Math.abs(Number(original.amount)),
         description: reason ? `Refund: ${reason}` : 'Refund',
         created_by: session.id,
@@ -203,7 +204,7 @@ export async function ensurePaymentLedgerEntry(payment: Payment, actorId: string
       sourceId: payment.id,
       outcomeAmount,
       incomeAmount,
-      description: `Payment ${payment.type} - ${payment.amount}`,
+      description: `Payment ${payment.method} - ${payment.amount}`,
       createdBy: actorId,
       invoiceId: payment.invoiceId,
     },

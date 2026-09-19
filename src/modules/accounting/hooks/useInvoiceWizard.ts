@@ -22,7 +22,7 @@ import type {
   InvoiceItem,
   InvoiceBookingLookup,
   InvoiceItemType,
-  PaymentType,
+  PaymentMethod,
   BookingWarning,
 } from '../types'
 import type { Contact } from '@/modules/contacts/types'
@@ -57,16 +57,7 @@ function useComputedValues(state: WizardState) {
       stepErrors: stepValidation.errors,
       stepWarnings: stepValidation.warnings,
     }
-  }, [
-    state.items,
-    state.discount,
-    state.serviceCharge,
-    state.taxRate,
-    state.payments,
-    state.applyDeposit,
-    state.depositAmount,
-    state.step,
-  ])
+  }, [state])
 }
 
 export function useInvoiceWizard(
@@ -77,10 +68,14 @@ export function useInvoiceWizard(
   const [state, setState] = useState<WizardState>(() => createInitialState(mode, invoice))
   const { validate } = useBookingValidation({ existingInvoicesMap })
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+  // Re-hydrate when a different invoice (or its loaded items) arrives. Adjusting
+  // state during render avoids an extra effect pass with stale form values.
+  const hydrationKey = `${mode}:${invoice?.id ?? ''}:${invoice?.items?.length ?? 0}`
+  const [hydratedFor, setHydratedFor] = useState(hydrationKey)
+  if (hydratedFor !== hydrationKey) {
+    setHydratedFor(hydrationKey)
     setState((prev) => hydrateWizardState(prev, mode, invoice))
-  }, [mode, invoice?.id, invoice?.items?.length])
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -272,12 +267,12 @@ export function useInvoiceWizard(
   const addPayment = useCallback(() => {
     setState((prev) => ({
       ...prev,
-      payments: [...prev.payments, { amount: 0, method: 'cash' as PaymentType }],
+      payments: [...prev.payments, { amount: 0, method: 'cash' as PaymentMethod }],
     }))
   }, [])
 
   const updatePayment = useCallback(
-    (idx: number, field: 'amount' | 'method', value: number | PaymentType) => {
+    (idx: number, field: 'amount' | 'method', value: number | PaymentMethod) => {
       setState((prev) => ({
         ...prev,
         payments: prev.payments.map((p, i) =>

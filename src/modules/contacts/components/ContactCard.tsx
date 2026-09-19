@@ -5,6 +5,7 @@ import Image from 'next/image'
 
 import { TableActionsMenu } from '@/shared/table'
 import { useLocale } from '@/i18n/components/LocaleContext'
+import { countryName } from '@/shared/static/countries'
 import { formatDateTime } from '@/shared/utils/date'
 import type { Contact } from '../types'
 import { ContactTypeBadge } from './ContactTypeBadge'
@@ -81,7 +82,7 @@ export const ContactCard = memo(function ContactCard({
           <div className="flex items-center justify-between">
             <dt className="text-xs font-medium uppercase tracking-[0.18em] text-[#787774]">{labels.country}</dt>
             <dd className="text-sm text-[#555555]">
-              {contact.city ? `${contact.city}, ` : ''}{contact.country}
+              {contact.city ? `${contact.city}, ` : ''}{countryName(contact.country, locale)}
             </dd>
           </div>
         )}

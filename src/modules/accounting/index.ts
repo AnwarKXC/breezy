@@ -1,6 +1,6 @@
 export type {
   Payment,
-  PaymentType,
+  PaymentMethod,
   Expense,
   ExpenseCategory,
   ExpenseCategoryRow,
@@ -30,7 +30,7 @@ export type {
   WizardStep,
 } from './types'
 export {
-  PAYMENT_TYPE_LABELS,
+  PAYMENT_METHOD_LABELS,
   INVOICE_STATUS_LABELS,
   INVOICE_ITEM_TYPE_LABELS,
   COST_CENTER_LABELS,

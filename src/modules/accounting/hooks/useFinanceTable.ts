@@ -6,10 +6,13 @@ import { useAccounting } from './useAccounting'
 export function useFinanceTable(dateParams?: { fromDate?: string; toDate?: string }) {
   const { financeTable, financialHealth, loading, loadFinanceTable, loadFinancialHealth } = useAccounting()
 
+  const fromDate = dateParams?.fromDate
+  const toDate = dateParams?.toDate
   useEffect(() => {
-    loadFinanceTable(dateParams)
-    loadFinancialHealth(dateParams)
-  }, [loadFinanceTable, loadFinancialHealth, dateParams?.fromDate, dateParams?.toDate])
+    const params = fromDate || toDate ? { fromDate, toDate } : undefined
+    loadFinanceTable(params)
+    loadFinancialHealth(params)
+  }, [loadFinanceTable, loadFinancialHealth, fromDate, toDate])
 
   const stats = useMemo(
     () =>

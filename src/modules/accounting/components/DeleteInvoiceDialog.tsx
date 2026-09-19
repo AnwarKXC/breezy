@@ -36,7 +36,7 @@ export function DeleteInvoiceDialog({ invoice, t, onClose, onDeleted }: Props) {
     } finally {
       setSubmitting(false)
     }
-  }, [invoice.id, onDeleted])
+  }, [invoice.id, onDeleted, t])
 
   return (
     <Modal isOpen onClose={onClose} title={t('common.delete')} size="md">

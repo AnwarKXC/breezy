@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { prisma } from '@/services/db/prisma'
+import { invalidateUserSessionCache } from '@/services/auth/sessionStore'
 import type { UpdateUserInput, User } from '../types'
 import { tryLogUserActivity } from './activityLogService'
 import { AuthServiceError, toAuthServiceError } from './authErrors'
@@ -70,6 +71,7 @@ export async function deleteUser(id: string) {
       prisma.users.update({ where: { id }, data: { is_active: false, updated_at: new Date() } }),
       prisma.sessions.deleteMany({ where: { user_id: id } }),
     ])
+    invalidateUserSessionCache(id)
 
     await tryLogUserActivity({ action: 'user_deleted', actor, target: user })
   })

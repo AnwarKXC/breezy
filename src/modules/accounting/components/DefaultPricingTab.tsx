@@ -21,14 +21,14 @@ export function DefaultPricingTab({ t }: DefaultPricingTabProps) {
   const [form, setForm] = useState<CreatePricingInput>({
     room_type_id: '',
     price: 0,
-    currency: 'USD',
+    currency: 'EGP',
     effective_from: null,
     effective_until: null,
   })
 
   const resetForm = useCallback(() => {
     setEditingId(null)
-    setForm({ room_type_id: '', price: 0, currency: 'USD', effective_from: null, effective_until: null })
+    setForm({ room_type_id: '', price: 0, currency: 'EGP', effective_from: null, effective_until: null })
   }, [])
 
   const handleEdit = useCallback((item: RoomTypePricing) => {
@@ -85,7 +85,7 @@ export function DefaultPricingTab({ t }: DefaultPricingTabProps) {
           <div>
             <label className="block text-sm font-medium text-[#333333]">{t('accounting.pricing.price')}</label>
             <input
-              type="number"
+              type="number" inputMode="decimal" onWheel={(event) => event.currentTarget.blur()}
               min={0}
               step="0.01"
               className="mt-1 block w-full rounded-lg border border-[#D4D4D4] px-3 py-2 text-sm"
@@ -97,7 +97,7 @@ export function DefaultPricingTab({ t }: DefaultPricingTabProps) {
           <div>
             <label className="block text-sm font-medium text-[#333333]">{t('accounting.pricing.effectiveFrom')}</label>
             <input
-              type="date"
+              type="date" max={form.effective_until || undefined}
               className="mt-1 block w-full rounded-lg border border-[#D4D4D4] px-3 py-2 text-sm"
               value={form.effective_from ?? ''}
               onChange={e => setForm(f => ({ ...f, effective_from: e.target.value || null }))}
@@ -106,7 +106,7 @@ export function DefaultPricingTab({ t }: DefaultPricingTabProps) {
           <div>
             <label className="block text-sm font-medium text-[#333333]">{t('accounting.pricing.effectiveUntil')}</label>
             <input
-              type="date"
+              type="date" min={form.effective_from || undefined}
               className="mt-1 block w-full rounded-lg border border-[#D4D4D4] px-3 py-2 text-sm"
               value={form.effective_until ?? ''}
               onChange={e => setForm(f => ({ ...f, effective_until: e.target.value || null }))}

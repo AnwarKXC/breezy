@@ -36,7 +36,7 @@ export async function upsertPriceOverrides(
   const rows = await prisma.$transaction(
     overrides.map((o) => {
       const key = { contact_id: contactId, room_category: o.roomCategory, occupancy_code: o.occupancyCode as occupancy_code }
-      const values = { price: o.price, currency: o.currency ?? 'USD', deleted_at: null }
+      const values = { price: o.price, currency: o.currency ?? 'EGP', deleted_at: null }
       return prisma.company_price_overrides.upsert({
         where: { contact_id_room_category_occupancy_code: key },
         create: { ...key, ...values },

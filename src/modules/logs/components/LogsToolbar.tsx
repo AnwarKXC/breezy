@@ -55,7 +55,7 @@ export function LogsToolbar({ filters, labels, onChange, onExportCsv, onExportPd
         />
         <FloatingInput
           aria-label={labels.fromDate}
-          type="date"
+          type="date" max={filters.toDate || undefined}
           value={filters.fromDate ?? ''}
           onChange={(event) => onChange({ ...filters, fromDate: event.target.value || undefined })}
           label={labels.fromDate}
@@ -63,7 +63,7 @@ export function LogsToolbar({ filters, labels, onChange, onExportCsv, onExportPd
         />
         <FloatingInput
           aria-label={labels.toDate}
-          type="date"
+          type="date" min={filters.fromDate || undefined}
           value={filters.toDate ?? ''}
           onChange={(event) => onChange({ ...filters, toDate: event.target.value || undefined })}
           label={labels.toDate}

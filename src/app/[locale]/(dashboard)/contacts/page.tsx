@@ -1,17 +1,10 @@
-﻿import dynamic from "next/dynamic";
+import { ContactsPage } from '@/modules/contacts/components'
 import { AuthAccessError } from '@/services/auth/serverSession'
 import { checkLocale, type Locale } from '@/i18n/config'
 import { requireContactsRead } from '@/modules/contacts/services/serviceSecurity'
 import { getContactsUiPermissions } from '@/modules/contacts/services/serviceSecurity'
 import ar from '@/i18n/locales/ar.json'
 import en from '@/i18n/locales/en.json'
-import { PageSkeleton } from "@/shared/components/PageSkeleton";
-
-const ContactsPage = dynamic(() =>
-  import("@/modules/contacts/components").then((m) => ({ default: m.ContactsPage })),
-  { loading: () => <PageSkeleton /> }
-);
-
 const translations = { ar, en }
 
 function getAccessLabels(locale: Locale, error: AuthAccessError) {

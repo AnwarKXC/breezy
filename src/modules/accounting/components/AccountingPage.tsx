@@ -1,6 +1,6 @@
 ﻿'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useState, useMemo, useSyncExternalStore } from 'react'
 import { AccountingDashboardTab } from './AccountingDashboardTab'
 import { InvoicesTab } from './InvoicesTab'
 import { PaymentsTab } from './PaymentsTab'
@@ -8,8 +8,7 @@ import { ExpenseManager } from './ExpenseManager'
 import { LedgerTab } from './LedgerTab'
 import { ReportsTab } from './ReportsTab'
 import { AccountingPageSkeleton } from './AccountingPageSkeleton'
-import ar from '@/i18n/locales/ar.json'
-import en from '@/i18n/locales/en.json'
+import { useTranslation } from '@/i18n/hooks/useTranslation'
 
 type Tab = 'overview' | 'invoices' | 'payments' | 'expenses' | 'ledger' | 'reports'
 
@@ -22,23 +21,6 @@ interface InvoiceFilters {
 
 interface AccountingPageProps {
   locale: string
-}
-
-const allTranslations: Record<string, Record<string, unknown>> = { ar, en }
-
-function createT(locale: string) {
-  return (key: string): string => {
-    const keys = key.split('.')
-    let result: unknown = allTranslations[locale]
-    for (const k of keys) {
-      if (result && typeof result === 'object') {
-        result = (result as Record<string, unknown>)[k]
-      } else {
-        return key
-      }
-    }
-    return typeof result === 'string' ? result : key
-  }
 }
 
 const tabs: { key: Tab; labelKey: string }[] = [
@@ -57,9 +39,23 @@ function isTab(value: string | null): value is Tab {
   return Boolean(value && tabKeys.has(value as Tab))
 }
 
+function readStoredTab(): Tab | null {
+  try {
+    const saved = window.localStorage.getItem(TAB_STORAGE_KEY)
+    return isTab(saved) ? saved : null
+  } catch {
+    return null
+  }
+}
+
+const subscribeToNothing = () => () => {}
+
 export function AccountingPage({ locale }: AccountingPageProps) {
-  const t = useMemo(() => createT(locale), [locale])
-  const [activeTab, setActiveTab] = useState<Tab>('overview')
+  const { t } = useTranslation()
+  // The user's click wins; until then show the last tab they used (server snapshot: none).
+  const [selectedTab, setActiveTab] = useState<Tab | null>(null)
+  const storedTab = useSyncExternalStore(subscribeToNothing, readStoredTab, () => null)
+  const activeTab = selectedTab ?? storedTab ?? 'overview'
   const [invoiceFilters, setInvoiceFilters] = useState<InvoiceFilters>({
     searchQuery: '',
     statusFilter: 'all',
@@ -67,14 +63,11 @@ export function AccountingPage({ locale }: AccountingPageProps) {
     dateRangeEnd: '',
   })
 
-  useEffect(() => {
-    const savedTab = window.localStorage.getItem(TAB_STORAGE_KEY)
-    if (isTab(savedTab)) setActiveTab(savedTab)
-  }, [])
-
   const handleTabChange = (tab: Tab) => {
     setActiveTab(tab)
-    window.localStorage.setItem(TAB_STORAGE_KEY, tab)
+    try {
+      window.localStorage.setItem(TAB_STORAGE_KEY, tab)
+    } catch {}
   }
 
   const tabContent = useMemo(() => {

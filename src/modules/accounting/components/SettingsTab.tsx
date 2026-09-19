@@ -79,7 +79,7 @@ export function SettingsTab({ t }: Props) {
                   {setting.key === 'vat_rate' && (
                     <div className="flex items-center gap-2">
                       <input
-                        type="number"
+                        type="number" inputMode="decimal" step="0.01" min={0} max={100} onWheel={(event) => event.currentTarget.blur()}
                         className="w-20 rounded-lg border border-[#D4D4D4] px-3 py-2 text-sm text-right"
                         defaultValue={Number(setting.value.rate ?? 0)}
                         onBlur={(e) => handleUpdate(setting.key, { rate: Number(e.target.value) })}
@@ -90,7 +90,7 @@ export function SettingsTab({ t }: Props) {
                   {setting.key === 'service_charge_rate' && (
                     <div className="flex items-center gap-2">
                       <input
-                        type="number"
+                        type="number" inputMode="decimal" step="0.01" min={0} max={100} onWheel={(event) => event.currentTarget.blur()}
                         className="w-20 rounded-lg border border-[#D4D4D4] px-3 py-2 text-sm text-right"
                         defaultValue={Number(setting.value.rate ?? 0)}
                         onBlur={(e) => handleUpdate(setting.key, { rate: Number(e.target.value) })}
@@ -102,7 +102,7 @@ export function SettingsTab({ t }: Props) {
                     <div className="flex items-center gap-2">
                       <span className="text-sm text-[#787774]">{currencySymbol}</span>
                       <input
-                        type="number"
+                        type="number" inputMode="decimal" step="0.01" min={0} onWheel={(event) => event.currentTarget.blur()}
                         className="w-24 rounded-lg border border-[#D4D4D4] px-3 py-2 text-sm text-right"
                         defaultValue={Number(setting.value.amount ?? 0)}
                         onBlur={(e) => handleUpdate(setting.key, { amount: Number(e.target.value) })}

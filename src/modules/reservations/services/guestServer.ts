@@ -4,6 +4,7 @@ import { z } from 'zod'
 import type { Prisma } from '@/generated/prisma/client'
 import { prisma } from '@/services/db/prisma'
 import { toRow } from '@/services/db/rows'
+import { countryCodeSchema } from '@/shared/validation'
 
 const optionalText = (max: number) => z.string().trim().max(max).nullable().optional()
 
@@ -14,7 +15,7 @@ export const ReservationGuestSchema = z.object({
   phone: optionalText(40),
   document_type: optionalText(50),
   document_number: optionalText(100),
-  nationality: optionalText(100),
+  nationality: countryCodeSchema.transform((value) => value || null).nullable().optional(),
   role: z.enum(['primary_guest', 'additional_guest', 'company_guest', 'child']).optional(),
   is_primary: z.boolean().optional(),
   is_vip: z.boolean().optional(),

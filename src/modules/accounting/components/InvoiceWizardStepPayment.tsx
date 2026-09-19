@@ -2,8 +2,8 @@
 
 import { FloatingInput } from '@/shared/components/FloatingField'
 import { useCurrency } from '@/shared/contexts/CurrencyContext'
-import type { WizardPayment, PaymentType } from '../types'
-import { PAYMENT_TYPE_LABELS } from '../types'
+import type { WizardPayment, PaymentMethod } from '../types'
+import { PAYMENT_METHOD_LABELS } from '../types'
 
 interface Props {
   t: (key: string) => string
@@ -21,7 +21,7 @@ interface Props {
   onSetRecordPayment: (value: boolean) => void
   onSetPayments: (payments: WizardPayment[]) => void
   onAddPayment: () => void
-  onUpdatePayment: (idx: number, field: 'amount' | 'method', value: number | PaymentType) => void
+  onUpdatePayment: (idx: number, field: 'amount' | 'method', value: number | PaymentMethod) => void
   onRemovePayment: (idx: number) => void
   onSetApplyDeposit: (value: boolean) => void
   onSetIssueDate: (date: string) => void
@@ -106,7 +106,7 @@ export function InvoiceWizardStepPayment({
                   {t('accounting.invoices.amount')}
                 </label>
                 <input
-                  type="number"
+                  type="number" inputMode="decimal" onWheel={(event) => event.currentTarget.blur()}
                   step="0.01"
                   min="0.01"
                   max={paymentLimitForIndex(idx)}
@@ -121,10 +121,10 @@ export function InvoiceWizardStepPayment({
                 </label>
                 <select
                   value={payment.method}
-                  onChange={(e) => onUpdatePayment(idx, 'method', e.target.value as PaymentType)}
+                  onChange={(e) => onUpdatePayment(idx, 'method', e.target.value as PaymentMethod)}
                   className="w-full rounded-lg border border-[#D4D4D4] px-3 py-2 text-sm"
                 >
-                  {Object.entries(PAYMENT_TYPE_LABELS).map(([key, label]) => (
+                  {Object.entries(PAYMENT_METHOD_LABELS).map(([key, label]) => (
                     <option key={key} value={key}>{label}</option>
                   ))}
                 </select>
@@ -172,7 +172,7 @@ export function InvoiceWizardStepPayment({
         <div>
           <label className="mb-1 block text-xs font-medium text-[#555555]">{t('accounting.invoices.issueDate')}</label>
           <input
-            type="date"
+            type="date" max={dueDate || undefined}
             value={issueDate}
             onChange={(e) => onSetIssueDate(e.target.value)}
             className={`w-full rounded-lg border px-3 py-2 text-sm ${errors?.issueDate ? 'border-red-400' : 'border-[#D4D4D4]'}`}
@@ -184,7 +184,7 @@ export function InvoiceWizardStepPayment({
         <div>
           <label className="mb-1 block text-xs font-medium text-[#555555]">{t('accounting.invoices.dueDate')}</label>
           <input
-            type="date"
+            type="date" min={issueDate || undefined}
             value={dueDate}
             onChange={(e) => onSetDueDate(e.target.value)}
             className={`w-full rounded-lg border px-3 py-2 text-sm ${errors?.dueDate ? 'border-red-400' : 'border-[#D4D4D4]'}`}

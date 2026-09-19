@@ -40,22 +40,19 @@ export default function LoginPage() {
   const errorMessage = error ? t(authErrorKeys[error]) : null;
   const blocked = remaining > 0;
 
+  // Countdown ticks come from timers (never synchronously in the effect body).
   useEffect(() => {
-    if (!blockedUntil || blockedUntil <= Date.now()) {
-      setRemaining(0);
-      return;
-    }
-    setRemaining(Math.ceil((blockedUntil - Date.now()) / 1000));
-    const id = setInterval(() => {
-      const left = Math.ceil((blockedUntil - Date.now()) / 1000);
-      if (left <= 0) {
-        clearInterval(id);
-        setRemaining(0);
-      } else {
-        setRemaining(left);
-      }
-    }, 1000);
-    return () => clearInterval(id);
+    const tick = () => {
+      const left = blockedUntil ? Math.ceil((blockedUntil - Date.now()) / 1000) : 0;
+      setRemaining(Math.max(0, left));
+      if (left <= 0) clearInterval(id);
+    };
+    const first = setTimeout(tick, 0);
+    const id = setInterval(tick, 1000);
+    return () => {
+      clearTimeout(first);
+      clearInterval(id);
+    };
   }, [blockedUntil]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {

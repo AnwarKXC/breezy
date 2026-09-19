@@ -1,16 +1,9 @@
-﻿import dynamic from "next/dynamic";
+import { LogsPage } from '@/modules/logs'
 import { ACTIONS, canPerformAction } from '@/config/rbac'
 import { checkLocale, type Locale } from '@/i18n/config'
 import ar from '@/i18n/locales/ar.json'
 import en from '@/i18n/locales/en.json'
 import { AuthAccessError, getCurrentServerSession } from '@/services/auth/serverSession'
-import { PageSkeleton } from "@/shared/components/PageSkeleton";
-
-const LogsPage = dynamic(() =>
-  import("@/modules/logs").then((m) => ({ default: m.LogsPage })),
-  { loading: () => <PageSkeleton /> }
-);
-
 const translations = { ar, en }
 
 function getAccessLabels(locale: Locale, error?: AuthAccessError) {

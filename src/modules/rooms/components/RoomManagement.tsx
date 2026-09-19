@@ -403,7 +403,7 @@ export function RoomManagement({ canDeleteRooms }: { canDeleteRooms?: boolean })
       },
     ]
     return cols
-  }, [t, editingRoomId, roomEditStatus, roomEditPrice, getTypeName, getEffectivePrice, saveEditRoom, startEditRoom, rooms, openDeleteDialog, router, pathname])
+  }, [t, router, pathname, getTypeName, editingRoomId, roomEditStatus, saveEditRoom, savingEditRoom, startEditRoom, openRenameModal, openDeleteDialog, rooms])
 
   const typeColumns = useMemo(() => {
     const cols: TableColumn<RoomTypeRow>[] = [
@@ -495,7 +495,7 @@ export function RoomManagement({ canDeleteRooms }: { canDeleteRooms?: boolean })
         <div>
           <label className="block text-xs font-medium text-[#787774] mb-1">{t('rooms.floor')}</label>
           <input
-            type="number"
+            type="number" inputMode="numeric" step={1} onWheel={(event) => event.currentTarget.blur()}
             min={0}
             value={quickFloor}
             onChange={e => setQuickFloor(Number(e.target.value))}
@@ -729,7 +729,7 @@ export function RoomManagement({ canDeleteRooms }: { canDeleteRooms?: boolean })
           </div>
           <FloatingInput
             label={t('rooms.capacity')}
-            type="number"
+            type="number" inputMode="numeric" step={1}
             min={1}
             value={typeForm.default_capacity}
             onChange={e => setTypeForm(f => ({ ...f, default_capacity: Number(e.target.value) }))}
@@ -757,7 +757,7 @@ export function RoomManagement({ canDeleteRooms }: { canDeleteRooms?: boolean })
       <form onSubmit={handleBulkCreate} className="space-y-5 mt-[15px]">
         <FloatingInput
           label={t('rooms.totalRooms')}
-          type="number"
+          type="number" inputMode="numeric" step={1}
           min={1}
           value={bulkTotal}
           onChange={e => handleBulkTotalChange(Number(e.target.value))}
@@ -770,7 +770,7 @@ export function RoomManagement({ canDeleteRooms }: { canDeleteRooms?: boolean })
                 <div key={rt.id} className="flex items-center justify-between gap-4">
                   <span className="text-sm text-[#1A1A1A] flex-1">{rt.name}</span>
                   <input
-                    type="number"
+                    type="number" inputMode="numeric" step={1} onWheel={(event) => event.currentTarget.blur()}
                     min={0}
                     value={bulkDistribution[rt.id] ?? 0}
                     onChange={e => handleBulkDistChange(rt.id, Number(e.target.value))}

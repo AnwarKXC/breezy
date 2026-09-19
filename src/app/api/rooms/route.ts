@@ -34,7 +34,7 @@ export async function POST(request: Request) {
   if (!parsed.success) return NextResponse.json({ error: zodErrorMessage(parsed.error) }, { status: 400 })
 
   try {
-    return NextResponse.json({ data: await createRoom(parsed.data) }, { status: 201 })
+    return NextResponse.json({ data: await createRoom(parsed.data, auth.session.id) }, { status: 201 })
   } catch (error) {
     if (isUniqueViolation(error)) {
       return NextResponse.json({ error: `Room number "${parsed.data.number}" already exists` }, { status: 409 })

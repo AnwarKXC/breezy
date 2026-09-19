@@ -226,7 +226,7 @@ export function ExpenseFormModal({ categories, saving, t, initialCategoryId, onC
 
             <FloatingInput
               required
-              type="number"
+              type="number" inputMode="decimal"
               step="0.01"
               min="0.01"
               label={t('accounting.expenses.amount')}
@@ -245,6 +245,7 @@ export function ExpenseFormModal({ categories, saving, t, initialCategoryId, onC
             <FloatingInput
               required
               type="date"
+              max={new Date().toISOString().slice(0, 10)}
               label={t('accounting.expenses.date')}
               value={date}
               onChange={(e) => setDate(e.target.value)}

@@ -1,4 +1,4 @@
-﻿import dynamic from "next/dynamic";
+import { SettingsPage } from "@/modules/settings/components/SettingsPage";
 import { Suspense } from "react";
 import { AuthAccessError } from '@/services/auth/serverSession'
 import { checkLocale, type Locale } from '@/i18n/config'
@@ -6,11 +6,6 @@ import { requireSettingsRead, getSettingsUiPermissions } from '@/modules/setting
 import ar from '@/i18n/locales/ar.json'
 import en from '@/i18n/locales/en.json'
 import { PageSkeleton } from "@/shared/components/PageSkeleton";
-
-const SettingsPage = dynamic(() =>
-  import("@/modules/settings/components/SettingsPage").then((m) => ({ default: m.SettingsPage })),
-  { loading: () => <PageSkeleton /> }
-);
 
 const translations = { ar, en }
 

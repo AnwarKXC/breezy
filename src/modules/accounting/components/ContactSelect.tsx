@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback, type KeyboardEvent, type UIEvent } from 'react'
 import { useDebounce } from '@/shared/hooks/useDebounce'
+import { useTranslation } from '@/i18n/hooks/useTranslation'
 import { useClickOutside } from '@/shared/hooks/useClickOutside'
 import { fetchContacts, fetchContactById } from '@/modules/contacts/services/contactsApiClient'
 import type { Contact } from '@/modules/contacts/types'
@@ -53,6 +54,7 @@ function mergeContacts(existing: Contact[], incoming: Contact[]) {
 }
 
 export function ContactSelect({ value, onChange, onSelectContact, label, required }: Props) {
+  const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [contacts, setContacts] = useState<Contact[]>([])
@@ -60,7 +62,8 @@ export function ContactSelect({ value, onChange, onSelectContact, label, require
   const [loadingMore, setLoadingMore] = useState(false)
   const [hasMore, setHasMore] = useState(false)
   const [nextCursor, setNextCursor] = useState<string | null>(null)
-  const [selectedName, setSelectedName] = useState('')
+  // Name of a selected contact that is not in the loaded page (fetched by id).
+  const [selected, setSelected] = useState<{ id: string; name: string } | null>(null)
   const [highlightIdx, setHighlightIdx] = useState(-1)
   const inputRef = useRef<HTMLInputElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
@@ -70,46 +73,40 @@ export function ContactSelect({ value, onChange, onSelectContact, label, require
 
   const selectedContact = contacts.find((c) => c.id === value) ?? null
 
-  const loadContactsPage = useCallback(async (options: {
+  const loadContactsPage = useCallback((options: {
     search: string
     cursor?: string | null
     append?: boolean
   }) => {
     const requestId = ++requestSeqRef.current
     const append = Boolean(options.append)
+    const isCurrent = () => requestId === requestSeqRef.current
 
-    if (append) {
-      setLoadingMore(true)
-    } else {
-      setLoading(true)
-      setHasMore(false)
-      setNextCursor(null)
-    }
-
-    try {
-      const result = await fetchContacts({
-        cursor: options.cursor,
-        limit: CONTACT_LOOKUP_PAGE_SIZE,
-        search: options.search || undefined,
+    // Loading flags are raised by the handlers that trigger each load; state is
+    // only touched in promise callbacks, so this is safe to start from an effect.
+    return fetchContacts({
+      cursor: options.cursor,
+      limit: CONTACT_LOOKUP_PAGE_SIZE,
+      search: options.search || undefined,
+    })
+      .then((result) => {
+        if (!isCurrent()) return
+        setContacts((current) => append ? mergeContacts(current, result.data) : result.data)
+        setHasMore(result.hasMore)
+        setNextCursor(result.nextCursor)
+        if (!append) setHighlightIdx(-1)
       })
-      if (requestId !== requestSeqRef.current) return
-
-      setContacts((current) => append ? mergeContacts(current, result.data) : result.data)
-      setHasMore(result.hasMore)
-      setNextCursor(result.nextCursor)
-      if (!append) setHighlightIdx(-1)
-    } catch {
-      if (requestId === requestSeqRef.current && !append) {
+      .catch(() => {
+        if (!isCurrent() || append) return
         setContacts([])
         setHasMore(false)
         setNextCursor(null)
-      }
-    } finally {
-      if (requestId === requestSeqRef.current) {
+      })
+      .finally(() => {
+        if (!isCurrent()) return
         setLoading(false)
         setLoadingMore(false)
-      }
-    }
+      })
   }, [])
 
   useEffect(() => {
@@ -117,27 +114,20 @@ export function ContactSelect({ value, onChange, onSelectContact, label, require
     void loadContactsPage({ search: debouncedQuery.trim() })
   }, [debouncedQuery, loadContactsPage, open])
 
+  const selectedInList = selectedContact !== null
   useEffect(() => {
-    if (!value) return
-    if (selectedContact) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setSelectedName(selectedContact.name)
-      return
-    }
+    if (!value || selectedInList) return
     let cancelled = false
     fetchContactById(value).then((contact) => {
-      if (!cancelled && contact) {
-        setSelectedName(contact.name)
-      }
+      if (!cancelled && contact) setSelected({ id: contact.id, name: contact.name })
     })
     return () => { cancelled = true }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value])
+  }, [value, selectedInList])
 
   const handleSelect = useCallback((contact: Contact) => {
     onChange(contact.id)
     onSelectContact?.(contact)
-    setSelectedName(contact.name)
+    setSelected({ id: contact.id, name: contact.name })
     setQuery('')
     setOpen(false)
   }, [onChange, onSelectContact])
@@ -145,7 +135,7 @@ export function ContactSelect({ value, onChange, onSelectContact, label, require
   const handleClear = useCallback(() => {
     onChange('')
     onSelectContact?.(null)
-    setSelectedName('')
+    setSelected(null)
     setQuery('')
     setOpen(false)
     inputRef.current?.focus()
@@ -175,6 +165,7 @@ export function ContactSelect({ value, onChange, onSelectContact, label, require
     const el = e.currentTarget
     const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight
     if (distanceFromBottom > 32 || loading || loadingMore || !hasMore || !nextCursor) return
+    setLoadingMore(true)
     void loadContactsPage({
       append: true,
       cursor: nextCursor,
@@ -205,7 +196,7 @@ export function ContactSelect({ value, onChange, onSelectContact, label, require
     }
   }, [highlightIdx])
 
-  const name = selectedContact?.name ?? selectedName
+  const name = selectedContact?.name ?? (selected?.id === value ? selected.name : '')
 
   return (
     <div ref={dropdownRef} className="relative">
@@ -223,7 +214,7 @@ export function ContactSelect({ value, onChange, onSelectContact, label, require
           ref={inputRef}
           type="text"
           className="form-control contact-select-input w-full"
-          placeholder={name || 'Search contacts...'}
+          placeholder={name || t('common.searchContacts')}
           value={open ? query : name}
           onFocus={handleFocus}
           onChange={(e) => handleInputChange(e.target.value)}
@@ -234,6 +225,7 @@ export function ContactSelect({ value, onChange, onSelectContact, label, require
           <button
             type="button"
             onClick={handleClear}
+            aria-label={t('common.clear')}
             className="absolute inset-y-0 end-0 flex items-center pe-2 text-[#787774] hover:text-[#555555]"
             tabIndex={-1}
           >
@@ -266,9 +258,9 @@ export function ContactSelect({ value, onChange, onSelectContact, label, require
           {loading && contacts.length === 0 ? (
             <LoadingSpinner />
           ) : debouncedQuery && contacts.length === 0 ? (
-            <p className="px-3 py-4 text-center text-[#787774]">No contacts found</p>
+            <p className="px-3 py-4 text-center text-[#787774]">{t('contacts.emptyTitle')}</p>
           ) : contacts.length === 0 ? (
-            <p className="px-3 py-4 text-center text-[#787774]">No contacts found</p>
+            <p className="px-3 py-4 text-center text-[#787774]">{t('contacts.emptyTitle')}</p>
           ) : (
             <div className="max-h-60 overflow-y-auto p-1" onScroll={handleListScroll}>
               {contacts.map((contact, idx) => {

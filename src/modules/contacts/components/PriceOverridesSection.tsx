@@ -85,7 +85,7 @@ export function PriceOverridesSection({ overrides, roomTypes, canEdit, onSave, l
               roomCategory: category,
               occupancyCode: occupancy,
               price: Number(priceStr),
-              currency: 'USD',
+              currency: 'EGP',
             } as CreatePriceOverrideInput)
           }
         }
@@ -131,7 +131,7 @@ export function PriceOverridesSection({ overrides, roomTypes, canEdit, onSave, l
                     <td key={oc} className="px-3 py-2">
                       {canEdit ? (
                         <input
-                          type="number"
+                          type="number" inputMode="decimal" onWheel={(event) => event.currentTarget.blur()}
                           min={0}
                           step="0.01"
                           value={getPrice(rt.slug, oc)}

@@ -1,6 +1,7 @@
 import 'server-only'
 
 import type { Prisma } from '@/generated/prisma/client'
+import { lockInvoice as lockInvoiceSql } from '@/generated/prisma/sql'
 import { prisma, type DbTransaction } from '@/services/db/prisma'
 import { dbDate, fromRow, serializeRow, toRow, toRows } from '@/services/db/rows'
 import type {
@@ -68,7 +69,7 @@ function withDerivedPaymentStatus(
   // Closed-status preservation: void stays void; the buggy historical
   // 'cancelled' label collapes to 'void' (it was never a valid invoices
   // status under the CHECK constraint).
-  if (invoice.status === 'void' || invoice.status === 'cancelled') {
+  if (invoice.status === 'void') {
     return {
       ...invoice,
       status: 'void',
@@ -314,7 +315,7 @@ export async function createInvoice(input: CreateInvoiceDraftInput & { items?: I
     // database-level guarantee.
     const existing = input.reservation_id
       ? await tx.invoices.findFirst({
-          where: { reservation_id: input.reservation_id, deleted_at: null, status: { notIn: ['void', 'cancelled'] } },
+          where: { reservation_id: input.reservation_id, deleted_at: null, status: { not: 'void' } },
           select: { id: true },
           orderBy: { created_at: 'asc' },
         })
@@ -432,11 +433,11 @@ export async function issueInvoice(id: string) {
   const session = await requireInvoicesIssue()
   const current = await prisma.invoices.findFirst({ where: { id, deleted_at: null } })
   if (!current) throw new Error('Failed to fetch invoice: not found')
-  if (current.status === 'void' || current.status === 'refunded' || current.status === 'cancelled') {
+  if (current.status === 'void' || current.status === 'refunded') {
     throw new Error('Invoice is already void or refunded')
   }
 
-  const shouldUpdateStatus = current.status === 'draft' || current.status === 'pending'
+  const shouldUpdateStatus = current.status === 'draft'
   const row = shouldUpdateStatus
     ? await prisma.invoices.update({
         where: { id },
@@ -457,7 +458,7 @@ async function ensureInvoiceIssuedEvent(invoice: Invoice, actorId: string, oldSt
     invoiceId: invoice.id,
     eventType: 'issued',
     actorId,
-    oldStatus: oldStatus === 'pending' ? 'draft' : oldStatus,
+    oldStatus,
     newStatus: 'issued',
   })
 }
@@ -553,7 +554,7 @@ export async function deleteInvoice(id: string) {
 }
 
 async function lockInvoice(tx: DbTransaction, invoiceId: string) {
-  await tx.$executeRaw`select 1 from public.invoices where id = ${invoiceId}::uuid for update`
+  await tx.$queryRawTyped(lockInvoiceSql(invoiceId))
 }
 
 function paymentSums(payments: Array<{ amount: Prisma.Decimal | number | null }>) {
@@ -579,7 +580,7 @@ export async function refundInvoice(id: string, amount: number, reason: string) 
     await lockInvoice(tx, id)
     const current = await tx.invoices.findFirst({ where: { id, deleted_at: null }, select: { status: true } })
     if (!current) throw new Error('Invoice not found')
-    if (current.status === 'void' || current.status === 'cancelled') {
+    if (current.status === 'void') {
       throw new Error('Cannot refund a voided invoice.')
     }
 
@@ -592,7 +593,7 @@ export async function refundInvoice(id: string, amount: number, reason: string) 
 
     // One negative payment row records the refund ('cash' mirrors prior behaviour).
     const refundRow = await tx.payments.create({
-      data: { invoice_id: id, type: 'cash', amount: -refundAmount, description: reason ? `Refund: ${reason}` : 'Refund', created_by: session.id },
+      data: { invoice_id: id, method: 'cash', amount: -refundAmount, description: reason ? `Refund: ${reason}` : 'Refund', created_by: session.id },
     })
 
     // Recompute derived columns (partially_refunded / refunded) from payment rows.
@@ -636,7 +637,7 @@ export async function applyInvoiceDiscount(id: string, amount: number, reason: s
       select: { status: true, subtotal: true, discount: true, tax_amount: true, service_charge: true, amount: true, paid_at: true, reservation_id: true },
     })
     if (!current) throw new Error('Invoice not found')
-    if (current.status === 'void' || current.status === 'cancelled') {
+    if (current.status === 'void') {
       throw new Error('Cannot discount a voided invoice.')
     }
     if (current.status === 'refunded') {
@@ -762,7 +763,7 @@ export async function getInvoiceFormLookups(): Promise<InvoiceFormLookups> {
     }),
     prisma.rooms.findMany({ where: { deleted_at: null }, select: { id: true, number: true, floor: true, status: true }, orderBy: { number: 'asc' }, take: 1000 }),
     prisma.invoices.findMany({
-      where: { reservation_id: { not: null }, deleted_at: null, status: { notIn: ['void', 'cancelled'] } },
+      where: { reservation_id: { not: null }, deleted_at: null, status: { not: 'void' } },
       select: { reservation_id: true },
     }),
   ])

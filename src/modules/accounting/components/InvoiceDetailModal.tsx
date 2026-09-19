@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useState, useCallback, useMemo } from 'react'
 import { useInvoices } from '../hooks/useInvoices'
@@ -12,8 +12,8 @@ import type { CurrencyCode } from '@/shared/utils/types'
 import { useLocale } from '@/i18n/components/LocaleContext'
 import { downloadInvoicePdf } from '../utils/invoicePdfExport'
 import { formatDate, formatDateTime } from '@/shared/utils/date'
-import type { Invoice } from '../types'
-import { INVOICE_STATUS_LABELS, INVOICE_ITEM_TYPE_LABELS, PAYMENT_TYPE_LABELS, LEDGER_TYPE_LABELS } from '../types'
+import type { Invoice, Payment } from '../types'
+import { INVOICE_STATUS_LABELS, INVOICE_ITEM_TYPE_LABELS, PAYMENT_METHOD_LABELS, LEDGER_TYPE_LABELS } from '../types'
 
 interface Props {
   invoiceId: string
@@ -37,6 +37,8 @@ function getStatusVariant(status: string): 'success' | 'warning' | 'error' | 'in
     default: return 'default'
   }
 }
+
+const NO_PAYMENTS: Payment[] = []
 
 export function InvoiceDetailModal({ invoiceId, t, onClose, onEdit }: Props) {
   const { formatCurrency } = useCurrency()
@@ -98,12 +100,12 @@ export function InvoiceDetailModal({ invoiceId, t, onClose, onEdit }: Props) {
   ]
 
   const invoice = currentInvoice
-  const payments = invoice?.payments ?? []
+  const payments = invoice?.payments ?? NO_PAYMENTS
   const timeline = useMemo(() => {
     const paymentItems = payments.map((payment) => ({
       amount: Number(payment.amount),
       date: payment.createdAt ?? '',
-      description: payment.description ?? PAYMENT_TYPE_LABELS[payment.type] ?? payment.type,
+      description: payment.description ?? PAYMENT_METHOD_LABELS[payment.method] ?? payment.method,
       id: `payment-${payment.id}`,
       kind: Number(payment.amount) < 0 ? t('accounting.invoiceEvents.payment_refunded') : t('accounting.invoiceEvents.payment_recorded'),
     }))
@@ -462,7 +464,7 @@ export function InvoiceDetailModal({ invoiceId, t, onClose, onEdit }: Props) {
                   {payments.map((p) => (
                     <div key={p.id} className="flex items-center justify-between rounded-lg border border-[#EAEAEA] bg-[#F9F9F8]/50 p-3 text-sm">
                       <div>
-                        <span className="font-medium">{PAYMENT_TYPE_LABELS[p.type] ?? p.type}</span>
+                        <span className="font-medium">{PAYMENT_METHOD_LABELS[p.method] ?? p.method}</span>
                         {p.description && <span className="ml-2 text-[#787774]">{p.description}</span>}
                         <p className="mt-0.5 text-xs text-[#787774]">{formatDateTime(p.createdAt, locale)}</p>
                       </div>

@@ -1,45 +1,31 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useCallback } from 'react'
+import { useResource } from '@/shared/data/useResource'
 import type { RoomTypePricing, CreatePricingInput, UpdatePricingInput } from '../types'
 import * as api from '../services/pricingApiClient'
 
+const PRICING_KEY = '/api/pricing'
+
 export function usePricing() {
-  const [items, setItems] = useState<RoomTypePricing[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  const load = useCallback(async () => {
-    setLoading(true)
-    setError(null)
-    try {
-      const data = await api.fetchPricing()
-      setItems(data)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load pricing')
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  useEffect(() => { load() }, [load])
+  const { data, error, isLoading, refresh, mutate } = useResource<RoomTypePricing[]>(PRICING_KEY, api.fetchPricing)
 
   const create = useCallback(async (input: CreatePricingInput) => {
     const item = await api.createPricingApi(input)
-    setItems(prev => [...prev, item])
+    mutate((items = []) => [...items, item])
     return item
-  }, [])
+  }, [mutate])
 
   const update = useCallback(async (id: string, input: UpdatePricingInput) => {
     const item = await api.updatePricingApi(id, input)
-    setItems(prev => prev.map(i => i.id === id ? item : i))
+    mutate((items = []) => items.map(i => i.id === id ? item : i))
     return item
-  }, [])
+  }, [mutate])
 
   const remove = useCallback(async (id: string) => {
     await api.deletePricingApi(id)
-    setItems(prev => prev.filter(i => i.id !== id))
-  }, [])
+    mutate((items = []) => items.filter(i => i.id !== id))
+  }, [mutate])
 
-  return { items, loading, error, create, update, remove, reload: load }
+  return { items: data ?? [], loading: isLoading, error: error?.message ?? null, create, update, remove, reload: refresh }
 }

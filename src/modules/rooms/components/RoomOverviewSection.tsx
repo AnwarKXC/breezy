@@ -124,7 +124,7 @@ export function RoomOverviewSection({
  const hasDiscount = effective !== row.price
  return editingRoomId === row.id ? (
  <input
- type="number"
+ type="number" inputMode="decimal" onWheel={(event) => event.currentTarget.blur()}
  min={0}
  step="0.01"
  value={roomEditPrice}
@@ -175,7 +175,7 @@ export function RoomOverviewSection({
  placeholder="101"
  className="w-full rounded-lg border border-[#D4D4D4] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
  /> </div> <div> <label className="block text-xs font-medium text-[#787774] mb-1">{t('rooms.floor')}</label> <input
- type="number"
+ type="number" inputMode="numeric" step={1} onWheel={(event) => event.currentTarget.blur()}
  min={0}
  value={quickFloor}
  onChange={e => onQuickFloorChange(Number(e.target.value))}

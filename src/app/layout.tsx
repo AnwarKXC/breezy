@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import { headers } from "next/headers";
 import { ReduxProvider } from "@/store/provider";
-import { I18nProvider } from "@/i18n/provider";
 import { ToastProvider } from "@/shared/toast";
 import { CsrfBootstrap } from "@/shared/components/CsrfBootstrap";
 import "./globals.css";

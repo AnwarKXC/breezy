@@ -11,6 +11,7 @@ interface ToolbarSearchProps {
 export function ToolbarSearch({ value, onChange, placeholder = 'Search...' }: ToolbarSearchProps) {
   return (
     <FloatingInput
+      type="search"
       value={value}
       onChange={(e) => onChange(e.target.value)}
       label={placeholder}

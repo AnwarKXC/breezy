@@ -1,12 +1,12 @@
 import 'server-only'
 import type { Prisma } from '@/generated/prisma/client'
-import type { occupancy_code, price_source } from '@/generated/prisma/enums'
+import type { price_source } from '@/generated/prisma/enums'
+import { resolveRoomRate } from '@/generated/prisma/sql'
 import { prisma } from '@/services/db/prisma'
 import { dbDate } from '@/services/db/rows'
 import { logAction } from '@/services/logs'
 import { LOG_ACTIONS, LOG_MODULES } from '@/types/logs'
 import { getSystemCurrency } from '@/shared/currency/server'
-import type { CurrencyCode } from '@/shared/utils/types'
 import { ROLES, type UserRole } from '@/config/roles'
 
 // price_override_audit_log.permission_level has a DB check constraint allowing
@@ -70,100 +70,17 @@ export async function getEffectiveRate(
   contactId?: string | null,
   occupancyCode?: 'S' | 'D' | 'T' | null,
 ): Promise<{ rate: number; currency: string; source: string }> {
-  // ponytail: rate sources (`room_type_pricing.price`, `company_price_overrides.price`)
-  // are stored as plain numerics in their respective `currency` columns
-  // (`room_type_pricing.currency` defaults to 'USD', `company_price_overrides.currency`
-  // defaults to 'USD', `rooms.price` has no currency column and historically
-  // followed the room_type currency). We return system currency here so the
-  // downstream code stores amounts in one consistent currency rather than
-  // blindly labelling everything as EGP.
-  const currency = await getSystemCurrency()
-
-  const room = await prisma.rooms.findUnique({ where: { id: roomId }, select: { price: true, room_type_id: true } })
-
-  if (!room) return { rate: 0, currency, source: 'default_room_type_rate' }
-
-  let baseRate = Number(room.price)
-  let source = 'default_room_type_rate'
-
-  // Check company override
-  if (contactId) {
-    const roomType = await prisma.room_types.findUnique({ where: { id: room.room_type_id }, select: { slug: true } })
-    const companyOverride = await prisma.company_price_overrides.findFirst({
-      where: {
-        contact_id: contactId,
-        room_category: roomType?.slug ?? '',
-        deleted_at: null,
-        ...(occupancyCode ? { occupancy_code: occupancyCode as occupancy_code } : {}),
-      },
-      select: { price: true },
-    })
-
-    if (companyOverride) {
-      return { rate: Number(companyOverride.price), currency, source: 'company_override' }
-    }
+  // Same hierarchy as reservation creation and availability: public.resolve_room_rate.
+  // Amounts are stored in the system currency.
+  const [currency, [row]] = await Promise.all([
+    getSystemCurrency(),
+    prisma.$queryRawTyped(resolveRoomRate(roomId, checkIn.slice(0, 10), checkOut.slice(0, 10), contactId ?? null, occupancyCode ?? null)),
+  ])
+  return {
+    rate: row?.rate == null ? 0 : Number(row.rate),
+    currency,
+    source: row?.source ?? 'default_room_type_rate',
   }
-
-  // Check room_type_pricing (standard/seasonal rates)
-  type PricingRow = { price: number | null; price_single: number | null; price_double: number | null; price_triple: number | null }
-  const applyPricingRow = (row: PricingRow | null): number | null => {
-    if (!row) return null
-    if (occupancyCode === 'S' && row.price_single != null) return Number(row.price_single)
-    if (occupancyCode === 'D' && row.price_double != null) return Number(row.price_double)
-    if (occupancyCode === 'T' && row.price_triple != null) return Number(row.price_triple)
-    if (row.price != null && Number(row.price) > 0) return Number(row.price)
-    return null
-  }
-
-  const pricingSelect = { price: true, price_single: true, price_double: true, price_triple: true } as const
-  const toPricingRow = (row: { price: Prisma.Decimal; price_single: Prisma.Decimal | null; price_double: Prisma.Decimal | null; price_triple: Prisma.Decimal | null } | null): PricingRow | null =>
-    row
-      ? {
-          price: Number(row.price),
-          price_single: row.price_single == null ? null : Number(row.price_single),
-          price_double: row.price_double == null ? null : Number(row.price_double),
-          price_triple: row.price_triple == null ? null : Number(row.price_triple),
-        }
-      : null
-
-  const stayStart = new Date(`${checkIn.slice(0, 10)}T00:00:00.000Z`)
-  const stayEnd = new Date(`${checkOut.slice(0, 10)}T00:00:00.000Z`)
-  const windowPricing = await prisma.room_type_pricing.findFirst({
-    where: {
-      room_type_id: room.room_type_id,
-      deleted_at: null,
-      AND: [
-        { OR: [{ effective_from: null }, { effective_from: { lte: stayStart } }] },
-        { OR: [{ effective_until: null }, { effective_until: { gte: stayEnd } }] },
-      ],
-    },
-    select: pricingSelect,
-    orderBy: { effective_from: { sort: 'desc', nulls: 'last' } },
-  })
-  const windowRate = applyPricingRow(toPricingRow(windowPricing))
-
-  // If the stay falls outside every pricing window (or the in-window row has
-  // no price for this occupancy), fall back to the most recent row for the
-  // type instead of rooms.price (which is 0 whenever rates live in
-  // room_type_pricing). Otherwise snapshotPricing persists 0 to
-  // reservation_rooms.rate_per_night and zeroes the reservation totals.
-  if (windowRate !== null) {
-    baseRate = windowRate
-    source = 'seasonal_rate'
-  } else {
-    const fallback = await prisma.room_type_pricing.findFirst({
-      where: { room_type_id: room.room_type_id, deleted_at: null },
-      select: pricingSelect,
-      orderBy: { effective_from: { sort: 'desc', nulls: 'last' } },
-    })
-    const fallbackRate = applyPricingRow(toPricingRow(fallback))
-    if (fallbackRate !== null) {
-      baseRate = fallbackRate
-      source = 'seasonal_rate'
-    }
-  }
-
-  return { rate: baseRate, currency, source }
 }
 
 export function buildPricingItems(params: {
@@ -267,10 +184,22 @@ export async function calculatePricing(
   reservationId: string,
   contactId?: string | null,
 ): Promise<PriceBreakdown> {
-  const reservationRow = await prisma.reservations.findUnique({
-    where: { id: reservationId },
-    select: { check_in_date: true, check_out_date: true },
-  })
+  // Every input is independent: fetch in one parallel round trip.
+  const [reservationRow, rooms, currencyCode, settings] = await Promise.all([
+    prisma.reservations.findUnique({
+      where: { id: reservationId },
+      select: { check_in_date: true, check_out_date: true },
+    }),
+    prisma.reservation_rooms.findMany({
+      where: { reservation_id: reservationId, deleted_at: null, status: { not: 'cancelled' } },
+      select: { id: true, room_id: true, rate_per_night: true, occupancy_code: true, price_source: true },
+    }),
+    getSystemCurrency(),
+    prisma.accounting_settings.findMany({
+      where: { key: { in: ['service_charge_rate', 'vat_rate'] } },
+      select: { key: true, value: true },
+    }),
+  ])
 
   if (!reservationRow) throw new Error('Reservation not found')
   const reservation = {
@@ -282,24 +211,29 @@ export async function calculatePricing(
   const checkOut = new Date(reservation.check_out_date)
   const nights = Math.max(1, Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24)))
 
-  const rooms = await prisma.reservation_rooms.findMany({
-    where: { reservation_id: reservationId, deleted_at: null, status: { not: 'cancelled' } },
-    select: { id: true, room_id: true, rate_per_night: true, occupancy_code: true, price_source: true },
-  })
-
-  const currency = await getSystemCurrency() as string
+  const currency = currencyCode as string
   const items: PriceBreakdown['items'] = []
   const roomRates: NonNullable<PriceBreakdown['roomRates']> = []
   let roomCharges = 0
 
-  for (const room of rooms) {
+  // Resolve every room's rate concurrently instead of one room at a time.
+  const effectiveRates = await Promise.all(
+    rooms.map((room) =>
+      room.price_source !== 'manual_override' && room.room_id
+        ? getEffectiveRate(room.room_id, reservation.check_in_date, reservation.check_out_date, contactId, room.occupancy_code as 'S' | 'D' | 'T' | null)
+        : null,
+    ),
+  )
+  const rateUpdates: Promise<unknown>[] = []
+
+  rooms.forEach((room, index) => {
     let rate = Number(room.rate_per_night)
     let priceSource = 'default_room_type_rate'
+    const effective = effectiveRates[index]
     if (room.price_source === 'manual_override') {
       // Staff pinned this room's rate for this booking; never auto-re-price it.
       priceSource = 'manual_override'
-    } else if (room.room_id) {
-      const effective = await getEffectiveRate(room.room_id, reservation.check_in_date, reservation.check_out_date, contactId, room.occupancy_code as 'S' | 'D' | 'T' | null)
+    } else if (effective) {
       // Never replace an existing rate with 0: when no price resolves (room
       // has no pricing row at all), keep the stored rate instead of zeroing
       // the reservation on every edit.
@@ -307,7 +241,7 @@ export async function calculatePricing(
       priceSource = effective.rate > 0 ? effective.source : rate > 0 ? 'default_room_type_rate' : 'missing'
 
       if (rate !== Number(room.rate_per_night)) {
-        await prisma.reservation_rooms.update({ where: { id: room.id }, data: { rate_per_night: rate } })
+        rateUpdates.push(prisma.reservation_rooms.update({ where: { id: room.id }, data: { rate_per_night: rate } }))
       }
     }
 
@@ -326,12 +260,9 @@ export async function calculatePricing(
       reservationRoomId: room.id,
       roomId: room.room_id,
     })
-  }
-
-  const settings = await prisma.accounting_settings.findMany({
-    where: { key: { in: ['service_charge_rate', 'vat_rate'] } },
-    select: { key: true, value: true },
   })
+  await Promise.all(rateUpdates)
+
   const settingsMap = new Map(settings.map((s) => [s.key, s.value as { rate?: number }]))
   const serviceChargePercent = (settingsMap.get('service_charge_rate')?.rate ?? 10)
   const taxPercent = (settingsMap.get('vat_rate')?.rate ?? 14)
@@ -513,15 +444,16 @@ export async function syncOpenInvoicesForReservation(reservationId: string): Pro
 
   const invoiceIds = linked.map((inv) => inv.id)
 
-  const rooms = await prisma.reservation_rooms.findMany({
-    where: { reservation_id: reservationId, deleted_at: null, status: { not: 'cancelled' } },
-    select: { rate_per_night: true, nights: true, check_in_date: true, check_out_date: true, rooms: { select: { number: true } } },
-  })
-
-  const pricingItems = await prisma.reservation_pricing_items.findMany({
-    where: { reservation_id: reservationId },
-    select: { pricing_level: true, total_amount: true, service_amount: true, tax_amount: true, manual_override_reason: true },
-  })
+  const [rooms, pricingItems] = await Promise.all([
+    prisma.reservation_rooms.findMany({
+      where: { reservation_id: reservationId, deleted_at: null, status: { not: 'cancelled' } },
+      select: { rate_per_night: true, nights: true, check_in_date: true, check_out_date: true, rooms: { select: { number: true } } },
+    }),
+    prisma.reservation_pricing_items.findMany({
+      where: { reservation_id: reservationId },
+      select: { pricing_level: true, total_amount: true, service_amount: true, tax_amount: true, manual_override_reason: true },
+    }),
+  ])
 
   const extraCharges = pricingItems.filter((p) => p.pricing_level === 'extra')
   const extraTotal = extraCharges.reduce((sum, p) => sum + Number(p.total_amount ?? 0), 0)

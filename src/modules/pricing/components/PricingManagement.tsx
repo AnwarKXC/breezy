@@ -25,7 +25,7 @@ export function PricingManagement() {
 
   const [showModal, setShowModal] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [form, setForm] = useState({ room_type_id: '', price: 0, price_single: 0, price_double: 0, price_triple: 0, currency: 'USD' as CurrencyCode, effective_from: '', effective_until: '' })
+  const [form, setForm] = useState({ room_type_id: '', price: 0, price_single: 0, price_double: 0, price_triple: 0, currency: 'EGP' as CurrencyCode, effective_from: '', effective_until: '' })
   const [formError, setFormError] = useState('')
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [saving, setSaving] = useState(false)
@@ -67,7 +67,7 @@ export function PricingManagement() {
 
   const openCreate = useCallback(() => {
     setEditingId(null)
-    setForm({ room_type_id: '', price: 0, price_single: 0, price_double: 0, price_triple: 0, currency: 'USD', effective_from: '', effective_until: '' })
+    setForm({ room_type_id: '', price: 0, price_single: 0, price_double: 0, price_triple: 0, currency: 'EGP', effective_from: '', effective_until: '' })
     setFormError('')
     setFieldErrors({})
     setShowModal(true)
@@ -102,7 +102,7 @@ export function PricingManagement() {
   const closeModal = useCallback(() => {
     setShowModal(false)
     setEditingId(null)
-    setForm({ room_type_id: '', price: 0, price_single: 0, price_double: 0, price_triple: 0, currency: 'USD', effective_from: '', effective_until: '' })
+    setForm({ room_type_id: '', price: 0, price_single: 0, price_double: 0, price_triple: 0, currency: 'EGP', effective_from: '', effective_until: '' })
     setFormError('')
     setFieldErrors({})
   }, [])
@@ -277,8 +277,8 @@ export function PricingManagement() {
           <div className="relative">
             <FloatingInput
               label={t('rooms.pricingForm.standard')}
-              type="text"
-              dir="ltr"
+              type="number"
+              dir="ltr" inputMode="decimal"
               min={0}
               step="0.01"
               value={form.price}
@@ -291,7 +291,7 @@ export function PricingManagement() {
           <div className="relative">
             <FloatingInput
               label={t('rooms.pricingForm.single')}
-              type="text"
+              type="number"
               min={0}
               step="0.01"
               value={form.price_single}
@@ -303,7 +303,7 @@ export function PricingManagement() {
           <div className="relative">
             <FloatingInput
               label={t('rooms.pricingForm.double')}
-              type="text"
+              type="number"
               min={0}
               step="0.01"
               value={form.price_double}
@@ -315,7 +315,7 @@ export function PricingManagement() {
           <div className="relative">
             <FloatingInput
               label={t('rooms.pricingForm.triple')}
-              type="text"
+              type="number"
               min={0}
               step="0.01"
               value={form.price_triple}
@@ -332,7 +332,7 @@ export function PricingManagement() {
           <div>
             <FloatingInput
               label={t('rooms.detail.from')}
-              type="date"
+              type="date" max={form.effective_until || undefined}
               value={form.effective_from}
               onChange={e => { clearFieldError('effective_from'); setForm(f => ({ ...f, effective_from: e.target.value })) }}
             />
@@ -341,7 +341,7 @@ export function PricingManagement() {
           <div>
             <FloatingInput
               label={t('rooms.detail.to')}
-              type="date"
+              type="date" min={form.effective_from || undefined}
               value={form.effective_until}
               onChange={e => { clearFieldError('effective_until'); setForm(f => ({ ...f, effective_until: e.target.value })) }}
             />

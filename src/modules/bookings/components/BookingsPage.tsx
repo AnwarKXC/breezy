@@ -1,9 +1,11 @@
 ﻿'use client'
 
-import { useState, useMemo, useCallback, useEffect } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { DeleteConfirmationDialog } from '@/shared/components/DeleteConfirmationDialog'
+import { Modal } from '@/shared/components/Modal'
+import { InfoHint } from '@/shared/components/InfoHint'
 import { BookingDeleteModal } from './BookingDeleteModal'
 import { useTranslation } from '@/i18n/hooks/useTranslation'
 import { useCurrency } from '@/shared/contexts/CurrencyContext'
@@ -12,6 +14,7 @@ import { useRooms } from '@/modules/rooms/hooks/useRooms'
 import { useRoomTypes } from '@/modules/room-types/hooks/useRoomTypes'
 import { usePricing } from '@/modules/pricing/hooks/usePricing'
 import { guestService } from '@/services/guestService'
+import { useResource } from '@/shared/data/useResource'
 import { roomService } from '@/services/roomService'
 import type { Guest } from '@/modules/guests/types'
 import { reservationService } from '@/services/reservationService'
@@ -32,6 +35,10 @@ import type { DerivedRoomAvailability } from '../utils/deriveRoomAvailability'
 import { deriveRoomPrice } from '../utils/deriveRoomPrice'
 import type { Booking, BookingStatus } from '../types'
 
+// Guests only feed the detail modal; a failed load just leaves it without guest info.
+const fetchGuests = () => guestService.getAll().catch(() => [] as Guest[])
+const EMPTY_GUESTS: Guest[] = []
+
 export function BookingsPage() {
   const router = useRouter()
   const { t, locale } = useTranslation()
@@ -41,12 +48,12 @@ export function BookingsPage() {
   const { rooms, loading: roomsLoading, fetchRooms } = useRooms()
   const { items: roomTypes } = useRoomTypes()
   const { items: pricing } = usePricing()
-  const [guests, setGuests] = useState<Guest[]>([])
-  const [guestsLoading, setGuestsLoading] = useState(true)
+  const { data: guestRows, isLoading: guestsLoading } = useResource<Guest[]>('/api/guests', fetchGuests)
+  const guests = guestRows ?? EMPTY_GUESTS
   const [detailBooking, setDetailBooking] = useState<Booking | null>(null)
   const [detailOpen, setDetailOpen] = useState(false)
   const [checkoutBooking, setCheckoutBooking] = useState<Booking | null>(null)
-  const [checkoutSavedCharges, setCheckoutSavedCharges] = useState<SavedCharge[]>([])
+  const [checkoutSavedCharges, setCheckoutSavedCharges] = useState<SavedCharge[] | null>(null)
 
   const [confirmAction, setConfirmAction] = useState<{ action: string; booking: Booking } | null>(null)
   const [confirmDeleting, setConfirmDeleting] = useState(false)
@@ -58,13 +65,6 @@ export function BookingsPage() {
   const [deleteBookingInvoiceOpen, setDeleteBookingInvoiceOpen] = useState(false)
   const [deleteBookingInvoiceData, setDeleteBookingInvoiceData] = useState<{ booking: Booking; invoice: { id: string; invoiceNumber: string; status: string; amount: number } } | null>(null)
   const [deleteBookingInvoiceLoading, setDeleteBookingInvoiceLoading] = useState(false)
-
-  useEffect(() => {
-    guestService.getAll()
-      .then(setGuests)
-      .catch(() => {})
-      .finally(() => setGuestsLoading(false))
-  }, [])
 
   // Check-out date of the confirmed stay on each room, derived from the loaded
   // reservations (single-room rows and per-room sub-bookings carry roomId).
@@ -175,7 +175,7 @@ export function BookingsPage() {
     }
     toast.success('Checked out successfully')
     setCheckoutBooking(null)
-    setCheckoutSavedCharges([])
+    setCheckoutSavedCharges(null)
 
     // Download invoice PDF if available
     if (json.invoice) {
@@ -185,8 +185,7 @@ export function BookingsPage() {
       } catch { /* non-critical */ }
     }
 
-    await fetchBookings()
-    await fetchRooms()
+    await Promise.all([fetchBookings(), fetchRooms()])
   }, [bookings, fetchBookings, fetchRooms])
 
   const handleAction = useCallback(
@@ -212,7 +211,10 @@ export function BookingsPage() {
             // Fetch saved extra charges for reservation-based bookings
             if (booking.reservationId) {
               reservationService.getById(booking.reservationId).then((res) => {
-                if (!res.ok || !res.data) return
+                if (!res.ok || !res.data) {
+                  setCheckoutSavedCharges([])
+                  return
+                }
                 setCheckoutSavedCharges(
                   res.data.pricingItems
                     .filter((p) => p.pricing_level === 'extra')
@@ -224,7 +226,7 @@ export function BookingsPage() {
                       amount: Number(p.total_amount),
                     })),
                 )
-              })
+              }).catch(() => setCheckoutSavedCharges([]))
             } else {
               setCheckoutSavedCharges([])
             }
@@ -293,8 +295,7 @@ export function BookingsPage() {
             return
           }
         }
-        await fetchBookings()
-        await fetchRooms()
+        await Promise.all([fetchBookings(), fetchRooms()])
       } catch {
         // error handled by hook
       }
@@ -316,8 +317,7 @@ export function BookingsPage() {
           }
         }
       }
-      await fetchBookings()
-      await fetchRooms()
+      await Promise.all([fetchBookings(), fetchRooms()])
     } catch {
       toast.error('Failed to delete booking')
     } finally {
@@ -347,8 +347,7 @@ export function BookingsPage() {
       toast.success('Booking cancelled')
       setBookingCancelOpen(false)
       setConfirmAction(null)
-      await fetchBookings()
-      await fetchRooms()
+      await Promise.all([fetchBookings(), fetchRooms()])
     } catch {
       toast.error('Failed to cancel booking')
     } finally {
@@ -388,8 +387,7 @@ export function BookingsPage() {
           toast.error(data.error?.message ?? 'Failed to delete reservation')
         }
       }
-      await fetchBookings()
-      await fetchRooms()
+      await Promise.all([fetchBookings(), fetchRooms()])
     } catch {
       toast.error('Failed to delete booking')
     } finally {
@@ -564,6 +562,7 @@ export function BookingsPage() {
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
             onFilterClick={() => setBookingFilterOpen(true)}
+            activeFilterCount={[dateRange.startDate || dateRange.endDate, bookingStatusFilter, guestTypeFilter].filter(Boolean).length}
             onAddBooking={canCreateReservation ? handleAddBooking : undefined}
             onCheckIn={(b) => handleAction('checkIn', b)}
             onCheckOut={(b) => handleAction('checkOut', b)}
@@ -618,13 +617,14 @@ export function BookingsPage() {
       />
 
       <CheckoutConfirmModal
-        key={`checkout-${checkoutBooking?.id ?? 'none'}`}
+        // Remounts once the saved charges arrive so the form starts from them.
+        key={`checkout-${checkoutBooking?.id ?? 'none'}-${checkoutSavedCharges ? 'ready' : 'loading'}`}
         isOpen={!!checkoutBooking}
-        onClose={() => { setCheckoutBooking(null); setCheckoutSavedCharges([]) }}
+        onClose={() => { setCheckoutBooking(null); setCheckoutSavedCharges(null) }}
         booking={checkoutBooking}
         formatCurrency={formatCurrency}
         onConfirm={handleCheckoutConfirm}
-        savedCharges={checkoutSavedCharges}
+        savedCharges={checkoutSavedCharges ?? []}
         invoiceSummary={checkoutBooking ? {
           status: checkoutBooking.paidAmount >= checkoutBooking.totalAmount && checkoutBooking.paidAmount > 0
             ? 'paid'
@@ -645,49 +645,60 @@ export function BookingsPage() {
         cancelLabel={t('bookings.keepLabel')}
       />
 
-      {bookingCancelOpen && confirmAction?.booking && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20">
-          <div className="rounded-xl border border-[#EAEAEA] bg-white p-6 w-96">
-            <p className="text-sm font-medium text-[#1A1A1A]">{t('bookings.cancelBookingTitle')}</p>
-            <p className="mt-1 text-sm text-[#787774]">{t('bookings.cancelBookingDescription')}</p>
-            <div className="mt-4">
-              <label className="text-xs font-medium text-[#787774]">{t('bookings.cancellationFeeAmount')}</label>
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                value={bookingCancelFee}
-                onChange={(e) => setBookingCancelFee(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-[#EAEAEA] px-3 py-2 text-sm text-[#333333] focus:outline-none focus:ring-2 focus:ring-[#1A1A1A]/10"
-                placeholder="0.00"
-              />
-            </div>
-            <div className="mt-5 flex justify-end gap-2">
-              <button
-                onClick={() => { setBookingCancelOpen(false); setBookingCancelFee(''); setConfirmAction(null) }}
-                disabled={bookingCancelLoading}
-                className="rounded-lg border border-[#EAEAEA] bg-white px-4 py-2 text-sm font-medium text-[#333333] transition-colors hover:bg-[#F9F9F8] disabled:opacity-50"
-              >
-                {t('bookings.backLabel')}
-              </button>
-              <button
-                onClick={() => handleBookingCancel()}
-                disabled={bookingCancelLoading}
-                className="rounded-lg border border-[#EAEAEA] bg-white px-4 py-2 text-sm font-medium text-[#333333] transition-colors hover:bg-rose-50 disabled:opacity-50"
-              >
-                {t('bookings.justCancel')}
-              </button>
-              <button
-                onClick={() => handleBookingCancel(Number(bookingCancelFee) || undefined)}
-                disabled={bookingCancelLoading}
-                className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-rose-700 disabled:opacity-50"
-              >
-                {t('bookings.cancelAndChargeFee')}
-              </button>
-            </div>
-          </div>
+      <Modal
+        isOpen={bookingCancelOpen && !!confirmAction?.booking}
+        onClose={() => {
+          if (bookingCancelLoading) return
+          setBookingCancelOpen(false); setBookingCancelFee(''); setConfirmAction(null)
+        }}
+        title={t('bookings.cancelBookingTitle')}
+      >
+        <p className="text-sm text-[#787774]">{t('bookings.cancelBookingDescription')}</p>
+        <div className="mt-4">
+          <label htmlFor="booking-cancel-fee" className="flex items-center gap-1.5 text-xs font-medium text-[#787774]">
+            {t('bookings.cancellationFeeAmount')}
+            <InfoHint text={t('bookings.cancellationFeeHint')} />
+          </label>
+          <input
+            id="booking-cancel-fee"
+            type="number" inputMode="decimal" onWheel={(event) => event.currentTarget.blur()}
+            min="0"
+            step="0.01"
+            value={bookingCancelFee}
+            onChange={(e) => setBookingCancelFee(e.target.value)}
+            className="mt-1 w-full rounded-lg border border-[#EAEAEA] px-3 py-2 text-sm text-[#333333] focus:outline-none focus:ring-2 focus:ring-[#1A1A1A]/10"
+            placeholder="0.00"
+          />
         </div>
-      )}
+        <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <button
+            type="button"
+            onClick={() => { setBookingCancelOpen(false); setBookingCancelFee(''); setConfirmAction(null) }}
+            disabled={bookingCancelLoading}
+            className="rounded-lg border border-[#EAEAEA] bg-white px-4 py-2 text-sm font-medium text-[#333333] transition-colors hover:bg-[#F9F9F8] disabled:opacity-50"
+          >
+            {t('bookings.backLabel')}
+          </button>
+          <button
+            type="button"
+            onClick={() => handleBookingCancel()}
+            disabled={bookingCancelLoading}
+            data-tooltip={t('bookings.justCancelHint')}
+            className="rounded-lg border border-[#EAEAEA] bg-white px-4 py-2 text-sm font-medium text-[#333333] transition-colors hover:bg-rose-50 disabled:opacity-50"
+          >
+            {t('bookings.justCancel')}
+          </button>
+          <button
+            type="button"
+            onClick={() => handleBookingCancel(Number(bookingCancelFee) || undefined)}
+            disabled={bookingCancelLoading || !(Number(bookingCancelFee) > 0)}
+            data-tooltip={t('bookings.cancelAndChargeFeeHint')}
+            className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-rose-700 disabled:opacity-50"
+          >
+            {t('bookings.cancelAndChargeFee')}
+          </button>
+        </div>
+      </Modal>
 
       <BookingDeleteModal
         isOpen={deleteBookingInvoiceOpen}

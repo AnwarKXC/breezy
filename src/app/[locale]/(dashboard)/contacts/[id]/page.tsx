@@ -55,26 +55,37 @@ export default async function ContactDetailsRoutePage({
   let invoices: Invoice[] = []
   let bookings: Booking[] = []
   let roomTypes: { slug: string; name: string; basePrice: number }[] = []
-  let seasonalPrices: Record<string, { price: number; priceSingle: number | null; priceDouble: number | null; priceTriple: number | null }> = {}
+  const seasonalPrices: Record<string, { price: number; priceSingle: number | null; priceDouble: number | null; priceTriple: number | null }> = {}
   let errorMessage: string | null = null
   let permissions = { canCreateContacts: false, canDeleteContacts: false, canUpdateContacts: false, canUpdatePriceOverrides: false }
 
   try {
     const session = await requireContactsRead()
     permissions = getContactsUiPermissions(session)
-    contact = await getContactById(id)
-    overrides = await getPriceOverrides(id)
-    invoices = await getInvoicesByContact(id)
-    bookings = await getBookingsByContact(id, contact?.type, {
-      year: year ? Number(year) : undefined,
-      month: month ? Number(month) : undefined,
-    }).catch(() => [] as Booking[])
-    roomTypes = (await listRoomTypes()).map(rt => ({ slug: rt.slug, name: rt.name, basePrice: rt.basePrice }))
-
-    const pricingRows = await prisma.room_type_pricing.findMany({
-      where: { deleted_at: null },
-      include: { room_types: { select: { slug: true } } },
-    })
+    // Independent queries run in parallel; only bookings needs the contact type.
+    const contactPromise = getContactById(id)
+    const bookingsPromise = contactPromise.then((c) =>
+      getBookingsByContact(id, c?.type, {
+        year: year ? Number(year) : undefined,
+        month: month ? Number(month) : undefined,
+      }),
+    ).catch(() => [] as Booking[])
+    const [contactRow, overrideRows, invoiceRows, bookingRows, roomTypeRows, pricingRows] = await Promise.all([
+      contactPromise,
+      getPriceOverrides(id),
+      getInvoicesByContact(id),
+      bookingsPromise,
+      listRoomTypes(),
+      prisma.room_type_pricing.findMany({
+        where: { deleted_at: null },
+        include: { room_types: { select: { slug: true } } },
+      }),
+    ])
+    contact = contactRow
+    overrides = overrideRows
+    invoices = invoiceRows
+    bookings = bookingRows
+    roomTypes = roomTypeRows.map(rt => ({ slug: rt.slug, name: rt.name, basePrice: rt.basePrice }))
     {
       const now = new Date()
       for (const row of pricingRows) {

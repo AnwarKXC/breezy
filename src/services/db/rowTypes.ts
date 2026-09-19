@@ -568,7 +568,7 @@ export type Database = {
           notes: string | null
           paid_amount: number
           paid_at: string | null
-          payment_method: string | null
+          payment_method: Database["public"]["Enums"]["payment_method"] | null
           public_notes: string | null
           refunded_amount: number
           remaining_balance: number
@@ -576,7 +576,7 @@ export type Database = {
           room_id: string | null
           room_number: string | null
           service_charge: number
-          status: string
+          status: Database["public"]["Enums"]["invoice_status"]
           stay_check_in: string | null
           stay_check_out: string | null
           subtotal: number
@@ -609,7 +609,7 @@ export type Database = {
           notes?: string | null
           paid_amount?: number
           paid_at?: string | null
-          payment_method?: string | null
+          payment_method?: Database["public"]["Enums"]["payment_method"] | null
           public_notes?: string | null
           refunded_amount?: number
           remaining_balance?: number
@@ -617,7 +617,7 @@ export type Database = {
           room_id?: string | null
           room_number?: string | null
           service_charge?: number
-          status?: string
+          status?: Database["public"]["Enums"]["invoice_status"]
           stay_check_in?: string | null
           stay_check_out?: string | null
           subtotal?: number
@@ -650,7 +650,7 @@ export type Database = {
           notes?: string | null
           paid_amount?: number
           paid_at?: string | null
-          payment_method?: string | null
+          payment_method?: Database["public"]["Enums"]["payment_method"] | null
           public_notes?: string | null
           refunded_amount?: number
           remaining_balance?: number
@@ -658,7 +658,7 @@ export type Database = {
           room_id?: string | null
           room_number?: string | null
           service_charge?: number
-          status?: string
+          status?: Database["public"]["Enums"]["invoice_status"]
           stay_check_in?: string | null
           stay_check_out?: string | null
           subtotal?: number
@@ -700,7 +700,7 @@ export type Database = {
           received_by: string | null
           refunded_amount: number
           transaction_date: string
-          type: Database["public"]["Enums"]["payment_type"]
+          method: Database["public"]["Enums"]["payment_method"]
           updated_at: string | null
           void_reason: string | null
         }
@@ -717,7 +717,7 @@ export type Database = {
           received_by?: string | null
           refunded_amount?: number
           transaction_date?: string
-          type: Database["public"]["Enums"]["payment_type"]
+          method: Database["public"]["Enums"]["payment_method"]
           updated_at?: string | null
           void_reason?: string | null
         }
@@ -734,7 +734,7 @@ export type Database = {
           received_by?: string | null
           refunded_amount?: number
           transaction_date?: string
-          type?: Database["public"]["Enums"]["payment_type"]
+          method?: Database["public"]["Enums"]["payment_method"]
           updated_at?: string | null
           void_reason?: string | null
         }
@@ -1740,7 +1740,6 @@ export type Database = {
       room_types: {
         Row: {
           amenities: Json
-          base_price: number
           created_at: string
           default_capacity: number
           deleted_at: string | null
@@ -1752,7 +1751,6 @@ export type Database = {
         }
         Insert: {
           amenities?: Json
-          base_price: number
           created_at?: string
           default_capacity: number
           deleted_at?: string | null
@@ -1764,7 +1762,6 @@ export type Database = {
         }
         Update: {
           amenities?: Json
-          base_price?: number
           created_at?: string
           default_capacity?: number
           deleted_at?: string | null
@@ -1785,9 +1782,11 @@ export type Database = {
           floor: number
           id: string
           number: string
-          price: number
           room_type_id: string
           status: Database["public"]["Enums"]["room_status"]
+          occupancy_status: Database["public"]["Enums"]["room_occupancy_status"]
+          housekeeping_status: Database["public"]["Enums"]["housekeeping_status"]
+          operational_status: Database["public"]["Enums"]["room_operational_status"]
           updated_at: string
         }
         Insert: {
@@ -1798,9 +1797,11 @@ export type Database = {
           floor: number
           id?: string
           number: string
-          price: number
           room_type_id: string
           status?: Database["public"]["Enums"]["room_status"]
+          occupancy_status?: Database["public"]["Enums"]["room_occupancy_status"]
+          housekeeping_status?: Database["public"]["Enums"]["housekeeping_status"]
+          operational_status?: Database["public"]["Enums"]["room_operational_status"]
           updated_at?: string
         }
         Update: {
@@ -1811,9 +1812,11 @@ export type Database = {
           floor?: number
           id?: string
           number?: string
-          price?: number
           room_type_id?: string
           status?: Database["public"]["Enums"]["room_status"]
+          occupancy_status?: Database["public"]["Enums"]["room_occupancy_status"]
+          housekeeping_status?: Database["public"]["Enums"]["housekeeping_status"]
+          operational_status?: Database["public"]["Enums"]["room_operational_status"]
           updated_at?: string
         }
         Relationships: [
@@ -1881,14 +1884,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      auto_clean_dirty_rooms: {
-        Args: never
-        Returns: {
-          new_status: string
-          old_status: string
-          room_id: string
-        }[]
-      }
       can_write_reservations: { Args: never; Returns: boolean }
       create_reservation_hold: {
         Args: {
@@ -1979,9 +1974,14 @@ export type Database = {
         | "user_deleted"
         | "user_updated"
         | "user_viewed"
+      room_occupancy_status: "vacant" | "occupied"
+      housekeeping_status: "clean" | "dirty" | "cleaning" | "inspected"
+      room_operational_status: "active" | "maintenance" | "out_of_order" | "blocked"
+      invoice_status:
+        | "draft" | "issued" | "partially_paid" | "partially_refunded" | "paid" | "overdue" | "void" | "refunded"
       log_module: "accounting" | "auth" | "contacts" | "reservations" | "users"
       occupancy_code: "S" | "D" | "T"
-      payment_type:
+      payment_method:
         | "instapay" | "vodafone_cash" | "cash" | "bank_transfer" | "visa" | "card" | "online" | "ota" | "company_credit" | "other"
       price_source:
         | "default_room_type_rate"
@@ -2000,20 +2000,6 @@ export type Database = {
         | "additional_guest"
         | "company_guest"
         | "child"
-      reservation_payment_method:
-        | "cash"
-        | "card"
-        | "bank_transfer"
-        | "company_credit"
-        | "voucher"
-        | "other"
-      reservation_payment_type:
-        | "deposit"
-        | "partial_payment"
-        | "full_payment"
-        | "refund"
-        | "company_invoice"
-        | "guarantee_only"
       reservation_room_status:
         | "selected"
         | "held"
@@ -2211,7 +2197,11 @@ export const Constants = {
       ],
       log_module: ["accounting", "auth", "contacts", "reservations", "users"],
       occupancy_code: ["S", "D", "T"],
-      payment_type: ["instapay", "vodafone_cash", "cash", "bank_transfer", "visa", "card", "online", "ota", "company_credit", "other"],
+      room_occupancy_status: ["vacant", "occupied"],
+      housekeeping_status: ["clean", "dirty", "cleaning", "inspected"],
+      room_operational_status: ["active", "maintenance", "out_of_order", "blocked"],
+      invoice_status: ["draft", "issued", "partially_paid", "partially_refunded", "paid", "overdue", "void", "refunded"],
+      payment_method: ["instapay", "vodafone_cash", "cash", "bank_transfer", "visa", "card", "online", "ota", "company_credit", "other"],
       price_source: [
         "default_room_type_rate",
         "room_specific_rate",
@@ -2231,22 +2221,6 @@ export const Constants = {
         "additional_guest",
         "company_guest",
         "child",
-      ],
-      reservation_payment_method: [
-        "cash",
-        "card",
-        "bank_transfer",
-        "company_credit",
-        "voucher",
-        "other",
-      ],
-      reservation_payment_type: [
-        "deposit",
-        "partial_payment",
-        "full_payment",
-        "refund",
-        "company_invoice",
-        "guarantee_only",
       ],
       reservation_room_status: [
         "selected",

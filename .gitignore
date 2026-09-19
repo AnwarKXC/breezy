@@ -39,14 +39,11 @@ yarn-error.log*
 !.env.example
 
 # migration exports may contain user data
-/scripts/migrate-firebase-to-supabase/exports/
-/scripts/migrate-firebase-to-supabase/transformed/
 
 # local tooling/cache
 /.opencode/
 /graphify-out/cache/
 /src/graphify-out/
-/supabase/.temp/
 
 # e2e test artifacts
 /test-results/

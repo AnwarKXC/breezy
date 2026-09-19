@@ -1,49 +1,27 @@
-import { useState, useEffect, useCallback } from 'react'
-import { bookingService } from '@/services/bookingService'
-import type { Booking } from '../types'
-import { toast } from '@/shared/toast/toastEvents'
+'use client'
 
-interface UseBookingsOptions {
-  autoFetch?: boolean
+import { bookingService } from '@/services/bookingService'
+import { useResource } from '@/shared/data/useResource'
+import { toast } from '@/shared/toast/toastEvents'
+import type { Booking } from '../types'
+
+export const BOOKINGS_KEY = '/api/reservations/board'
+
+function fetchBookings() {
+  return bookingService.getAll().catch((e: unknown) => {
+    toast.error('Network error', { description: e instanceof Error ? e.message : 'Failed to fetch bookings' })
+    throw e
+  })
 }
 
-export function useBookings(options: UseBookingsOptions = {}) {
-  const { autoFetch = true } = options
-
-  const [bookings, setBookings] = useState<Booking[]>([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  const fetchBookings = useCallback(async () => {
-    setLoading(true)
-    setError(null)
-    try {
-      const data = await bookingService.getAll()
-      setBookings(data)
-    } catch (e) {
-      const message = e instanceof Error ? e.message : 'Failed to fetch bookings'
-      setError(message)
-      toast.error('Network error', { description: message })
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    if (autoFetch) {
-      const timer = setTimeout(() => {
-        void fetchBookings()
-      }, 0)
-
-      return () => clearTimeout(timer)
-    }
-  }, [autoFetch, fetchBookings])
+export function useBookings() {
+  const { data, error, isLoading, refresh } = useResource<Booking[]>(BOOKINGS_KEY, fetchBookings)
 
   return {
-    bookings,
-    loading,
-    error,
-    fetchBookings,
+    bookings: data ?? [],
+    loading: isLoading,
+    error: error?.message ?? null,
+    fetchBookings: refresh,
   }
 }
 

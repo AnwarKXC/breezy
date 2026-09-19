@@ -1,6 +1,6 @@
 ﻿'use client'
 
-import { useEffect, useState, type FormEvent } from 'react'
+import { useState, type FormEvent } from 'react'
 import { useTranslation } from '@/i18n/hooks/useTranslation'
 import { Modal } from '@/shared/components/Modal'
 import { useCurrency } from '@/shared/contexts/CurrencyContext'
@@ -78,14 +78,6 @@ export function CheckoutConfirmModal({ isOpen, onClose, booking, formatCurrency,
   const [paidAmount, setPaidAmount] = useState('')
   const [saving, setSaving] = useState(false)
 
-  useEffect(() => {
-    if (!isOpen) return
-    setExtraCharges(savedCharges.map((c) => ({ label: c.label, amount: c.amount })))
-    setCustomLabel('')
-    setCustomAmount('')
-    setPaidAmount('')
-  }, [isOpen, savedCharges])
-
   if (!booking) return null
 
   const isCompany = !!booking.contactId
@@ -160,6 +152,7 @@ export function CheckoutConfirmModal({ isOpen, onClose, booking, formatCurrency,
           <button
             type="button"
             onClick={onClose}
+            aria-label={t('common.close')}
             className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-[#787774] transition-colors hover:bg-[#F5F5F5] hover:text-[#333333]"
           >
             <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24">
@@ -213,7 +206,7 @@ export function CheckoutConfirmModal({ isOpen, onClose, booking, formatCurrency,
               className="min-w-0 flex-1 rounded-lg border border-[#E5E7EB] px-3 py-2 text-sm outline-none transition-colors placeholder:text-[#9CA3AF] focus:border-[#111]"
             />
             <input
-              type="number"
+              type="number" inputMode="decimal" step="0.01" min={0} onWheel={(event) => event.currentTarget.blur()}
               value={customAmount}
               onChange={(e) => setCustomAmount(e.target.value)}
               placeholder={t('bookings.amountPlaceholder')}
@@ -279,7 +272,7 @@ export function CheckoutConfirmModal({ isOpen, onClose, booking, formatCurrency,
             </label>
             <div className="relative">
               <input
-                type="number"
+                type="number" inputMode="decimal" step="0.01" min={0} onWheel={(event) => event.currentTarget.blur()}
                 max={amountDue}
                 value={displayPaidAmount}
                 onChange={(e) => handlePaidAmountChange(e.target.value)}

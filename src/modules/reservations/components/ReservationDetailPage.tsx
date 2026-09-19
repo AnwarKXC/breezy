@@ -1,7 +1,8 @@
-﻿'use client'
+'use client'
 
 import { useParams, useRouter } from 'next/navigation'
-import { useEffect, useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo } from 'react'
+import { useResource } from '@/shared/data/useResource'
 import { useTranslation } from '@/i18n/hooks/useTranslation'
 import { reservationService } from '@/services/reservationService'
 import { SkeletonCard } from '@/shared/components/SkeletonCard'
@@ -20,14 +21,25 @@ import { RoomGuestCard } from './RoomGuestCard'
 import { ReservationNotes } from './ReservationNotes'
 import { ReservationActions } from './ReservationActions'
 
+async function fetchReservation(id: string): Promise<ReservationDetail> {
+  const res = await reservationService.getById(id)
+  if (res.ok && res.data) return res.data
+  throw new Error(res.error?.message ?? '')
+}
+
 export function ReservationDetailPage() {
   const { t } = useTranslation()
   const { id, locale } = useParams<{ id: string; locale: string }>()
   const router = useRouter()
   const { formatCurrency, vatRate, serviceChargeRate } = useCurrency()
-  const [detail, setDetail] = useState<ReservationDetail | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  // Cached per reservation: refreshes after actions keep the page on screen
+  // instead of flashing the skeleton.
+  const reservation = useResource(`/api/reservations/${id}`, () => fetchReservation(id))
+  const detail = reservation.data ?? null
+  const loading = reservation.isLoading
+  const error = reservation.error ? reservation.error.message || t('reservations.failedToLoadReservation') : null
+  const fetchDetail = reservation.refresh
+  const refreshDetail = reservation.refresh
   const [extendRoom, setExtendRoom] = useState<ReservationDetail['rooms'][number] | null>(null)
   const [shortenRoom, setShortenRoom] = useState<ReservationDetail['rooms'][number] | null>(null)
   const [changeRoom, setChangeRoom] = useState<ReservationDetail['rooms'][number] | null>(null)
@@ -38,26 +50,6 @@ export function ReservationDetailPage() {
   const [extraChargeModalOpen, setExtraChargeModalOpen] = useState(false)
   const [extendedRooms, setExtendedRooms] = useState<Record<string, { date: string; roomNumber?: string }>>({})
   const [shortenedRooms, setShortenedRooms] = useState<Record<string, { date: string }>>({})
-
-  const fetchDetail = useCallback(async () => {
-    setLoading(true)
-    const res = await reservationService.getById(id)
-    if (res.ok && res.data) {
-      setDetail(res.data)
-      setError(null)
-    } else {
-      setError(res.error?.message ?? t('reservations.failedToLoadReservation'))
-    }
-    setLoading(false)
-  }, [id])
-
-  const refreshDetail = useCallback(async () => {
-    const res = await reservationService.getById(id)
-    if (res.ok && res.data) {
-      setDetail(res.data)
-      setError(null)
-    }
-  }, [id])
 
   const handlePriceSave = useCallback(async (reservationRoomId: string, ratePerNight: number | null, reason?: string) => {
     const res = await fetch(`/api/reservations/${id}/rooms/price`, {
@@ -73,10 +65,6 @@ export function ReservationDetailPage() {
     toast.success(t('reservations.priceSaved'))
     await refreshDetail()
   }, [id, refreshDetail, t])
-
-  useEffect(() => {
-    fetchDetail()
-  }, [fetchDetail])
 
   /** Convert a reservation + optional room into a Booking-shaped object */
   const buildBooking = useCallback((room?: ReservationDetail['rooms'][number]): Booking | null => {
@@ -133,7 +121,7 @@ export function ReservationDetailPage() {
       nightlyRate: nightly,
       capacity: occCapacity,
     } satisfies Booking
-  }, [detail])
+  }, [detail, t])
 
   const extendBooking = detail && extendRoom ? buildBooking(extendRoom) : null
   const shortenBooking = detail && shortenRoom ? buildBooking(shortenRoom) : null
@@ -190,7 +178,7 @@ export function ReservationDetailPage() {
         label: p.manual_override_reason ?? t('reservations.extraChargeFallback'),
         amount: p.total_amount,
       }))
-  }, [detail, extraChargeRoom])
+  }, [detail, extraChargeRoom, t])
 
   /** All extra charges across all rooms (for checkout modal) */
   const allExtraCharges = useMemo(() => {
@@ -204,7 +192,7 @@ export function ReservationDetailPage() {
         label: `${p.manual_override_reason ?? t('reservations.extraChargeFallback')}${p.reservation_room_id ? t('reservations.roomSuffix') : ''}`,
         amount: p.total_amount,
       }))
-  }, [detail])
+  }, [detail, t])
 
   /** Fetch how much of the reservation's invoice is already paid (accounting module) */
   const fetchCheckoutInvoiceSummary = useCallback(async () => {
@@ -262,7 +250,7 @@ export function ReservationDetailPage() {
     } catch {
       toast.error(t('reservations.networkErrorCheckout'))
     }
-  }, [id, fetchDetail])
+  }, [id, t, fetchDetail])
 
   const handleSaveExtraCharges = useCallback(async (_bookingId: string, charges: Array<{ dayIndex: number; dayLabel: string; label: string; amount: number }>) => {
     if (!extraChargeRoom) return
@@ -284,7 +272,7 @@ export function ReservationDetailPage() {
     setExtraChargeModalOpen(false)
     setExtraChargeRoom(null)
     await fetchDetail()
-  }, [id, extraChargeRoom, fetchDetail])
+  }, [extraChargeRoom, id, t, fetchDetail])
 
   const handleEditReservation = useCallback(() => {
     router.push(`/${locale}/reservations/${id}/edit`)
@@ -374,7 +362,7 @@ export function ReservationDetailPage() {
     )
   }
 
-  if (error || !detail) {
+  if (!detail) {
     return (
       <div className="min-h-screen bg-[#FBFBFA] p-6">
         <div className="mx-auto max-w-2xl rounded-xl border border-[#EAEAEA] bg-white p-8">
@@ -417,6 +405,7 @@ export function ReservationDetailPage() {
                 setCheckoutModalOpen(true)
                 void fetchCheckoutInvoiceSummary()
               }}
+              data-tooltip={t('reservations.hints.checkOut')}
               className="rounded-lg bg-[#1A1A1A] px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-[#333333]"
             >
               {t('reservations.checkOutButton')}

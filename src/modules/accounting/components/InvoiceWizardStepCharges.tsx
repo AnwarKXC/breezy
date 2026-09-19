@@ -96,7 +96,7 @@ export function InvoiceWizardStepCharges({
               </div>
               <div className="grid min-w-0 gap-3 sm:grid-cols-[minmax(5.5rem,0.7fr)_minmax(6rem,0.8fr)_minmax(7rem,1fr)_2rem]">
                 <FloatingInput
-                  type="number"
+                  type="number" inputMode="numeric"
                   label={t('accounting.invoices.quantity')}
                   wrapperClassName="min-w-0"
                   className="h-11 min-w-0 text-sm"
@@ -106,7 +106,7 @@ export function InvoiceWizardStepCharges({
                   onChange={(e) => onUpdateItem(idx, 'quantity', Number(e.target.value))}
                 />
                 <FloatingInput
-                  type="number"
+                  type="number" inputMode="decimal"
                   label={t('accounting.invoices.unitPrice')}
                   wrapperClassName="min-w-0"
                   className="h-11 min-w-0 text-sm"
@@ -183,7 +183,7 @@ export function InvoiceWizardStepCharges({
             <label className="text-xs text-[#555555]">
               {t('accounting.invoices.wizard.discountValue')}
               <input
-                type="number"
+                type="number" inputMode="decimal" onWheel={(event) => event.currentTarget.blur()}
                 min={0}
                 step="0.01"
                 value={discount?.value ?? 0}
@@ -221,8 +221,9 @@ export function InvoiceWizardStepCharges({
         <label className="text-xs text-[#555555]">
           {t('accounting.invoices.wizard.serviceCharge')} (%)
           <input
-            type="number"
+            type="number" inputMode="decimal" onWheel={(event) => event.currentTarget.blur()}
             min={0}
+            max={100}
             step="0.1"
             value={serviceCharge}
             onChange={(e) => onSetServiceCharge(Number(e.target.value))}
@@ -232,8 +233,9 @@ export function InvoiceWizardStepCharges({
         <label className="text-xs text-[#555555]">
           {t('accounting.invoices.wizard.taxRate')} (%)
           <input
-            type="number"
+            type="number" inputMode="decimal" onWheel={(event) => event.currentTarget.blur()}
             min={0}
+            max={100}
             step="0.1"
             value={taxRate}
             onChange={(e) => onSetTaxRate(Number(e.target.value))}

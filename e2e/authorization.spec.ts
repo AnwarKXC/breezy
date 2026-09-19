@@ -56,9 +56,8 @@ test.describe("Authorization & Security", () => {
     await page.waitForLoadState("networkidle");
 
     const html = await page.content();
-    const serviceKey = requireEnv("SUPABASE_SERVICE_ROLE_KEY");
-    expect(html).not.toContain(serviceKey);
-    expect(html).not.toContain("service_role");
+    expect(html).not.toContain("postgresql://");
+    expect(html).not.toContain("DATABASE_URL");
   });
 
   test("Common invalid inputs do not break the login page", async ({ page }) => {

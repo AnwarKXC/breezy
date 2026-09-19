@@ -1,5 +1,6 @@
 ﻿'use client'
 
+import { countryName } from '@/shared/static/countries'
 import { useMemo } from 'react'
 import { useTranslation } from '@/i18n/hooks/useTranslation'
 import { Table, TableActionsMenu, type TableColumn } from '@/shared/table'
@@ -73,7 +74,7 @@ export function BookingsTable({
   loading,
   ...callbacks
 }: BookingsTableProps) {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
 
   const columns = useMemo<TableColumn<BookingsTableRow & Record<string, unknown>>[]>(
     () => [
@@ -140,7 +141,7 @@ export function BookingsTable({
         key: 'country',
         label: t('bookings.columns.country'),
         render: (_v, row) => (
-          <span className="text-sm text-[#555555]">{row.guest?.country ?? '-'}</span>
+          <span className="text-sm text-[#555555]">{row.guest?.country ? countryName(row.guest.country, locale) : '-'}</span>
         ),
       },
       {
@@ -172,7 +173,7 @@ export function BookingsTable({
         },
       },
     ],
-    [t, callbacks],
+    [t, locale, callbacks],
   )
 
   return (

@@ -4,6 +4,9 @@ import { useState, useCallback } from 'react'
 import type { ReservationDetail } from '@/modules/reservations/types'
 import { toast } from '@/shared/toast/toastEvents'
 import { BookingDeleteModal } from '@/modules/bookings/components/BookingDeleteModal'
+import { useTranslation } from '@/i18n/hooks/useTranslation'
+import { Modal } from '@/shared/components/Modal'
+import { InfoHint } from '@/shared/components/InfoHint'
 
 interface Props {
   detail: ReservationDetail
@@ -16,17 +19,18 @@ const ACTION_MAP: Record<
   string,
   { action: string; label: string; method: string; endpoint: string; tone?: 'primary' | 'danger' | 'quiet' }[]
 > = {
+  // `label` is an i18n key under reservations.actionBar; `${label}Hint` explains the consequence.
   draft: [
-    { action: 'confirm', label: 'Confirm stay', method: 'POST', endpoint: 'confirm', tone: 'primary' },
-    { action: 'delete', label: 'Delete', method: 'DELETE', endpoint: '', tone: 'danger' },
+    { action: 'confirm', label: 'confirm', method: 'POST', endpoint: 'confirm', tone: 'primary' },
+    { action: 'delete', label: 'delete', method: 'DELETE', endpoint: '', tone: 'danger' },
   ],
   held: [
-    { action: 'confirm', label: 'Confirm stay', method: 'POST', endpoint: 'confirm', tone: 'primary' },
-    { action: 'cancel', label: 'Cancel', method: 'POST', endpoint: 'cancel', tone: 'danger' },
+    { action: 'confirm', label: 'confirm', method: 'POST', endpoint: 'confirm', tone: 'primary' },
+    { action: 'cancel', label: 'cancel', method: 'POST', endpoint: 'cancel', tone: 'danger' },
   ],
   confirmed: [
-    { action: 'check-in', label: 'Check in', method: 'POST', endpoint: 'check-in', tone: 'primary' },
-    { action: 'cancel', label: 'Cancel', method: 'POST', endpoint: 'cancel', tone: 'danger' },
+    { action: 'check-in', label: 'checkIn', method: 'POST', endpoint: 'check-in', tone: 'primary' },
+    { action: 'cancel', label: 'cancel', method: 'POST', endpoint: 'cancel', tone: 'danger' },
   ],
   checked_in: [],
   checked_out: [],
@@ -43,6 +47,8 @@ const BUTTON_STYLES = {
 }
 
 export function ReservationActions({ detail, onRefresh, onDeleted, onEdit }: Props) {
+  const { t } = useTranslation()
+  const tr = useCallback((key: string) => t(`reservations.actionBar.${key}`), [t])
   const [loading, setLoading] = useState<string | null>(null)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [confirmCancel, setConfirmCancel] = useState(false)
@@ -96,12 +102,12 @@ export function ReservationActions({ detail, onRefresh, onDeleted, onEdit }: Pro
       const data = await res.json()
       if (data.ok) {
         onRefresh()
-        toast.success('Action successful')
+        toast.success(tr('success'))
       } else {
-        toast.error(data.error?.message ?? 'Action failed')
+        toast.error(data.error?.message ?? tr('failed'))
       }
     } catch {
-      toast.error('Network error')
+      toast.error(tr('networkError'))
     } finally {
       setLoading(null)
     }
@@ -112,11 +118,11 @@ export function ReservationActions({ detail, onRefresh, onDeleted, onEdit }: Pro
     const data = await res.json()
     if (data.ok) {
       onDeleted?.()
-      toast.success('Reservation deleted')
+      toast.success(tr('deleted'))
     } else {
-      toast.error(data.error?.message ?? 'Failed to delete')
+      toast.error(data.error?.message ?? tr('deleteFailed'))
     }
-  }, [onDeleted])
+  }, [onDeleted, tr])
 
   const handleDeleteConfirmed = async () => {
     setLoading('delete')
@@ -126,13 +132,13 @@ export function ReservationActions({ detail, onRefresh, onDeleted, onEdit }: Pro
       setConfirmDelete(false)
       if (data.ok) {
         onDeleted?.()
-        toast.success('Reservation deleted')
+        toast.success(tr('deleted'))
       } else {
-        toast.error(data.error?.message ?? 'Failed to delete')
+        toast.error(data.error?.message ?? tr('deleteFailed'))
       }
     } catch {
       setConfirmDelete(false)
-      toast.error('Network error')
+      toast.error(tr('networkError'))
     } finally {
       setLoading(null)
     }
@@ -147,17 +153,17 @@ export function ReservationActions({ detail, onRefresh, onDeleted, onEdit }: Pro
       setConfirmCancel(false)
       if (data.ok) {
         onRefresh()
-        toast.success('Reservation cancelled' + (data.invoice ? ', invoice created' : ''))
+        toast.success(data.invoice ? tr('cancelledWithInvoice') : tr('cancelled'))
       } else {
-        toast.error(data.error?.message ?? 'Failed to cancel')
+        toast.error(data.error?.message ?? tr('cancelFailed'))
       }
     } catch {
       setConfirmCancel(false)
-      toast.error('Network error')
+      toast.error(tr('networkError'))
     } finally {
       setLoading(null)
     }
-  }, [detail.id, onRefresh])
+  }, [detail.id, onRefresh, tr])
 
   const handleChargeReservation = useCallback(async () => {
     if (!deleteInvoiceData) return
@@ -226,97 +232,109 @@ export function ReservationActions({ detail, onRefresh, onDeleted, onEdit }: Pro
 
   if (actions.length === 0 && !canEdit) return null
 
+  const closeCancel = () => {
+    if (loading === 'cancel') return
+    setConfirmCancel(false)
+    setCancelFeeAmount('')
+  }
+  const feeValue = Number(cancelFeeAmount)
+
   return (
     <>
       <div className="flex flex-wrap gap-2">
         {actions.map((a) => (
           <button
             key={a.action}
+            type="button"
             onClick={() => handleAction(a)}
             disabled={loading === a.action}
+            aria-busy={loading === a.action}
+            data-tooltip={tr(`${a.label}Hint`)}
             className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${BUTTON_STYLES[a.tone ?? 'primary']}`}
           >
-            {loading === a.action ? 'Processing...' : a.label}
+            {loading === a.action ? tr('processing') : tr(a.label)}
           </button>
         ))}
         {canEdit && onEdit && (
           <button
             type="button"
             onClick={() => onEdit(detail)}
+            data-tooltip={tr('editHint')}
             className="rounded-lg border border-[#EAEAEA] bg-white px-4 py-2 text-sm font-medium text-[#333333] transition-colors hover:bg-[#F9F9F8]"
           >
-            Edit reservation
+            {tr('edit')}
           </button>
         )}
       </div>
 
-      {confirmCancel && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20">
-          <div className="rounded-xl border border-[#EAEAEA] bg-white p-6 w-96">
-            <p className="text-sm font-medium text-[#1A1A1A]">Cancel this reservation?</p>
-            <p className="mt-1 text-sm text-[#787774]">Choose how to handle this cancellation.</p>
-            <div className="mt-4">
-              <label className="text-xs font-medium text-[#787774]">Cancellation fee amount</label>
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                value={cancelFeeAmount}
-                onChange={(e) => setCancelFeeAmount(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-[#EAEAEA] px-3 py-2 text-sm text-[#333333] focus:outline-none focus:ring-2 focus:ring-[#1A1A1A]/10"
-                placeholder="0.00"
-              />
-            </div>
-            <div className="mt-5 flex justify-end gap-2">
-              <button
-                onClick={() => { setConfirmCancel(false); setCancelFeeAmount('') }}
-                disabled={loading === 'cancel'}
-                className="rounded-lg border border-[#EAEAEA] bg-white px-4 py-2 text-sm font-medium text-[#333333] transition-colors hover:bg-[#F9F9F8] disabled:opacity-50"
-              >
-                Back
-              </button>
-              <button
-                onClick={() => doCancel()}
-                disabled={loading === 'cancel'}
-                className="rounded-lg border border-[#EAEAEA] bg-white px-4 py-2 text-sm font-medium text-[#333333] transition-colors hover:bg-rose-50 disabled:opacity-50"
-              >
-                Just Cancel
-              </button>
-              <button
-                onClick={() => doCancel(Number(cancelFeeAmount) || undefined)}
-                disabled={loading === 'cancel'}
-                className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-rose-700 disabled:opacity-50"
-              >
-                Cancel & Charge Fee
-              </button>
-            </div>
-          </div>
+      <Modal isOpen={confirmCancel} onClose={closeCancel} title={tr('cancelTitle')}>
+        <p className="text-sm text-[#787774]">{tr('cancelDescription')}</p>
+        <div className="mt-4">
+          <label htmlFor="reservation-cancel-fee" className="flex items-center gap-1.5 text-xs font-medium text-[#787774]">
+            {tr('cancelFee')}
+            <InfoHint text={tr('cancelFeeHint')} />
+          </label>
+          <input
+            id="reservation-cancel-fee"
+            type="number" inputMode="decimal" onWheel={(event) => event.currentTarget.blur()}
+            min="0"
+            step="0.01"
+            value={cancelFeeAmount}
+            onChange={(e) => setCancelFeeAmount(e.target.value)}
+            className="mt-1 w-full rounded-lg border border-[#EAEAEA] px-3 py-2 text-sm text-[#333333] focus:outline-none focus:ring-2 focus:ring-[#1A1A1A]/10"
+            placeholder="0.00"
+          />
         </div>
-      )}
+        <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <button
+            type="button"
+            onClick={closeCancel}
+            disabled={loading === 'cancel'}
+            className="rounded-lg border border-[#EAEAEA] bg-white px-4 py-2 text-sm font-medium text-[#333333] transition-colors hover:bg-[#F9F9F8] disabled:opacity-50"
+          >
+            {tr('back')}
+          </button>
+          <button
+            type="button"
+            onClick={() => doCancel()}
+            disabled={loading === 'cancel'}
+            data-tooltip={tr('justCancelHint')}
+            className="rounded-lg border border-[#EAEAEA] bg-white px-4 py-2 text-sm font-medium text-[#333333] transition-colors hover:bg-rose-50 disabled:opacity-50"
+          >
+            {tr('justCancel')}
+          </button>
+          <button
+            type="button"
+            onClick={() => doCancel(feeValue || undefined)}
+            disabled={loading === 'cancel' || !(feeValue > 0)}
+            data-tooltip={tr('cancelWithFeeHint')}
+            className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-rose-700 disabled:opacity-50"
+          >
+            {tr('cancelWithFee')}
+          </button>
+        </div>
+      </Modal>
 
-      {confirmDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20">
-          <div className="rounded-xl border border-[#EAEAEA] bg-white p-6 ">
-            <p className="text-sm font-medium text-[#1A1A1A]">Delete this reservation?</p>
-            <p className="mt-1 text-sm text-[#787774]">This cannot be undone.</p>
-            <div className="mt-5 flex justify-end gap-2">
-              <button
-                onClick={() => setConfirmDelete(false)}
-                className="rounded-lg border border-[#EAEAEA] bg-white px-4 py-2 text-sm font-medium text-[#333333] transition-colors hover:bg-[#F9F9F8]"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDeleteConfirmed}
-                disabled={loading === 'delete'}
-                className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-rose-700 disabled:opacity-50"
-              >
-                {loading === 'delete' ? 'Deleting...' : 'Delete'}
-              </button>
-            </div>
-          </div>
+      <Modal isOpen={confirmDelete} onClose={() => { if (loading !== 'delete') setConfirmDelete(false) }} title={tr('deleteTitle')}>
+        <p className="text-sm text-[#787774]">{tr('deleteDescription')}</p>
+        <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <button
+            type="button"
+            onClick={() => setConfirmDelete(false)}
+            className="rounded-lg border border-[#EAEAEA] bg-white px-4 py-2 text-sm font-medium text-[#333333] transition-colors hover:bg-[#F9F9F8]"
+          >
+            {tr('back')}
+          </button>
+          <button
+            type="button"
+            onClick={handleDeleteConfirmed}
+            disabled={loading === 'delete'}
+            className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-rose-700 disabled:opacity-50"
+          >
+            {loading === 'delete' ? t('common.deleting') : t('common.delete')}
+          </button>
         </div>
-      )}
+      </Modal>
 
       <BookingDeleteModal
         isOpen={deleteInvoiceOpen}

@@ -1,54 +1,30 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+'use client'
+
+import { useCallback } from 'react'
+import { useResource } from '@/shared/data/useResource'
 import type { Room, CreateRoomInput, UpdateRoomInput } from '../types'
 import * as api from '../services/roomsApiClient'
+import { ROOMS_KEY } from './useRooms'
 
 export function useAdminRooms() {
-  const [items, setItems] = useState<Room[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const genRef = useRef(0)
-
-  const load = useCallback(async () => {
-    const gen = ++genRef.current
-    setLoading(true)
-    setError(null)
-    try {
-      const data = await api.fetchRooms()
-      if (gen !== genRef.current) return
-      setItems(data)
-    } catch (err) {
-      if (gen === genRef.current) {
-        setError(err instanceof Error ? err.message : 'Failed to load rooms')
-      }
-    } finally {
-      if (gen === genRef.current) setLoading(false)
-    }
-  }, [])
-
-  useEffect(() => { load() }, [load])
+  const { data, error, isLoading, refresh, mutate } = useResource<Room[]>(ROOMS_KEY, api.fetchRooms)
 
   const create = useCallback(async (input: CreateRoomInput) => {
     const item = await api.createRoomApi(input)
-    genRef.current++
-    setItems(prev => [...prev, item])
-    setLoading(false)
+    mutate((items = []) => [...items, item])
     return item
-  }, [])
+  }, [mutate])
 
   const update = useCallback(async (id: string, input: UpdateRoomInput) => {
     const item = await api.updateRoomApi(id, input)
-    genRef.current++
-    setItems(prev => prev.map(i => i.id === id ? item : i))
-    setLoading(false)
+    mutate((items = []) => items.map(i => i.id === id ? item : i))
     return item
-  }, [])
+  }, [mutate])
 
   const remove = useCallback(async (id: string) => {
     await api.deleteRoomApi(id)
-    genRef.current++
-    setItems(prev => prev.filter(i => i.id !== id))
-    setLoading(false)
-  }, [])
+    mutate((items = []) => items.filter(i => i.id !== id))
+  }, [mutate])
 
-  return { items, loading, error, create, update, remove, reload: load }
+  return { items: data ?? [], loading: isLoading, error: error?.message ?? null, create, update, remove, reload: refresh }
 }

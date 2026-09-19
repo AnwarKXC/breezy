@@ -76,7 +76,7 @@ function EditPriceModalBody({
       <label className="block">
         <span className="mb-1 block text-xs font-medium text-[#787774]">{t('reservations.editPriceNewRate')}</span>
         <input
-          type="number"
+          type="number" inputMode="decimal" onWheel={(event) => event.currentTarget.blur()}
           min="1"
           step="any"
           value={rateText}

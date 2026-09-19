@@ -1,5 +1,7 @@
 'use client'
 
+import { useLocale } from '@/i18n/components/LocaleContext'
+import { countryName } from '@/shared/static/countries'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -50,6 +52,7 @@ interface ContactDetailsViewProps {
 }
 
 function HeroSection({ contact, labels, permissions, onDelete, onEdit }: { contact: Contact; labels: Record<string, string>; permissions: ContactDetailsViewProps['permissions']; onDelete?: () => void; onEdit?: () => void }) {
+  const locale = useLocale()
   const isCompany = contact.type === 'company'
 
   return (
@@ -137,17 +140,17 @@ function HeroSection({ contact, labels, permissions, onDelete, onEdit }: { conta
         </div>
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#787774]">{labels.email}</p>
-          <p className="mt-1 text-sm font-medium text-[#1A1A1A]">{contact.email || '�'}</p>
+          <p className="mt-1 text-sm font-medium text-[#1A1A1A]">{contact.email || '—'}</p>
         </div>
         {isCompany && (
           <>
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#787774]">{labels.country}</p>
-              <p className="mt-1 text-sm font-medium text-[#1A1A1A]">{contact.country || '�'}</p>
+              <p className="mt-1 text-sm font-medium text-[#1A1A1A]">{contact.country ? countryName(contact.country, locale) : '—'}</p>
             </div>
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#787774]">{labels.city}</p>
-              <p className="mt-1 text-sm font-medium text-[#1A1A1A]">{contact.city || '�'}</p>
+              <p className="mt-1 text-sm font-medium text-[#1A1A1A]">{contact.city || '—'}</p>
             </div>
           </>
         )}
@@ -180,7 +183,7 @@ function ContactAnalytics({ invoices }: { invoices: Invoice[] }) {
       <AnalyticsCard label={t('accounting.invoices.summary.totalInvoices')} value={invoices.length} accent="indigo" />
       <AnalyticsCard label={t('accounting.invoices.amount')} value={formatCurrency(totalRevenue)} accent="emerald" />
       <AnalyticsCard label={t('accounting.finance.outstanding')} value={formatCurrency(remaining)} accent="amber" />
-      <AnalyticsCard label={t('accounting.invoices.invoice')} value={lastInvoice ? `#${lastInvoice.invoiceNumber}` : '�'} accent="violet" />
+      <AnalyticsCard label={t('accounting.invoices.invoice')} value={lastInvoice ? `#${lastInvoice.invoiceNumber}` : '—'} accent="violet" />
     </section>
   )
 }

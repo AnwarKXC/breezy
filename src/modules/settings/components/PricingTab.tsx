@@ -57,7 +57,7 @@ export function PricingTab() {
     } finally {
       setSaving(false)
     }
-  }, [serviceCharge, vatRate])
+  }, [serviceCharge, t, vatRate])
 
   if (loading) {
     return <div className="text-sm text-[#787774]">{t('settingsPricing.loading')}</div>
@@ -80,7 +80,7 @@ export function PricingTab() {
             {t('accounting.settings.serviceCharge')} (%)
           </label>
           <input
-            type="number"
+            type="number" inputMode="decimal" onWheel={(event) => event.currentTarget.blur()}
             min="0"
             max="100"
             step="0.1"
@@ -94,7 +94,7 @@ export function PricingTab() {
             {t('accounting.settings.vatRate')} (%)
           </label>
           <input
-            type="number"
+            type="number" inputMode="decimal" onWheel={(event) => event.currentTarget.blur()}
             min="0"
             max="100"
             step="0.1"

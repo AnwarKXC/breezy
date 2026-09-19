@@ -84,7 +84,7 @@ export function RefundConfirmDialog({ invoice, t, onClose, onRefunded }: Props) 
             {t('accounting.invoices.refundAmount')} <span className="text-[#9F2F2D]">*</span>
           </label>
           <input
-            type="number"
+            type="number" inputMode="decimal" onWheel={(event) => event.currentTarget.blur()}
             step="0.01"
             min="0.01"
             max={maxRefund}

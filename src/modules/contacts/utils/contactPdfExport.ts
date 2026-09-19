@@ -2,6 +2,7 @@ import type { Locale } from '@/i18n/config'
 import { buildAndDownloadPdf } from '@/shared/utils/pdfMake'
 import { formatDateTime } from '@/shared/utils/date'
 import type { Contact } from '../types'
+import { countryName } from '@/shared/static/countries'
 
 type ExportLabels = Record<
   'name' | 'type' | 'phone' | 'email' | 'country' | 'city' | 'responsiblePerson' | 'idPassport' | 'createdAt' | 'title',
@@ -19,7 +20,7 @@ export async function exportContactsPdf(
     contact.type,
     contact.phone ?? '',
     contact.email ?? '',
-    contact.country ?? '',
+    contact.country ? countryName(contact.country, locale) : '',
     contact.city ?? '',
     contact.responsiblePerson ?? '',
     contact.idPassport ?? '',

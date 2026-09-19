@@ -2,6 +2,7 @@ import "server-only";
 
 import { Prisma } from "@/generated/prisma/client";
 import { prisma, withActor, type DbTransaction } from "@/services/db/prisma";
+import { createReservationHold as createReservationHoldSql, createReservationWithRooms as createReservationWithRoomsSql, getRoomAvailability as getRoomAvailabilitySql } from "@/generated/prisma/sql";
 
 /** Decimal -> number, bigint -> number, Date -> ISO string for raw query rows. */
 function plain<T>(row: Record<string, unknown>): T {
@@ -44,15 +45,16 @@ export interface RoomAvailabilityArgs {
 }
 
 export async function getRoomAvailability(args: RoomAvailabilityArgs, tx: DbTransaction | typeof prisma = prisma) {
-  const rows = await tx.$queryRaw<Record<string, unknown>[]>`
-    select * from public.get_room_availability(
-      ${args.checkIn}::date,
-      ${args.checkOut}::date,
-      ${args.roomTypeId ?? null}::uuid,
-      ${args.capacity ?? null}::int,
-      ${args.contactId ?? null}::uuid,
-      ${args.excludeReservationId ?? null}::uuid
-    )`;
+  const rows = await tx.$queryRawTyped(
+    getRoomAvailabilitySql(
+      args.checkIn,
+      args.checkOut,
+      args.roomTypeId ?? null,
+      args.capacity ?? null,
+      args.contactId ?? null,
+      args.excludeReservationId ?? null,
+    ),
+  );
   return rows.map((row) => plain<RoomAvailabilityRow>(row));
 }
 
@@ -61,14 +63,9 @@ export async function createReservationHold(
   args: { roomId: string; checkIn: string; checkOut: string; reservationId?: string | null; holdDurationMinutes?: number },
 ) {
   return withActor(actorId, async (tx) => {
-    const [row] = await tx.$queryRaw<Array<{ result: unknown }>>`
-      select public.create_reservation_hold(
-        ${args.roomId}::uuid,
-        ${args.checkIn}::date,
-        ${args.checkOut}::date,
-        ${args.reservationId ?? null}::uuid,
-        ${args.holdDurationMinutes ?? 15}::int
-      ) as result`;
+    const [row] = await tx.$queryRawTyped(
+      createReservationHoldSql(args.roomId, args.checkIn, args.checkOut, args.reservationId ?? null, args.holdDurationMinutes ?? 15),
+    );
     return row?.result;
   });
 }
@@ -85,16 +82,17 @@ export async function createReservationWithRooms(
   },
 ) {
   return withActor(actorId, async (tx) => {
-    const [row] = await tx.$queryRaw<Array<{ result: unknown }>>`
-      select public.create_reservation_with_rooms(
-        ${args.checkIn}::date,
-        ${args.checkOut}::date,
-        ${JSON.stringify(args.roomTypeCounts ?? [])}::jsonb,
-        ${args.contactId ?? null}::uuid,
-        ${args.guestName ?? ""}::text,
-        ${args.guestId ?? null}::uuid,
-        ${actorId}::uuid
-      ) as result`;
+    const [row] = await tx.$queryRawTyped(
+      createReservationWithRoomsSql(
+        args.checkIn,
+        args.checkOut,
+        JSON.stringify(args.roomTypeCounts ?? []),
+        args.contactId ?? null,
+        args.guestName ?? "",
+        args.guestId ?? null,
+        actorId,
+      ),
+    );
     return row?.result;
   });
 }

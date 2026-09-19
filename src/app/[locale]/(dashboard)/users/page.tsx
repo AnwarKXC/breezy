@@ -1,16 +1,10 @@
-﻿import dynamic from "next/dynamic";
+import { UsersPage } from "@/modules/users/components";
 import { AuthServiceError } from '@/modules/users/services/authErrors'
 import { getUsersUiPermissions, requireUsersRead } from '@/modules/users/services/server'
 import { getUsersPage } from '@/modules/users/services/userService'
 import { checkLocale, type Locale } from '@/i18n/config'
 import ar from '@/i18n/locales/ar.json'
 import en from '@/i18n/locales/en.json'
-import { PageSkeleton } from "@/shared/components/PageSkeleton";
-
-const UsersPage = dynamic(() =>
-  import("@/modules/users/components").then((m) => ({ default: m.UsersPage })),
-  { loading: () => <PageSkeleton /> }
-);
 
 const translations = { ar, en }
 

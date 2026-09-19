@@ -2,7 +2,9 @@ import 'server-only'
 
 import { MS_PER_DAY } from '@/shared/constants'
 import type { Prisma } from '@/generated/prisma/client'
+import { heldDeposits, paidByContact } from '@/generated/prisma/sql'
 import { prisma } from '@/services/db/prisma'
+import { invalidateSystemCurrencyCache } from '@/shared/currency/server'
 import { dbDate, serializeRow, toRows } from '@/services/db/rows'
 import type {
   AccountingOverview, FinanceRow, FinancialHealth,
@@ -70,16 +72,13 @@ export async function getAccountingOverview(): Promise<AccountingOverview> {
     prisma.invoices.count({ where: { ...liveInvoice, status: { in: ['paid', 'partially_paid'] } } }),
     prisma.invoices.count({ where: { ...liveInvoice, status: { in: ['issued', 'overdue', 'draft'] } } }),
     prisma.expenses.aggregate({ where: { deleted_at: null, date: { gte: monthStart } }, _sum: { total_amount: true } }),
-    prisma.payments.groupBy({ by: ['type'], where: { deleted_at: null, created_at: dayRange(today) }, _sum: { amount: true } }),
+    prisma.payments.groupBy({ by: ['method'], where: { deleted_at: null, created_at: dayRange(today) }, _sum: { amount: true } }),
     prisma.payments.aggregate({ where: { deleted_at: null, amount: { lt: 0 } }, _sum: { amount: true } }),
-    prisma.$queryRaw<Array<{ held: Prisma.Decimal | null }>>`
-      select sum(greatest(0, coalesce(paid_amount, 0) - coalesce(remaining_balance, 0))) as held
-      from public.invoices
-      where deleted_at is null and status not in ('void', 'refunded')`,
+    prisma.$queryRawTyped(heldDeposits()),
   ])
 
   const paidToday = (types: string[]) =>
-    todayPayments.filter((p) => types.includes(p.type)).reduce((s, p) => s + num(p._sum.amount), 0)
+    todayPayments.filter((p) => types.includes(p.method)).reduce((s, p) => s + num(p._sum.amount), 0)
   const monthToDateRevenue = num(monthInvoices._sum.amount)
   const totalExpenses = num(monthExpenses._sum.total_amount)
 
@@ -109,12 +108,7 @@ export async function getFinanceTable(): Promise<FinanceRow[]> {
   const [contacts, invoiceTotals, paymentTotals] = await Promise.all([
     prisma.contacts.findMany({ where: { deleted_at: null }, select: { id: true, name: true, type: true }, orderBy: { name: 'asc' } }),
     prisma.invoices.groupBy({ by: ['contact_id'], where: { deleted_at: null }, _sum: { amount: true }, _count: { _all: true } }),
-    prisma.$queryRaw<Array<{ contact_id: string; paid: Prisma.Decimal | null }>>`
-      select i.contact_id, sum(p.amount) as paid
-      from public.payments p
-      join public.invoices i on i.id = p.invoice_id
-      where p.deleted_at is null and i.deleted_at is null
-      group by i.contact_id`,
+    prisma.$queryRawTyped(paidByContact()),
   ])
 
   const invoicedBy = new Map(invoiceTotals.map((g) => [g.contact_id, g]))
@@ -162,7 +156,7 @@ export async function getDailyRevenueReport(date: string): Promise<DailyRevenueR
   const day = dbDate(date)
 
   const [payments, invoiceRows, expenseRows, occupancyCount] = await Promise.all([
-    prisma.payments.findMany({ where: { deleted_at: null, created_at: range }, select: { amount: true, type: true } }),
+    prisma.payments.findMany({ where: { deleted_at: null, created_at: range }, select: { amount: true, method: true } }),
     prisma.invoices.findMany({ where: { deleted_at: null, created_at: range } }),
     prisma.expenses.findMany({ where: { deleted_at: null, date: day }, include: { expense_categories: { select: { name: true } } } }),
     // Rooms in house that night: stays spanning the date that were actually occupied.
@@ -183,7 +177,7 @@ export async function getDailyRevenueReport(date: string): Promise<DailyRevenueR
   const paymentsByMethod: Record<string, number> = {}
   for (const p of payments) {
     const amt = num(p.amount)
-    if (amt > 0) paymentsByMethod[p.type] = (paymentsByMethod[p.type] ?? 0) + amt
+    if (amt > 0) paymentsByMethod[p.method] = (paymentsByMethod[p.method] ?? 0) + amt
   }
 
   return {
@@ -273,5 +267,6 @@ export async function updateAccountingSetting(key: string, value: Record<string,
     update: { value: value as Prisma.InputJsonValue, updated_by: session.id },
     create: { key, value: value as Prisma.InputJsonValue, description: 'System currency', updated_by: session.id },
   })
+  if (key === 'currency') invalidateSystemCurrencyCache()
   void logSettingUpdated({ key })
 }

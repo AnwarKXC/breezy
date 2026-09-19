@@ -3,30 +3,47 @@ import type { Prisma } from '@/generated/prisma/client'
 import { prisma } from '@/services/db/prisma'
 import { toRow } from '@/services/db/rows'
 import { mapRoomTypeRow, toRoomTypeRow, type RoomType, type CreateRoomTypeInput, type UpdateRoomTypeInput } from '../types'
+import { currentTypePrices, setCurrentTypePrice } from '@/modules/rooms/services/rateStore'
 import { requireCatalogRead, requireSettingsWrite } from '@/modules/settings/services/serviceSecurity'
 
 export async function listRoomTypes(): Promise<RoomType[]> {
   await requireCatalogRead()
-  const rows = await prisma.room_types.findMany({ where: { deleted_at: null }, orderBy: { name: 'asc' } })
-  return rows.map((row) => mapRoomTypeRow(toRow('room_types', row)))
+  const [rows, prices] = await Promise.all([
+    prisma.room_types.findMany({ where: { deleted_at: null }, orderBy: { name: 'asc' } }),
+    currentTypePrices(),
+  ])
+  return rows.map((row) => mapRoomTypeRow(toRow('room_types', row), prices.get(row.id) ?? 0))
 }
 
 export async function getRoomType(id: string): Promise<RoomType | null> {
   await requireCatalogRead()
-  const row = await prisma.room_types.findFirst({ where: { id, deleted_at: null } })
-  return row ? mapRoomTypeRow(toRow('room_types', row)) : null
+  const [row, prices] = await Promise.all([
+    prisma.room_types.findFirst({ where: { id, deleted_at: null } }),
+    currentTypePrices([id]),
+  ])
+  return row ? mapRoomTypeRow(toRow('room_types', row), prices.get(id) ?? 0) : null
 }
 
 export async function createRoomType(input: CreateRoomTypeInput): Promise<RoomType> {
   await requireSettingsWrite()
-  const row = await prisma.room_types.create({ data: toRoomTypeRow(input) as Prisma.room_typesCreateInput })
-  return mapRoomTypeRow(toRow('room_types', row))
+  const basePrice = input.base_price ?? 0
+  const row = await prisma.$transaction(async (tx) => {
+    const created = await tx.room_types.create({ data: toRoomTypeRow(input) as Prisma.room_typesCreateInput })
+    await setCurrentTypePrice(tx, created.id, basePrice)
+    return created
+  })
+  return mapRoomTypeRow(toRow('room_types', row), basePrice)
 }
 
 export async function updateRoomType(id: string, input: UpdateRoomTypeInput): Promise<RoomType> {
   await requireSettingsWrite()
-  const row = await prisma.room_types.update({ where: { id }, data: toRoomTypeRow(input) as Prisma.room_typesUpdateInput })
-  return mapRoomTypeRow(toRow('room_types', row))
+  await prisma.$transaction(async (tx) => {
+    await tx.room_types.update({ where: { id }, data: toRoomTypeRow(input) as Prisma.room_typesUpdateInput })
+    if (input.base_price !== undefined) await setCurrentTypePrice(tx, id, input.base_price)
+  })
+  const updated = await getRoomType(id)
+  if (!updated) throw new Error('Room type not found')
+  return updated
 }
 
 /** Soft-deletes the room type together with its pricing and rooms. */

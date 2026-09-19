@@ -1,19 +1,13 @@
 // 📁 src/shared/utils/types.ts - Utility types
 
 export type DateFormat = 'short' | 'long' | 'time' | 'datetime' | 'iso'
-export type CurrencyCode = 'USD' | 'EGP' | 'EUR'
+import { CURRENCIES, type CurrencyCode } from '@/shared/static/currencies'
 
-export const CURRENCY_LABELS: Record<CurrencyCode, string> = {
-  USD: 'USD ($)',
-  EGP: 'EGP (ج.م)',
-  EUR: 'EUR (€)',
-}
+export type { CurrencyCode }
 
-export const CURRENCY_SYMBOLS: Record<CurrencyCode, string> = {
-  USD: '$',
-  EGP: 'EGP',
-  EUR: '€',
-}
+export const CURRENCY_LABELS = Object.fromEntries(CURRENCIES.map((c) => [c.code, c.label])) as Record<CurrencyCode, string>
+
+export const CURRENCY_SYMBOLS = Object.fromEntries(CURRENCIES.map((c) => [c.code, c.symbol])) as Record<CurrencyCode, string>
 
 export interface DateUtils {
   format: (date: Date, format: DateFormat, locale?: string) => string

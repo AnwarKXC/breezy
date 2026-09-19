@@ -17,7 +17,7 @@ import { VoidConfirmDialog } from './VoidConfirmDialog'
 import { DiscountInvoiceDialog } from './DiscountInvoiceDialog'
 import { RefundConfirmDialog } from './RefundConfirmDialog'
 import type { Invoice, WizardMode } from '../types'
-import { INVOICE_STATUS_LABELS, PAYMENT_TYPE_LABELS } from '../types'
+import { INVOICE_STATUS_LABELS, PAYMENT_METHOD_LABELS } from '../types'
 import { exportInvoicesCsv } from '../utils/invoiceCsvExport'
 import { exportInvoicesListPdf } from '../utils/invoiceListPdfExport'
 import { downloadInvoicePdf } from '../utils/invoicePdfExport'
@@ -100,7 +100,7 @@ export function InvoicesTab({ t, locale, invoiceFilters, onInvoiceFiltersChange 
     return invoices.filter((inv) => {
       const statusLabel = (INVOICE_STATUS_LABELS as Record<string, string>)[inv.status] ?? inv.status
       const payMethod = inv.paymentMethod
-        ? ((PAYMENT_TYPE_LABELS as Record<string, string>)[inv.paymentMethod] ?? inv.paymentMethod)
+        ? ((PAYMENT_METHOD_LABELS as Record<string, string>)[inv.paymentMethod] ?? inv.paymentMethod)
         : ''
       const contactName = inv.contact?.name ?? inv.guestName ?? inv.companyName ?? inv.contactId ?? ''
       return (
@@ -236,7 +236,7 @@ export function InvoicesTab({ t, locale, invoiceFilters, onInvoiceFiltersChange 
     {
       key: 'paymentMethod',
       label: t('accounting.invoices.paymentMethod'),
-      render: (v) => v ? ((PAYMENT_TYPE_LABELS as Record<string, string>)[String(v)] ?? String(v)) : '-',
+      render: (v) => v ? ((PAYMENT_METHOD_LABELS as Record<string, string>)[String(v)] ?? String(v)) : '-',
     },
     {
       key: 'amount',
@@ -360,14 +360,14 @@ export function InvoicesTab({ t, locale, invoiceFilters, onInvoiceFiltersChange 
             ))}
           </FloatingSelect>
           <input
-            type="date"
+            type="date" max={dateRangeEnd || undefined}
             value={dateRangeStart}
             onChange={(e) => setDateRangeStart(e.target.value)}
             className="h-9 w-full rounded-lg border border-[#EAEAEA] px-3 text-sm"
             aria-label={t('accounting.invoices.issueDate')}
           />
           <input
-            type="date"
+            type="date" min={dateRangeStart || undefined}
             value={dateRangeEnd}
             onChange={(e) => setDateRangeEnd(e.target.value)}
             className="h-9 w-full rounded-lg border border-[#EAEAEA] px-3 text-sm"

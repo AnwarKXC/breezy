@@ -12,7 +12,7 @@ function downloadBuffer(buffer: ArrayBuffer, fileName: string) {
   URL.revokeObjectURL(url)
 }
 import type { Invoice, InvoiceItem, Payment } from '../types'
-import { INVOICE_ITEM_TYPE_LABELS, INVOICE_STATUS_LABELS, PAYMENT_TYPE_LABELS } from '../types'
+import { INVOICE_ITEM_TYPE_LABELS, INVOICE_STATUS_LABELS, PAYMENT_METHOD_LABELS } from '../types'
 
 type InvoiceForPdf = Invoice & { payments?: Payment[] }
 
@@ -243,7 +243,7 @@ const AR_INVOICE_ITEM_TYPE_LABELS: Record<string, string> = {
   other: "\u0623\u062e\u0631\u0649",
 }
 
-const AR_PAYMENT_TYPE_LABELS: Record<string, string> = {
+const AR_PAYMENT_METHOD_LABELS: Record<string, string> = {
   instapay: "\u0625\u0646\u0633\u062a\u0627\u0628\u0627\u064a",
   vodafone_cash: "\u0641\u0648\u062f\u0627\u0641\u0648\u0646 \u0643\u0627\u0634",
   cash: "\u0646\u0642\u062f\u064a",
@@ -636,7 +636,7 @@ export async function downloadInvoicePdf(invoice: InvoiceForPdf, locale: string)
     }))
     const payRows = payments.map((p) => [
       cell(formatInvoiceDate(p.createdAt), { alignment: 'right', color: C.textMuted }),
-      cell(isRTL ? AR_PAYMENT_TYPE_LABELS[p.type] ?? p.type : PAYMENT_TYPE_LABELS[p.type] ?? p.type),
+      cell(isRTL ? AR_PAYMENT_METHOD_LABELS[p.method] ?? p.method : PAYMENT_METHOD_LABELS[p.method] ?? p.method),
       cell(p.description ?? '-'),
       cell(formatInvoiceCurrency(Number(p.amount)), { alignment: 'right', bold: true }),
     ])

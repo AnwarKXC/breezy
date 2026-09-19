@@ -1,5 +1,6 @@
 ﻿'use client'
 
+import { countryName } from '@/shared/static/countries'
 import { useMemo } from 'react'
 import { Modal } from '@/shared/components/Modal'
 import { useTranslation } from '@/i18n/hooks/useTranslation'
@@ -80,7 +81,7 @@ export function BookingDetailModal({ isOpen, onClose, booking, guest }: BookingD
               {guest.country && (
                 <div>
                   <span className="text-[#787774]">{t('guests.country')}: </span>
-                  <span className="text-[#1A1A1A]">{guest.country}</span>
+                  <span className="text-[#1A1A1A]">{countryName(guest.country, locale)}</span>
                 </div>
               )}
               {guest.passportNumber && (

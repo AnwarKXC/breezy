@@ -154,7 +154,21 @@ export const ContactsPage = memo(function ContactsPage({ permissions }: { permis
           />
         ) : null}
         {!view.loading && !view.error && !view.contacts.length ? (
-          <ContactsStateCard title={labels.emptyTitle} description={labels.emptyDescription} />
+          view.query || view.type !== 'all' ? (
+            <ContactsStateCard
+              title={labels.emptyTitle}
+              description={t('contacts.emptyFilteredDescription')}
+              retryLabel={t('contacts.clearFilters')}
+              onRetry={() => { view.setQuery(''); view.setType('all') }}
+            />
+          ) : (
+            <ContactsStateCard
+              title={labels.emptyTitle}
+              description={labels.emptyDescription}
+              retryLabel={permissions.canCreateContacts ? labels.create : undefined}
+              onRetry={permissions.canCreateContacts ? form.openCreateForm : undefined}
+            />
+          )
         ) : null}
         {!view.loading && !view.error && view.contacts.length ? (
           <div className="content-visibility-auto">

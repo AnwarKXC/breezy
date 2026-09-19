@@ -128,7 +128,7 @@ export function SheetView({ year, monthIndex, locale, rooms, roomTypes, bookingI
                   return (
                     <td key={room.id} className="max-w-[130px] border-l border-t border-[#EAEAEA] px-2 py-1 align-top">
                       {booking && (
-                        <div className="leading-tight" title={`${booking.companyName ?? booking.guestName ?? '—'} · ${typeName}`}>
+                        <div className="leading-tight" data-tooltip={`${booking.companyName ?? booking.guestName ?? '—'} · ${typeName}`}>
                           <Link
                             href={`/${locale}/reservations/${booking.reservationId}`}
                             className="block truncate text-[#1A1A1A] underline-offset-2 hover:underline"

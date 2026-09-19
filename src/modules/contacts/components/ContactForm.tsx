@@ -1,8 +1,11 @@
 ﻿'use client'
-import { FloatingInput } from '@/shared/components/FloatingField'
+import { FloatingInput, FloatingSelect } from '@/shared/components/FloatingField'
+import { useLocale } from '@/i18n/components/LocaleContext'
+import { countryOptions } from '@/shared/static/countries'
 import type { ContactFormDraft, ContactFormMode } from '../hooks/useContactForm'
 import { ContactTypeSelector } from './ContactTypeSelector'
 import { LogoUpload } from './LogoUpload'
+import { useEscapeKey } from '@/shared/hooks/useEscapeKey'
 interface ContactFormLabels {
   createTitle: string
   editTitle: string
@@ -40,13 +43,16 @@ interface ContactFormProps {
 }
 
 export function ContactForm(props: ContactFormProps) {
+  const locale = useLocale()
   const isCreate = props.mode === 'create'
   const isCompany = props.draft.type === 'company'
+  useEscapeKey(props.onClose, !props.saving)
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/20 px-4 py-6">
       <form
-        className="w-full max-w-xl rounded-xl bg-white p-6 "
+        role="dialog" aria-modal="true"
+        className="max-h-[calc(100dvh-3rem)] w-full max-w-xl overflow-y-auto rounded-xl bg-white p-4 shadow-xl sm:p-6"
         onSubmit={(event) => {
           event.preventDefault()
           props.onSubmit()
@@ -91,6 +97,7 @@ export function ContactForm(props: ContactFormProps) {
           <div>
             <FloatingInput
               label={props.labels.phone}
+              type="tel"
               value={props.draft.phone}
               onChange={(event) => props.onUpdate('phone', event.target.value)}
             />
@@ -101,6 +108,7 @@ export function ContactForm(props: ContactFormProps) {
           <div>
             <FloatingInput
               label={props.labels.email}
+              type="email"
               value={props.draft.email}
               onChange={(event) => props.onUpdate('email', event.target.value)}
             />
@@ -111,11 +119,16 @@ export function ContactForm(props: ContactFormProps) {
           {isCompany ? (
             <>
               <div>
-                <FloatingInput
+                <FloatingSelect
                   label={props.labels.country}
                   value={props.draft.country}
                   onChange={(event) => props.onUpdate('country', event.target.value)}
-                />
+                >
+                  <option value="">—</option>
+                  {countryOptions(locale).map((option) => (
+                    <option key={option.value} value={option.value}>{option.label}</option>
+                  ))}
+                </FloatingSelect>
                 {props.fieldErrors.country ? (
                   <p className="mt-1 text-sm text-[#9F2F2D]">{props.fieldErrors.country}</p>
                 ) : null}
@@ -150,6 +163,9 @@ export function ContactForm(props: ContactFormProps) {
             <div>
               <FloatingInput
                 label={props.labels.idPassport}
+                  dir="ltr"
+                  autoCapitalize="characters"
+                  spellCheck={false}
                 value={props.draft.idPassport}
                 onChange={(event) => props.onUpdate('idPassport', event.target.value)}
               />

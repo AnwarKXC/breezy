@@ -1,6 +1,7 @@
-﻿'use client'
+'use client'
 
-import { useState, useMemo, useCallback, useEffect } from 'react'
+import { useState, useMemo, useCallback } from 'react'
+import { fetchData, useResource } from '@/shared/data/useResource'
 import { Table } from '@/shared/components/Table'
 import type { TableColumn } from '@/shared/table/types'
 import { FloatingInput } from '@/shared/components/FloatingField'
@@ -8,9 +9,11 @@ import { useCurrency } from '@/shared/contexts/CurrencyContext'
 
 import { useLocale } from '@/i18n/components/LocaleContext'
 import { formatDateTime } from '@/shared/utils/date'
-import type { Payment, PaymentType, Invoice } from '../types'
-import { PAYMENT_TYPE_LABELS } from '../types'
+import type { Payment, PaymentMethod, Invoice } from '../types'
+import { PAYMENT_METHOD_LABELS } from '../types'
 import { downloadInvoicePdf } from '../utils/invoicePdfExport'
+
+const EMPTY_PAYMENTS: Payment[] = []
 
 interface Props {
   t: (key: string) => string
@@ -19,31 +22,18 @@ interface Props {
 export function PaymentsTab({ t }: Props) {
   const { formatCurrency } = useCurrency()
   const locale = useLocale()
-  const [payments, setPayments] = useState<Payment[]>([])
-  const [loading, setLoading] = useState(false)
   const [fromDate, setFromDate] = useState('')
   const [toDate, setToDate] = useState('')
   const [methodFilter, setMethodFilter] = useState('')
   const [printingId, setPrintingId] = useState<string | null>(null)
 
-  const loadPayments = useCallback(async () => {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams()
-      if (fromDate) params.set('fromDate', fromDate)
-      if (toDate) params.set('toDate', toDate)
-      if (methodFilter) params.set('method', methodFilter)
-      const qs = params.toString()
-      const res = await fetch(`/api/accounting/payments${qs ? `?${qs}` : ''}`)
-      if (res.ok) {
-        const json = await res.json()
-        setPayments(json.data ?? [])
-      }
-    } catch { /* handled */ }
-    finally { setLoading(false) }
-  }, [fromDate, toDate, methodFilter])
-
-  useEffect(() => { loadPayments() }, [loadPayments])
+  const params = new URLSearchParams()
+  if (fromDate) params.set('fromDate', fromDate)
+  if (toDate) params.set('toDate', toDate)
+  if (methodFilter) params.set('method', methodFilter)
+  const paymentsUrl = `/api/accounting/payments${params.size ? `?${params}` : ''}`
+  const { data, isFetching: loading, refresh: loadPayments } = useResource<Payment[]>(paymentsUrl, () => fetchData(paymentsUrl))
+  const payments = data ?? EMPTY_PAYMENTS
 
   const handlePrintPdf = useCallback(async (invoiceId: string | null, invoiceNumber: string | null) => {
     if (!invoiceId || !invoiceNumber) return
@@ -68,7 +58,7 @@ export function PaymentsTab({ t }: Props) {
     {
       key: 'type',
       label: t('accounting.payments.type'),
-      render: (v) => PAYMENT_TYPE_LABELS[v as PaymentType] ?? v,
+      render: (v) => PAYMENT_METHOD_LABELS[v as PaymentMethod] ?? v,
     },
     {
       key: 'amount',
@@ -114,7 +104,7 @@ export function PaymentsTab({ t }: Props) {
       label: t('common.date'),
       render: (v) => v ? formatDateTime(v as string, locale) : '',
     },
-  ], [t, formatCurrency, locale])
+  ], [t, formatCurrency, printingId, handlePrintPdf, locale])
 
   return (
     <div className="space-y-6">
@@ -126,19 +116,19 @@ export function PaymentsTab({ t }: Props) {
             onChange={(e) => setMethodFilter(e.target.value)}
           >
             <option value="">{t('common.all')}</option>
-            {(Object.keys(PAYMENT_TYPE_LABELS) as PaymentType[]).map((key) => (
-              <option key={key} value={key}>{PAYMENT_TYPE_LABELS[key]}</option>
+            {(Object.keys(PAYMENT_METHOD_LABELS) as PaymentMethod[]).map((key) => (
+              <option key={key} value={key}>{PAYMENT_METHOD_LABELS[key]}</option>
             ))}
           </select>
           <FloatingInput
-            type="date"
+            type="date" max={toDate || undefined}
             label={t('accounting.finance.fromDate')}
             value={fromDate}
             onChange={(e) => setFromDate(e.target.value)}
             wrapperClassName="sm:max-w-40"
           />
           <FloatingInput
-            type="date"
+            type="date" min={fromDate || undefined}
             label={t('accounting.finance.toDate')}
             value={toDate}
             onChange={(e) => setToDate(e.target.value)}

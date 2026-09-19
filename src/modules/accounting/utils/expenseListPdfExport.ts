@@ -3,15 +3,15 @@ import type { Expense } from '../types'
 import { buildAndDownloadPdf } from '@/shared/utils/pdfMake'
 import type { Locale } from '@/i18n/config'
 
-function formatCurrency(value: number): string {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(value)
+function formatCurrency(value: number, currency: string): string {
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency, minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(value)
 }
 
-export async function exportExpensesListPdf(expenses: Expense[], categoryNames: Record<string, string>, locale: Locale, fileName: string): Promise<void> {
+export async function exportExpensesListPdf(expenses: Expense[], categoryNames: Record<string, string>, locale: Locale, fileName: string, currency: string): Promise<void> {
   const rows = expenses.map((exp) => [
     categoryNames[exp.categoryId] ?? exp.categoryId,
     exp.description,
-    formatCurrency(exp.totalAmount),
+    formatCurrency(exp.totalAmount, currency),
     exp.vendor ?? '',
     exp.costCenter ?? '',
     exp.status,

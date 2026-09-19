@@ -1,113 +1,65 @@
-import { useState, useEffect, useCallback } from 'react'
-import { roomService } from '@/services/roomService'
-import type { Room } from '../types'
-import { toast } from '@/shared/toast/toastEvents'
-import * as api from '../services/roomsApiClient'
-import type { CreateRoomInput, UpdateRoomInput } from '../types'
+'use client'
 
-interface UseRoomsOptions {
-  autoFetch?: boolean
-  filterAvailable?: boolean
+import { useCallback } from 'react'
+import { roomService } from '@/services/roomService'
+import { useResource } from '@/shared/data/useResource'
+import { toast } from '@/shared/toast/toastEvents'
+import type { Room } from '../types'
+
+export const ROOMS_KEY = '/api/rooms'
+const AVAILABLE_ROOMS_KEY = '/api/rooms?status=available'
+
+function reportLoadError(error: unknown): never {
+  const message = error instanceof Error ? error.message : 'Failed to fetch rooms'
+  toast.error('Network error', { description: message })
+  throw error
 }
 
-export function useRooms(options: UseRoomsOptions = {}) {
-  const { autoFetch = true, filterAvailable = false } = options
+const fetchAllRooms = () => roomService.getAll().catch(reportLoadError)
+const fetchAvailableRooms = () => roomService.getAvailable().catch(reportLoadError)
 
-  const [rooms, setRooms] = useState<Room[]>([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+export function useRooms({ filterAvailable = false }: { filterAvailable?: boolean } = {}) {
+  const { data, error, isLoading, refresh, mutate } = useResource<Room[]>(
+    filterAvailable ? AVAILABLE_ROOMS_KEY : ROOMS_KEY,
+    filterAvailable ? fetchAvailableRooms : fetchAllRooms,
+  )
 
-  const fetchRooms = useCallback(async () => {
-    setLoading(true)
-    setError(null)
+  const run = useCallback(async <T,>(action: () => Promise<T>, fallback: T, failure: string): Promise<T> => {
     try {
-      const data = filterAvailable 
-        ? await roomService.getAvailable()
-        : await roomService.getAll()
-      setRooms(data)
+      return await action()
     } catch (e) {
-      const message = e instanceof Error ? e.message : 'Failed to fetch rooms'
-      setError(message)
-      toast.error('Network error', { description: message })
-    } finally {
-      setLoading(false)
-    }
-  }, [filterAvailable])
-
-  const createRoom = useCallback(async (data: Omit<Room, 'id'>) => {
-    setLoading(true)
-    setError(null)
-    try {
-      const created = await roomService.create(data)
-      setRooms(prev => [...prev, created])
-      toast.success('Operation completed')
-      return created
-    } catch (e) {
-      const message = e instanceof Error ? e.message : 'Failed to create room'
-      setError(message)
-      toast.error('Operation failed', { description: message })
-      return null
-    } finally {
-      setLoading(false)
+      toast.error('Operation failed', { description: e instanceof Error ? e.message : failure })
+      return fallback
     }
   }, [])
 
-  const updateRoom = useCallback(async (id: string, data: Partial<Room>) => {
-    setLoading(true)
-    setError(null)
-    try {
-      const updated = await roomService.update(id, data)
-      if (updated) {
-        setRooms(prev => prev.map(r => (r.id === id ? updated : r)))
-        toast.success('Operation completed')
-      } else {
-        toast.error('Operation failed', { description: 'Failed to update room' })
-      }
-      return updated
-    } catch (e) {
-      const message = e instanceof Error ? e.message : 'Failed to update room'
-      setError(message)
-      toast.error('Operation failed', { description: message })
-      return null
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+  const createRoom = useCallback((room: Omit<Room, 'id'>) => run(async () => {
+    const created = await roomService.create(room)
+    mutate((rooms = []) => [...rooms, created])
+    toast.success('Operation completed')
+    return created
+  }, null, 'Failed to create room'), [mutate, run])
 
-  const deleteRoom = useCallback(async (id: string) => {
-    setLoading(true)
-    setError(null)
-    try {
-      const success = await roomService.delete(id)
-      if (success) {
-        setRooms(prev => prev.filter(r => r.id !== id))
-        toast.success('Operation completed')
-      } else {
-        toast.error('Operation failed', { description: 'Failed to delete room' })
-      }
-      return success
-    } catch (e) {
-      const message = e instanceof Error ? e.message : 'Failed to delete room'
-      setError(message)
-      toast.error('Operation failed', { description: message })
-      return false
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+  const updateRoom = useCallback((id: string, patch: Partial<Room>) => run(async () => {
+    const updated = await roomService.update(id, patch)
+    if (!updated) throw new Error('Failed to update room')
+    mutate((rooms = []) => rooms.map(r => (r.id === id ? updated : r)))
+    toast.success('Operation completed')
+    return updated
+  }, null, 'Failed to update room'), [mutate, run])
 
-  useEffect(() => {
-    if (!autoFetch) return
-
-    const timer = setTimeout(() => void fetchRooms(), 0)
-    return () => clearTimeout(timer)
-  }, [autoFetch, fetchRooms])
+  const deleteRoom = useCallback((id: string) => run(async () => {
+    if (!(await roomService.delete(id))) throw new Error('Failed to delete room')
+    mutate((rooms = []) => rooms.filter(r => r.id !== id))
+    toast.success('Operation completed')
+    return true
+  }, false, 'Failed to delete room'), [mutate, run])
 
   return {
-    rooms,
-    loading,
-    error,
-    fetchRooms,
+    rooms: data ?? [],
+    loading: isLoading,
+    error: error?.message ?? null,
+    fetchRooms: refresh,
     createRoom,
     updateRoom,
     deleteRoom,

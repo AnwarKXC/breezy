@@ -1,8 +1,8 @@
 import type { Invoice } from '../types'
-import { INVOICE_STATUS_LABELS, PAYMENT_TYPE_LABELS } from '../types'
+import { INVOICE_STATUS_LABELS, PAYMENT_METHOD_LABELS } from '../types'
 
-function formatCurrency(value: number): string {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(value)
+function formatCurrency(value: number, currency: string): string {
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency, minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(value)
 }
 
 export function exportInvoicesCsv(invoices: Invoice[], fileName: string): void {
@@ -24,11 +24,11 @@ export function exportInvoicesCsv(invoices: Invoice[], fileName: string): void {
     inv.invoiceNumber,
     inv.contact?.name ?? inv.contactId,
     INVOICE_STATUS_LABELS[inv.status] ?? inv.status,
-    inv.paymentMethod ? ((PAYMENT_TYPE_LABELS as Record<string, string>)[inv.paymentMethod] ?? inv.paymentMethod) : '',
-    formatCurrency(inv.amount),
-    formatCurrency(inv.discount ?? 0),
-    formatCurrency(inv.paidAmount),
-    formatCurrency(inv.remainingBalance),
+    inv.paymentMethod ? ((PAYMENT_METHOD_LABELS as Record<string, string>)[inv.paymentMethod] ?? inv.paymentMethod) : '',
+    formatCurrency(inv.amount, inv.currency),
+    formatCurrency(inv.discount ?? 0, inv.currency),
+    formatCurrency(inv.paidAmount, inv.currency),
+    formatCurrency(inv.remainingBalance, inv.currency),
     inv.issueDate,
     inv.dueDate,
     inv.notes ?? '',

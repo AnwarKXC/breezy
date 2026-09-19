@@ -32,9 +32,11 @@ export function useInvoices(filters?: Record<string, string>) {
   const nextInvoiceNumber = useAppSelector(selectNextInvoiceNumber)
   const loading = useAppSelector(selectAccountingLoading)
 
+  // Callers pass inline objects; key the fetch on the filter values, not identity.
+  const filtersKey = JSON.stringify(filters ?? null)
   useEffect(() => {
-    dispatch(fetchInvoicesData(filters))
-  }, [dispatch, JSON.stringify(filters)])
+    dispatch(fetchInvoicesData(JSON.parse(filtersKey) ?? undefined))
+  }, [dispatch, filtersKey])
 
   const loadById = useCallback((id: string) => dispatch(fetchInvoiceByIdData(id)), [dispatch])
   const loadLedger = useCallback((id: string) => dispatch(fetchInvoiceLedgerData(id)), [dispatch])

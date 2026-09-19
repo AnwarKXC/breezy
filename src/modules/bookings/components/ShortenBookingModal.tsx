@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, type FormEvent } from 'react'
+import { useState, type FormEvent } from 'react'
 import { Modal } from '@/shared/components/Modal'
 import { useCurrency } from '@/shared/contexts/CurrencyContext'
 import type { Booking } from '../types'
@@ -19,17 +19,15 @@ function dayDiff(a: Date, b: Date): number {
 // Opposite of ExtendBookingModal: pulls the check-out date earlier instead of
 // later. Removing nights can never conflict with another booking, so there is
 // no availability check here.
-export function ShortenBookingModal({ isOpen, onClose, booking, onShorten }: ShortenBookingModalProps) {
+// Content remounts on every open/close, so each opening starts from fresh state.
+export function ShortenBookingModal(props: ShortenBookingModalProps) {
+  return <ShortenBookingModalContent key={props.isOpen ? 'open' : 'closed'} {...props} />
+}
+
+function ShortenBookingModalContent({ isOpen, onClose, booking, onShorten }: ShortenBookingModalProps) {
   const { formatCurrency } = useCurrency()
   const [newCheckOut, setNewCheckOut] = useState('')
   const [saving, setSaving] = useState(false)
-
-  useEffect(() => {
-    if (!isOpen) {
-      setNewCheckOut('')
-      setSaving(false)
-    }
-  }, [isOpen])
 
   if (!booking) return null
 

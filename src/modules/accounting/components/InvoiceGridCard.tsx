@@ -8,7 +8,7 @@ import type { CurrencyCode } from '@/shared/utils/types'
 import { useLocale } from '@/i18n/components/LocaleContext'
 import { formatDate } from '@/shared/utils/date'
 import type { Invoice } from '../types'
-import { INVOICE_STATUS_LABELS, PAYMENT_TYPE_LABELS } from '../types'
+import { INVOICE_STATUS_LABELS, PAYMENT_METHOD_LABELS } from '../types'
 
 interface InvoiceGridCardProps {
   invoice: Invoice
@@ -139,7 +139,7 @@ export const InvoiceGridCard = memo(function InvoiceGridCard({
           </dt>
           <dd className="text-sm text-[#555555]">
             {invoice.paymentMethod
-              ? (PAYMENT_TYPE_LABELS as Record<string, string>)[invoice.paymentMethod] ?? invoice.paymentMethod
+              ? (PAYMENT_METHOD_LABELS as Record<string, string>)[invoice.paymentMethod] ?? invoice.paymentMethod
               : '-'}
           </dd>
         </div>

@@ -79,7 +79,7 @@ export function RoomsTab() {
           <div>
             <label className="block text-sm font-medium text-[#333333]">{t('rooms.floor')}</label>
             <input
-              type="number"
+              type="number" inputMode="numeric" step={1} onWheel={(event) => event.currentTarget.blur()}
               min={0}
               className="mt-1 block w-full rounded-lg border border-[#D4D4D4] px-3 py-2 text-sm"
               value={form.floor}
@@ -98,7 +98,6 @@ export function RoomsTab() {
                 setForm(f => ({
                   ...f,
                   room_type_id: roomTypeId,
-                  price: roomType?.basePrice ?? f.price,
                   capacity: roomType?.defaultCapacity ?? f.capacity,
                 }))
               }}
@@ -113,7 +112,7 @@ export function RoomsTab() {
           <div>
             <label className="block text-sm font-medium text-[#333333]">{t('rooms.price')}</label>
             <input
-              type="number"
+              type="number" inputMode="decimal" onWheel={(event) => event.currentTarget.blur()}
               min={0}
               step="0.01"
               className="mt-1 block w-full rounded-lg border border-[#D4D4D4] px-3 py-2 text-sm"
@@ -125,7 +124,7 @@ export function RoomsTab() {
           <div>
             <label className="block text-sm font-medium text-[#333333]">{t('rooms.capacity')}</label>
             <input
-              type="number"
+              type="number" inputMode="numeric" step={1} onWheel={(event) => event.currentTarget.blur()}
               min={1}
               className="mt-1 block w-full rounded-lg border border-[#D4D4D4] px-3 py-2 text-sm"
               value={form.capacity}

@@ -85,7 +85,7 @@ export function RoomTypesTab() {
           <div>
             <label className="block text-sm font-medium text-[#333333]">{t('rooms.basePrice')}</label>
             <input
-              type="number"
+              type="number" inputMode="decimal" onWheel={(event) => event.currentTarget.blur()}
               min={0}
               step="0.01"
               className="mt-1 block w-full rounded-lg border border-[#D4D4D4] px-3 py-2 text-sm"
@@ -97,7 +97,7 @@ export function RoomTypesTab() {
           <div>
             <label className="block text-sm font-medium text-[#333333]">{t('rooms.defaultCapacity')}</label>
             <input
-              type="number"
+              type="number" inputMode="numeric" step={1} onWheel={(event) => event.currentTarget.blur()}
               min={1}
               className="mt-1 block w-full rounded-lg border border-[#D4D4D4] px-3 py-2 text-sm"
               value={form.default_capacity}

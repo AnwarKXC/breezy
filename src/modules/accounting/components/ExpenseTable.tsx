@@ -86,7 +86,7 @@ export const ExpenseTable = memo(function ExpenseTable({
     }
 
     return cols
-  }, [categoryNames, t, hasActions, onDelete, formatCurrency, locale])
+  }, [hideCategory, t, hasActions, onCategoryClick, categoryNames, formatCurrency, locale, onDelete])
 
   return (
     <Table

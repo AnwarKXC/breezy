@@ -74,7 +74,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       return NextResponse.json({ ok: false, error: { code: 'NOT_FOUND', message: 'Reservation not found' } }, { status: 404 })
     }
 
-    const activeInvoiceWhere: Prisma.invoicesWhereInput = { reservation_id: id, deleted_at: null, status: { notIn: ['void', 'cancelled'] } }
+    const activeInvoiceWhere: Prisma.invoicesWhereInput = { reservation_id: id, deleted_at: null, status: { not: 'void' } }
 
     // Idempotency guard: a reservation already checked out (a previous request
     // succeeded) returns success without creating another invoice or payment.
@@ -196,7 +196,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
               await tx.payments.create({
                 data: {
                   invoice_id: invoice.id,
-                  type: paymentMethod,
+                  method: paymentMethod,
                   amount: paidAmount,
                   description: `Checkout payment for reservation ${id}`,
                   created_by: session.id,
@@ -224,7 +224,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
           actorId: session.id,
           reason: 'Check-out',
           roomStatus: 'checked_out',
-          nextRoomStatus: 'dirty',
+          housekeeping: 'dirty',
           at: new Date(now),
         })
         await recordReservationStatus(tx, { reservationId: id, from: 'checked_in', to: 'checked_out', actorId: session.id, at: new Date(now) })

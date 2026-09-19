@@ -1,17 +1,15 @@
-// src/services/README.md
 # Services
 
-External API services and Supabase configuration.
+Server-side data access for the app. All database access goes through Prisma.
 
 ## Structure:
 ```
 services/
-- supabase/        # Supabase browser, server, and service-role helpers
-- api.ts            # API client
-- {service}.ts      # Feature services
+- db/              # Prisma client, RPC helpers (withActor), row mappers, errors
+- auth/            # Session auth (bi_session cookie)
+- logs/            # Activity log service
+- {service}.ts     # Feature services
 ```
 
-## Supabase env:
-Browser/server SSR clients use `NEXT_PUBLIC_SUPABASE_URL` plus `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
-`NEXT_PUBLIC_SUPABASE_ANON_KEY` is also supported as a migration fallback.
-Service-role operations must use `SUPABASE_SERVICE_ROLE_KEY` from server-only files only.
+## Env:
+`DATABASE_URL` (pooled) and `DIRECT_URL` (migrations) — server-only, never expose to the browser.

@@ -8,7 +8,7 @@ import { toast } from '@/shared/toast/toastEvents'
 import { downloadInvoicePdf } from '../utils/invoicePdfExport'
 import { formatDate } from '@/shared/utils/date'
 import type { Invoice } from '../types'
-import { PAYMENT_TYPE_LABELS } from '../types'
+import { PAYMENT_METHOD_LABELS } from '../types'
 
 export type DetailTab = 'overview' | 'items' | 'payments' | 'ledger' | 'events'
 
@@ -96,7 +96,7 @@ export function useInvoiceDetail(invoiceId: string, t: (key: string) => string) 
     const paymentItems = payments.map((payment) => ({
       amount: Number(payment.amount),
       date: payment.createdAt ?? '',
-      description: payment.description ?? PAYMENT_TYPE_LABELS[payment.type] ?? payment.type,
+      description: payment.description ?? PAYMENT_METHOD_LABELS[payment.method] ?? payment.method,
       id: `payment-${payment.id}`,
       kind: Number(payment.amount) < 0 ? t('accounting.invoiceEvents.payment_refunded') : t('accounting.invoiceEvents.payment_recorded'),
     }))
@@ -113,7 +113,7 @@ export function useInvoiceDetail(invoiceId: string, t: (key: string) => string) 
     return [...paymentItems, ...eventItems]
       .sort((a, b) => String(b.date).localeCompare(String(a.date)))
       .slice(0, 8)
-  }, [invoice?.events, invoiceEvents, payments, t, invoice])
+  }, [invoiceEvents, payments, t, invoice])
 
   return {
     formatCurrency,

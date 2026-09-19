@@ -63,7 +63,7 @@ export function AddExtraChargeModal({ isOpen, onClose, booking, formatCurrency, 
       i++
     }
     return list
-  }, [booking])
+  }, [booking, t])
 
   if (!booking) return null
 
@@ -196,7 +196,7 @@ export function AddExtraChargeModal({ isOpen, onClose, booking, formatCurrency, 
               className="flex-1 rounded-lg border border-[#EAEAEA] px-3 py-1.5 text-sm outline-none focus:border-gray-400"
             />
             <input
-              type="number"
+              type="number" inputMode="decimal" step="0.01" min={0} onWheel={(event) => event.currentTarget.blur()}
               value={customAmount}
               onChange={(e) => setCustomAmount(e.target.value)}
               placeholder={t('bookings.amountPlaceholder')}

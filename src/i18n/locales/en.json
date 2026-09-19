@@ -79,7 +79,11 @@
     "name": "Name",
     "email": "Email",
     "phone": "Phone",
-    "address": "Address"
+    "address": "Address",
+    "clear": "Clear",
+    "searchContacts": "Search contacts...",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
   },
   "nav": {
     "home": "Home",
@@ -114,7 +118,22 @@
     "moduleComingSoon": "This module is ready in navigation and will be connected to its workspace next.",
     "poweredBy": "Powered by Step.eg",
     "collapseSidebar": "Collapse sidebar",
-    "expandSidebar": "Expand sidebar"
+    "expandSidebar": "Expand sidebar",
+    "quickActions": {
+      "title": "Quick actions",
+      "short": "Quick",
+      "newReservation": "New reservation",
+      "newReservationHint": "Book rooms for a guest",
+      "yearView": "Year overview",
+      "yearViewHint": "Occupancy across the whole year",
+      "findContact": "Find a contact",
+      "findContactHint": "Search guests and companies",
+      "accounting": "Accounting",
+      "accountingHint": "Invoices, payments and expenses",
+      "activityLog": "Activity log",
+      "activityLogHint": "Who changed what, and when",
+      "footer": "Tip: press Ctrl+K anywhere to open this menu."
+    }
   },
   "dashboard": {
     "title": "Dashboard",
@@ -269,10 +288,7 @@
       "draft": "Draft",
       "issued": "Open",
       "partiallyPaid": "Partially Paid",
-      "paid": "Paid",
       "overdue": "Overdue",
-      "void": "Void",
-      "refunded": "Refunded",
       "partial": "Partially Paid",
       "unpaid": "Unpaid",
       "summary": {
@@ -657,6 +673,34 @@
       "serviceCharge": "Service Charge",
       "approvalThreshold": "Approval Threshold",
       "currency": "Currency"
+    },
+    "hints": {
+      "refresh": "Reload all figures from the server",
+      "sections": {
+        "summary": "Today and this month",
+        "paymentsToday": "Payments received today",
+        "financialHealth": "All-time totals across every invoice, payment and expense."
+      },
+      "overview": {
+        "todayRevenue": "Total of invoices created today",
+        "monthRevenue": "Total of invoices created since the 1st of this month",
+        "outstanding": "Unpaid remaining balance across all open invoices",
+        "netProfit": "This month's invoiced revenue minus this month's expenses",
+        "paidInvoices": "Invoices fully or partially paid",
+        "unpaidInvoices": "Draft, issued or overdue invoices with no payment yet",
+        "totalExpenses": "Expenses dated this month",
+        "totalRefunds": "All money refunded to guests",
+        "cashToday": "Cash payments recorded today",
+        "cardToday": "Card (Visa) payments recorded today",
+        "bankToday": "Bank transfers recorded today",
+        "onlineToday": "InstaPay and Vodafone Cash payments recorded today"
+      },
+      "finance": {
+        "totalRevenue": "Sum of all invoice amounts",
+        "totalExpenses": "Sum of all recorded expenses",
+        "netBalance": "Total revenue minus total expenses",
+        "outstanding": "Invoiced amount not yet collected as payments"
+      }
     }
   },
   "rooms": {
@@ -811,7 +855,7 @@
     "searchPlaceholder": "Search room, Guest",
     "guestSearchPlaceholder": "Search by name or email or phone number",
     "filter": "Filter",
-    "allStatuses": "All statuses",
+    "allStatuses": "All",
     "filterStartDate": "From date",
     "filterEndDate": "To date",
     "filterApply": "Apply",
@@ -864,7 +908,13 @@
       "bookedRooms": "Booked Rooms",
       "occupied": "Occupied",
       "cancelled": "Cancelled",
-      "totalRevenue": "Total Revenue"
+      "totalRevenue": "Total Revenue",
+      "periodLabel": "Last 7 days",
+      "periodHint": "These numbers count bookings created in the last 7 days, not stays happening this week.",
+      "bookedRoomsHint": "New bookings still waiting to be confirmed",
+      "occupiedHint": "Confirmed or checked-in bookings",
+      "cancelledHint": "Bookings cancelled among those created in this period",
+      "totalRevenueHint": "Sum of booking totals created in this period (before payments)"
     },
     "actions": {
       "checkIn": "Check In",
@@ -945,7 +995,6 @@
     "fromDate": "From",
     "toDate": "To",
     "roomStatusSection": "Room status",
-    "allStatuses": "All",
     "clearAll": "Clear all",
     "bookRooms": "Book",
     "roomSingular": "Room",
@@ -1000,7 +1049,18 @@
     "loadingAvailableRooms": "Loading available rooms...",
     "noAvailableRooms": "No available rooms for this period.",
     "perNight": "/night",
-    "changeRoomButton": "Change Room"
+    "changeRoomButton": "Change Room",
+    "cancellationFeeHint": "Optional. A fee here is added to the guest's invoice when you choose Cancel & Charge Fee.",
+    "justCancelHint": "Cancel without charging the guest anything",
+    "cancelAndChargeFeeHint": "Cancel and bill the fee entered above (enter an amount first)",
+    "hints": {
+      "search": "Search by guest name or room number. Press / to jump here, Esc to clear.",
+      "listFilter": "Filter the list by dates, status or guest type",
+      "addBooking": "Create a new reservation (Alt+N)",
+      "roomStatus": "Live status of every room today. Click a room to open its page with bookings, history and status controls.",
+      "roomFilter": "Show only rooms with a given status or date range",
+      "refresh": "Reload the latest room and booking data"
+    }
   },
   "reservations": {
     "new": {
@@ -1038,7 +1098,22 @@
       "exceedsAvailability": "One or more room types exceed availability.",
       "creating": "Creating...",
       "create": "Create reservation",
-      "availabilityVerified": "Availability is verified on submit to prevent overbooking."
+      "availabilityVerified": "Availability is verified on submit to prevent overbooking.",
+      "hints": {
+        "guest": "Search an existing contact by name or phone. Not found? Use Add to create one without leaving this page.",
+        "addContact": "Create a new guest or company contact",
+        "stayDates": "Check-out must be after check-in. Availability and prices update as soon as both dates are set.",
+        "roomDistribution": "Set how many rooms you need in total, then split them across room types. Only rooms free for the whole stay are counted.",
+        "decreaseRooms": "Remove one {type} room",
+        "increaseRooms": "Add one {type} room",
+        "serviceCharge": "Percentage of the room subtotal, set in Settings → Pricing",
+        "vat": "Applied to subtotal plus service charge; rate set in Settings → Pricing"
+      },
+      "occupancy": {
+        "S": "Single occupancy (1 guest)",
+        "D": "Double occupancy (2 guests)",
+        "T": "Triple occupancy (3 guests)"
+      }
     },
     "deskNotes": "Desk notes",
     "notesTitle": "Notes",
@@ -1146,7 +1221,47 @@
     "extraChargeFallback": "Extra charge",
     "roomSuffix": " (room)",
     "failedToLoadReservation": "Failed to load reservation",
-    "failedToSaveFallback": "Failed to save"
+    "failedToSaveFallback": "Failed to save",
+    "actionBar": {
+      "confirm": "Confirm stay",
+      "confirmHint": "Locks the rooms for these dates and marks the reservation as confirmed",
+      "delete": "Delete",
+      "deleteHint": "Permanently remove this draft reservation",
+      "cancel": "Cancel",
+      "cancelHint": "Release the rooms; you can optionally charge a cancellation fee",
+      "checkIn": "Check in",
+      "checkInHint": "Mark the guest as arrived and the rooms as occupied",
+      "edit": "Edit reservation",
+      "editHint": "Change dates, rooms or guests (only while draft or held)",
+      "processing": "Processing...",
+      "success": "Reservation updated",
+      "failed": "Action failed",
+      "networkError": "Network error. Check your connection and try again.",
+      "deleted": "Reservation deleted",
+      "deleteFailed": "Failed to delete reservation",
+      "cancelled": "Reservation cancelled",
+      "cancelledWithInvoice": "Reservation cancelled and fee invoice created",
+      "cancelFailed": "Failed to cancel reservation",
+      "cancelTitle": "Cancel this reservation?",
+      "cancelDescription": "Choose how to handle this cancellation.",
+      "cancelFee": "Cancellation fee amount",
+      "cancelFeeHint": "Pre-filled with the reservation total. Adjust it, or use Just cancel to charge nothing.",
+      "justCancel": "Just cancel",
+      "justCancelHint": "Cancel without charging the guest anything",
+      "cancelWithFee": "Cancel & charge fee",
+      "cancelWithFeeHint": "Cancel and create an invoice for the fee above",
+      "back": "Back",
+      "deleteTitle": "Delete this reservation?",
+      "deleteDescription": "This permanently removes the reservation and cannot be undone."
+    },
+    "hints": {
+      "editPrice": "Override the nightly rate for this room only",
+      "extraCharge": "Add a minibar, laundry or other charge to this room's bill",
+      "changeRoom": "Move the guest to another available room",
+      "shorten": "End the stay earlier; nights removed are no longer charged",
+      "extend": "Add nights to the stay if the room is still free",
+      "checkOut": "Review charges and payments, then close the stay and free the rooms"
+    }
   },
   "guests": {
     "title": "Guests",
@@ -1325,7 +1440,9 @@
       "editTitle": "Edit contact",
       "description": "Add or update client information.",
       "saving": "Saving..."
-    }
+    },
+    "emptyFilteredDescription": "No contacts match your search or type filter.",
+    "clearFilters": "Clear search and filters"
   },
   "logs": {
     "title": "Logs",

@@ -9,9 +9,11 @@ export function useLedger(filters?: Record<string, string>) {
   const ledgerEntries = useAppSelector(selectLedgerEntries)
   const loading = useAppSelector(selectAccountingLoading)
 
+  // Callers pass inline objects; key the fetch on the filter values, not identity.
+  const filtersKey = JSON.stringify(filters ?? null)
   useEffect(() => {
-    dispatch(fetchLedgerEntriesData(filters))
-  }, [dispatch, JSON.stringify(filters)])
+    dispatch(fetchLedgerEntriesData(JSON.parse(filtersKey) ?? undefined))
+  }, [dispatch, filtersKey])
 
   const load = useCallback((params?: Record<string, string>) => dispatch(fetchLedgerEntriesData(params)), [dispatch])
 

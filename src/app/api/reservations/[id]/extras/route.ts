@@ -5,6 +5,7 @@ import { secureMutationEndpoint } from '@/shared/secureEndpoint'
 import { prisma } from '@/services/db/prisma'
 import { toRows } from '@/services/db/rows'
 import { ReservationExtrasSchema, zodErrorMessage } from '@/shared/validation'
+import { getSystemCurrency } from '@/shared/currency/server'
 import { syncOpenInvoicesForReservation } from '@/modules/reservations/services/pricingService'
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -23,30 +24,26 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     let created
     try {
       created = await prisma.$transaction(async (tx) => {
-        const rows = []
-        for (const charge of charges) {
-          rows.push(
-            await tx.reservation_pricing_items.create({
-              data: {
-                reservation_id: id,
-                reservation_room_id: reservationRoomId ?? null,
-                pricing_level: 'extra',
-                base_rate: charge.amount,
-                applied_rate: charge.amount,
-                nights: 1,
-                quantity: 1,
-                discount_amount: 0,
-                tax_amount: 0,
-                service_amount: 0,
-                total_amount: charge.amount,
-                currency: 'USD',
-                price_source: 'manual_override',
-                source_type: 'manual_override',
-                manual_override_reason: charge.label,
-              },
-            }),
-          )
-        }
+        const currency = await getSystemCurrency()
+        const rows = await tx.reservation_pricing_items.createManyAndReturn({
+          data: charges.map((charge) => ({
+            reservation_id: id,
+            reservation_room_id: reservationRoomId ?? null,
+            pricing_level: 'extra' as const,
+            base_rate: charge.amount,
+            applied_rate: charge.amount,
+            nights: 1,
+            quantity: 1,
+            discount_amount: 0,
+            tax_amount: 0,
+            service_amount: 0,
+            total_amount: charge.amount,
+            currency,
+            price_source: 'manual_override' as const,
+            source_type: 'manual_override',
+            manual_override_reason: charge.label,
+          })),
+        })
 
         if (chargesTotal !== 0) {
           const current = await tx.reservations.findUnique({

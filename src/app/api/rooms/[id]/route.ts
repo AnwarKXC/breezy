@@ -36,7 +36,7 @@ export async function PATCH(request: Request, { params }: Context) {
   if (!parsed.success) return NextResponse.json({ error: zodErrorMessage(parsed.error) }, { status: 400 })
 
   try {
-    const room = await updateRoom((await params).id, parsed.data)
+    const room = await updateRoom((await params).id, parsed.data, auth.session.id)
     if (!room) return NextResponse.json({ error: 'Not found' }, { status: 404 })
     return NextResponse.json({ data: room })
   } catch (error) {

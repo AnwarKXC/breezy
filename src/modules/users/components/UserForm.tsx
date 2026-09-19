@@ -1,11 +1,13 @@
 ﻿import { useMemo, useState } from 'react'
 
+import { useTranslation } from '@/i18n/hooks/useTranslation'
 import { DropdownSelect } from '@/shared/components/DropdownSelect'
 import { FloatingInput } from '@/shared/components/FloatingField'
 import type { UserRole } from '../types'
 import { USER_ROLES } from '../utils/userUi'
 import type { UserFormDraft, UserFormMode } from '../hooks/useUserForm'
 import { EyeIcon, EyeOffIcon } from './UserIcons'
+import { useEscapeKey } from '@/shared/hooks/useEscapeKey'
 
 interface UserFormProps {
   draft: UserFormDraft
@@ -23,7 +25,9 @@ interface UserFormProps {
 export function UserForm(props: UserFormProps) {
   const isCreate = props.mode === 'create'
   const isEdit = props.mode === 'edit'
+  const { t } = useTranslation()
   const [showPassword, setShowPassword] = useState(false)
+  useEscapeKey(props.onClose, !props.saving)
   const emailError = props.error === 'auth/email_already_exists' ? props.errorDescription : null
   const formError = props.error && props.error !== 'auth/email_already_exists' ? props.errorDescription : null
   const roleOptions = useMemo(
@@ -38,7 +42,8 @@ export function UserForm(props: UserFormProps) {
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/20 px-4 py-6">
       <form
-        className="w-full max-w-xl rounded-xl bg-white p-6 "
+        role="dialog" aria-modal="true"
+        className="max-h-[calc(100dvh-3rem)] w-full max-w-xl overflow-y-auto rounded-xl bg-white p-4 shadow-xl sm:p-6"
         onSubmit={(event) => {
           event.preventDefault()
           props.onSubmit()
@@ -83,6 +88,7 @@ export function UserForm(props: UserFormProps) {
           <FloatingInput
             required
             label={props.labels.phone}
+            type="tel"
             value={props.draft.phone}
             onChange={(event) => props.onUpdate('phone', event.target.value)}
           />
@@ -100,6 +106,7 @@ export function UserForm(props: UserFormProps) {
               <FloatingInput
                 required={isCreate}
                 label={props.labels.password}
+                autoComplete="new-password"
                 minLength={6}
                 type={showPassword ? 'text' : 'password'}
                 value={props.draft.password}
@@ -107,8 +114,7 @@ export function UserForm(props: UserFormProps) {
                 trailing={
                 <button
                   type="button"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  title={showPassword ? 'Hide password' : 'Show password'}
+                  aria-label={showPassword ? t('common.hidePassword') : t('common.showPassword')}
                   onClick={() => setShowPassword((current) => !current)}
                   className="absolute end-2 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-[#787774] transition-all duration-200 hover:bg-[#F5F5F5] hover:text-[#1A1A1A]"
                 >

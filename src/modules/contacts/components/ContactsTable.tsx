@@ -3,6 +3,7 @@ import Image from 'next/image'
 
 import { Table, TableActionsMenu, type TableColumn } from '@/shared/table'
 import { useLocale } from '@/i18n/components/LocaleContext'
+import { countryName } from '@/shared/static/countries'
 import { formatDateTime } from '@/shared/utils/date'
 import type { Contact } from '../types'
 import { ContactTypeBadge } from './ContactTypeBadge'
@@ -75,7 +76,7 @@ export const ContactsTable = memo(function ContactsTable({
         render: (_value, row) => {
           const contact = row as Contact
           if (!contact.country) return <span className="text-[#787774]">—</span>
-          return <span className="text-[#555555]">{contact.country}</span>
+          return <span className="text-[#555555]">{countryName(contact.country, locale)}</span>
         },
       },
       {

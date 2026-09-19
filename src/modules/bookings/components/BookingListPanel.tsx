@@ -1,5 +1,7 @@
 ﻿'use client'
 
+import { useEffect, useRef } from 'react'
+
 import { useTranslation } from '@/i18n/hooks/useTranslation'
 import { Card } from '@/shared/components/Card'
 import { BookingsTable, type BookingsTableRow } from './BookingsTable'
@@ -11,6 +13,8 @@ interface BookingListPanelProps {
   searchQuery: string
   onSearchChange: (value: string) => void
   onFilterClick?: () => void
+  /** Number of list filters currently applied; shown as a badge on the Filter button. */
+  activeFilterCount?: number
   onAddBooking?: () => void
   onCheckIn?: (booking: Booking) => void
   onCheckOut?: (booking: Booking) => void
@@ -31,10 +35,25 @@ export function BookingListPanel({
   searchQuery,
   onSearchChange,
   onFilterClick,
+  activeFilterCount = 0,
   onAddBooking,
   ...callbacks
 }: BookingListPanelProps) {
   const { t } = useTranslation()
+  const searchRef = useRef<HTMLInputElement>(null)
+
+  // Press "/" anywhere (outside a field) to jump to the search box.
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== '/' || event.ctrlKey || event.metaKey || event.altKey) return
+      const target = event.target as HTMLElement
+      if (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)) return
+      event.preventDefault()
+      searchRef.current?.focus()
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [])
 
   return (
     <Card padding="md">
@@ -43,29 +62,41 @@ export function BookingListPanel({
           {t('bookings.bookingList')}
         </h3>
         <div className="flex flex-wrap items-center gap-2">
-          <div className="relative">
+          <div className="relative w-full sm:w-auto">
             <input
-              type="text"
+              ref={searchRef}
+              type="search"
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Escape') onSearchChange('') }}
               placeholder={t('bookings.searchPlaceholder')}
-              className="h-9 rounded-lg border border-[#EAEAEA] bg-white px-3 pr-8 text-sm text-[#333333] placeholder-gray-400 outline-none transition-colors focus:border-gray-400 focus:ring-1 focus:ring-gray-200"
+              aria-label={t('bookings.searchPlaceholder')}
+              data-tooltip={t('bookings.hints.search')}
+              className="h-9 w-full rounded-lg border border-[#EAEAEA] bg-white pe-10 ps-3 text-sm text-[#333333] placeholder-gray-400 outline-none transition-colors focus:border-gray-400 focus:ring-1 focus:ring-gray-200 sm:w-64"
             />
+            <kbd aria-hidden="true" className="pointer-events-none absolute end-2 top-1/2 hidden -translate-y-1/2 rounded border border-[#EAEAEA] bg-[#FAFAFA] px-1.5 font-mono text-[10px] text-[#787774] sm:block">/</kbd>
           </div>
           <button
             type="button"
             onClick={onFilterClick}
-            className="h-9 rounded-lg border border-[#EAEAEA] bg-white px-3 text-sm font-medium text-[#555555] transition-colors hover:bg-[#F9F9F8]"
+            data-tooltip={t('bookings.hints.listFilter')}
+            className={`inline-flex h-9 items-center gap-1.5 rounded-lg border px-3 text-sm font-medium transition-colors hover:bg-[#F9F9F8] ${activeFilterCount > 0 ? 'border-[#1A1A1A] bg-white text-[#1A1A1A]' : 'border-[#EAEAEA] bg-white text-[#555555]'}`}
           >
             {t('bookings.filter')}
+            {activeFilterCount > 0 && (
+              <span className="grid h-5 min-w-5 place-items-center rounded-full bg-[#1A1A1A] px-1 text-[11px] font-semibold text-white">
+                {activeFilterCount}
+              </span>
+            )}
           </button>
           {onAddBooking && (
             <button
               type="button"
               onClick={onAddBooking}
+              data-tooltip={t('bookings.hints.addBooking')}
               className="inline-flex h-9 items-center gap-1.5 rounded-full bg-[#1A1A1A] px-4 text-sm font-medium text-white transition-colors hover:bg-[#333333]"
             >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
               {t('bookings.addBooking')}

@@ -1,6 +1,7 @@
-﻿'use client'
+'use client'
 
-import { useState, useCallback, useEffect, useMemo } from 'react'
+import { useState, useCallback, useMemo } from 'react'
+import { fetchData, useResource } from '@/shared/data/useResource'
 import { Skeleton } from '@/shared/components/Skeleton'
 import { ToolbarExportGroup } from '@/shared/components/toolbar'
 import { useCurrency } from '@/shared/contexts/CurrencyContext'
@@ -9,7 +10,7 @@ import { formatDate } from '@/shared/utils/date'
 import type { DailyRevenueReport, MonthlyRevenueReport, ReportInvoiceDetail, ReportExpenseDetail } from '../types'
 import { exportDailyRevenueCsv, exportMonthlyRevenueCsv } from '../utils/reportCsvExport'
 import { exportDailyRevenuePdf, exportMonthlyRevenuePdf } from '../utils/reportPdfExport'
-import { INVOICE_STATUS_LABELS, PAYMENT_TYPE_LABELS, COST_CENTER_LABELS } from '../types'
+import { INVOICE_STATUS_LABELS, PAYMENT_METHOD_LABELS, COST_CENTER_LABELS } from '../types'
 
 interface Props {
   t: (key: string) => string
@@ -164,7 +165,7 @@ function CombinedTable({ rows, page, totalPages, onPrev, onNext, formatCurrency,
                   {r.remainingBalance > 0 ? formatCurrency(r.remainingBalance) : '0'}
                 </td>
                 <td className={`${tableCellClass} text-[#787774]`}>
-                  {r.method ? (PAYMENT_TYPE_LABELS[r.method as keyof typeof PAYMENT_TYPE_LABELS] ?? r.method) : '—'}
+                  {r.method ? (PAYMENT_METHOD_LABELS[r.method as keyof typeof PAYMENT_METHOD_LABELS] ?? r.method) : '—'}
                 </td>
                 <td className={tableCellClass}><StatusBadge status={r.status} type={r.type} /></td>
                 <td className={`${tableCellClass} text-[#787774]`}>{r.date?.slice(0, 10) ?? '—'}</td>
@@ -203,47 +204,37 @@ function mergeRows(invoices: ReportInvoiceDetail[], expenses: ReportExpenseDetai
   return [...inv, ...exp].sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''))
 }
 
+const EMPTY_INVOICES: DailyRevenueReport['invoices'] = []
+const EMPTY_EXPENSES: DailyRevenueReport['expenseDetails'] = []
+
 export function ReportsTab({ t }: Props) {
   const { formatCurrency, currencyCode } = useCurrency()
   const locale = useLocale()
   const [reportType, setReportType] = useState<'daily' | 'monthly'>('daily')
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10))
   const [month, setMonth] = useState(new Date().toISOString().slice(0, 7))
-  const [dailyReport, setDailyReport] = useState<DailyRevenueReport | null>(null)
-  const [monthlyReport, setMonthlyReport] = useState<MonthlyRevenueReport | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
   const [exportingCsv, setExportingCsv] = useState(false)
   const [exportingPdf, setExportingPdf] = useState(false)
   const [printingId, setPrintingId] = useState<string | null>(null)
-  const [page, setPage] = useState(0)
 
-  const loadReport = useCallback(async () => {
-    setLoading(true)
-    setPage(0)
-    try {
-      if (reportType === 'daily') {
-        const res = await fetch(`/api/accounting/reports/daily-revenue?date=${date}`)
-        if (res.ok) {
-          const json = await res.json()
-          setDailyReport(json.data)
-        }
-      } else if (reportType === 'monthly') {
-        const res = await fetch(`/api/accounting/reports/monthly-revenue?month=${month}`)
-        if (res.ok) {
-          const json = await res.json()
-          setMonthlyReport(json.data)
-        }
-      }
-      setLastUpdated(new Date())
-    } catch { /* handled */ }
-    finally { setLoading(false) }
-  }, [reportType, date, month])
+  const reportUrl = reportType === 'daily'
+    ? `/api/accounting/reports/daily-revenue?date=${date}`
+    : `/api/accounting/reports/monthly-revenue?month=${month}`
+  const report = useResource<DailyRevenueReport | MonthlyRevenueReport>(reportUrl, () => fetchData(reportUrl))
+  const dailyReport = reportType === 'daily' ? (report.data as DailyRevenueReport | undefined) ?? null : null
+  const monthlyReport = reportType === 'monthly' ? (report.data as MonthlyRevenueReport | undefined) ?? null : null
+  const loading = report.isLoading
+  const lastUpdated = report.updatedAt ? new Date(report.updatedAt) : null
+  const loadReport = report.refresh
 
-  useEffect(() => { loadReport() }, [loadReport])
+  // Pagination restarts whenever a different report is shown.
+  const [pageState, setPageState] = useState({ url: reportUrl, page: 0 })
+  const page = pageState.url === reportUrl ? pageState.page : 0
+  const setPage = (update: (page: number) => number) => setPageState({ url: reportUrl, page: update(page) })
 
-  const invoices = (reportType === 'daily' ? dailyReport?.invoices : monthlyReport?.invoices) ?? []
-  const expenseDetails = (reportType === 'daily' ? dailyReport?.expenseDetails : monthlyReport?.expenseDetails) ?? []
+  const activeReport = reportType === 'daily' ? dailyReport : monthlyReport
+  const invoices = activeReport?.invoices ?? EMPTY_INVOICES
+  const expenseDetails = activeReport?.expenseDetails ?? EMPTY_EXPENSES
 
   const allRows = useMemo(() => mergeRows(invoices, expenseDetails), [invoices, expenseDetails])
   const totalPages = Math.max(1, Math.ceil(allRows.length / PAGE_SIZE))
@@ -357,7 +348,7 @@ export function ReportsTab({ t }: Props) {
             {dailyReport.payments.length === 0 && <p className="text-sm text-[#787774]">{t('accounting.reports.noData')}</p>}
             {dailyReport.payments.map((p, i) => (
               <div key={i} className="flex justify-between py-1 text-sm border-b border-gray-50 last:border-0">
-                <span className="text-[#555555]">{PAYMENT_TYPE_LABELS[p.method as keyof typeof PAYMENT_TYPE_LABELS] ?? p.method}</span>
+                <span className="text-[#555555]">{PAYMENT_METHOD_LABELS[p.method as keyof typeof PAYMENT_METHOD_LABELS] ?? p.method}</span>
                 <span className="font-medium">{formatCurrency(p.amount)}</span>
               </div>
             ))}

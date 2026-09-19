@@ -1,54 +1,31 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useCallback } from 'react'
+import { useResource } from '@/shared/data/useResource'
 import type { RoomType, CreateRoomTypeInput, UpdateRoomTypeInput } from '../types'
 import * as api from '../services/roomTypeApiClient'
 
-interface RoomTypesState {
-  items: RoomType[]
-  loading: boolean
-  error: string | null
-}
+const ROOM_TYPES_KEY = '/api/room-types'
 
 export function useRoomTypes() {
-  const [state, setState] = useState<RoomTypesState>({ items: [], loading: true, error: null })
-  const genRef = useRef(0)
-
-  const load = useCallback(async () => {
-    const gen = ++genRef.current
-    setState(prev => ({ ...prev, loading: true, error: null }))
-    try {
-      const items = await api.fetchRoomTypes()
-      if (gen !== genRef.current) return
-      setState({ items, loading: false, error: null })
-    } catch (error) {
-      if (gen === genRef.current) {
-        setState(prev => ({ ...prev, loading: false, error: error instanceof Error ? error.message : 'Failed to load room types' }))
-      }
-    }
-  }, [])
-
-  useEffect(() => { load() }, [load])
+  const { data, error, isLoading, refresh, mutate } = useResource<RoomType[]>(ROOM_TYPES_KEY, api.fetchRoomTypes)
 
   const create = useCallback(async (input: CreateRoomTypeInput) => {
     const item = await api.createRoomTypeApi(input)
-    genRef.current++
-    setState(prev => ({ ...prev, items: [...prev.items, item], loading: false }))
+    mutate((items = []) => [...items, item])
     return item
-  }, [])
+  }, [mutate])
 
   const update = useCallback(async (id: string, input: UpdateRoomTypeInput) => {
     const item = await api.updateRoomTypeApi(id, input)
-    genRef.current++
-    setState(prev => ({ ...prev, items: prev.items.map(i => i.id === id ? item : i), loading: false }))
+    mutate((items = []) => items.map(i => i.id === id ? item : i))
     return item
-  }, [])
+  }, [mutate])
 
   const remove = useCallback(async (id: string) => {
     await api.deleteRoomTypeApi(id)
-    genRef.current++
-    setState(prev => ({ ...prev, items: prev.items.filter(i => i.id !== id), loading: false }))
-  }, [])
+    mutate((items = []) => items.filter(i => i.id !== id))
+  }, [mutate])
 
-  return { ...state, create, update, remove, reload: load }
+  return { items: data ?? [], loading: isLoading, error: error?.message ?? null, create, update, remove, reload: refresh }
 }

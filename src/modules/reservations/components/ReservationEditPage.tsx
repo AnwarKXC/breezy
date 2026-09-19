@@ -34,7 +34,7 @@ export function ReservationEditPage() {
   const { id, locale } = useParams<{ id: string; locale: string }>()
   const router = useRouter()
   const { t } = useTranslation()
-  const { formatCurrency } = useCurrency()
+  const { formatCurrency, vatRate: vatPercent, serviceChargeRate: serviceChargePercent } = useCurrency()
 
   // Data
   const [detail, setDetail] = useState<ReservationDetail | null>(null)
@@ -63,8 +63,8 @@ export function ReservationEditPage() {
   const [baselineOverrides, setBaselineOverrides] = useState<Record<string, string>>({})
   // ponytail: load service/vat from settings so the edit preview matches
   // pricingService.calculatePricing on the server rather than a hardcoded 10/14.
-  const [serviceChargeRate, setServiceChargeRate] = useState(0.10)
-  const [vatRate, setVatRate] = useState(0.14)
+  const serviceChargeRate = serviceChargePercent / 100
+  const vatRate = vatPercent / 100
 
   // Derived
   const datesValid = Boolean(form.check_in_date && form.check_out_date && new Date(form.check_out_date) > new Date(form.check_in_date))
@@ -156,7 +156,7 @@ export function ReservationEditPage() {
     const tax = (roomCharges + serviceCharge) * vatRate
     const total = roomCharges + serviceCharge + tax
     return { roomDetails, roomCharges, serviceCharge, tax, total }
-  }, [allRooms, form.selectedRoomIds, roomOccupancies, roomTypeMap, nights, datesValid, detail?.companyInfo, companyPriceOverrides, roomTypePricing, serviceChargeRate, vatRate, lineOverrides])
+  }, [datesValid, form.selectedRoomIds.length, serviceChargeRate, vatRate, selectedRooms, roomTypeMap, getStandardRoomPrice, getOverrideFor, nights])
 
   // Load initial data
   useEffect(() => {
@@ -168,16 +168,6 @@ export function ReservationEditPage() {
           roomService.getAll(),
         ])
 
-        // ponytail: load service/vat from settings so the edit preview honors
-        // them rather than a hardcoded 10/14 fallback.
-        fetch('/api/accounting/settings').then((r) => r.ok ? r.json() : null).then((json) => {
-          if (cancelled || !json?.data) return
-          const settings: Array<{ key: string; value: { rate?: number } }> = json.data
-          const sc = settings.find((s) => s.key === 'service_charge_rate')
-          const vr = settings.find((s) => s.key === 'vat_rate')
-          if (sc?.value?.rate != null) setServiceChargeRate(Number(sc.value.rate) / 100)
-          if (vr?.value?.rate != null) setVatRate(Number(vr.value.rate) / 100)
-        }).catch((err) => console.error('[ReservationEditPage] failed to load tax settings:', err))
 
         const json = await res.json()
         if (!json.ok || !json.data) {
@@ -671,7 +661,7 @@ export function ReservationEditPage() {
                           <span className="text-[10px] text-[#787774] line-through">{formatCurrency(g.standardPrice)}</span>
                         )}
                         <input
-                          type="number"
+                          type="number" inputMode="decimal" onWheel={(event) => event.currentTarget.blur()}
                           min="0"
                           step="any"
                           value={lineOverrides[targetRoomId] ?? ''}

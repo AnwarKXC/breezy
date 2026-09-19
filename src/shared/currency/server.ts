@@ -6,7 +6,7 @@
 
 import 'server-only'
 import { prisma } from '@/services/db/prisma'
-import type { CurrencyCode } from '@/shared/utils/types'
+import { isCurrencyCode, type CurrencyCode } from '@/shared/static/currencies'
 
 const DEFAULT_SYSTEM_CURRENCY: CurrencyCode = 'EGP'
 const RATE_CACHE_TTL_MS = 30 * 60 * 1000 // 30 min
@@ -18,12 +18,26 @@ const FALLBACK_RATES: Record<CurrencyCode, Partial<Record<CurrencyCode, number>>
 
 let cached: { base: CurrencyCode; rates: Record<string, number>; ts: number } | null = null
 
+// Read on nearly every pricing/invoice request but changed only from settings:
+// cache briefly in-process and invalidate on write (other instances converge in TTL).
+const SYSTEM_CURRENCY_TTL_MS = 60 * 1000
+let systemCurrencyCache: { code: CurrencyCode; ts: number } | null = null
+
+export function invalidateSystemCurrencyCache() {
+  systemCurrencyCache = null
+}
+
 export async function getSystemCurrency(): Promise<CurrencyCode> {
+  if (systemCurrencyCache && Date.now() - systemCurrencyCache.ts < SYSTEM_CURRENCY_TTL_MS) {
+    return systemCurrencyCache.code
+  }
   try {
     const data = await prisma.accounting_settings.findUnique({ where: { key: 'currency' }, select: { value: true } })
     const value = data?.value as { code?: unknown } | null | undefined
     const code = typeof value?.code === 'string' ? value.code.toUpperCase() : undefined
-    if (code === 'USD' || code === 'EGP' || code === 'EUR') return code
+    const resolved = isCurrencyCode(code) ? code : DEFAULT_SYSTEM_CURRENCY
+    systemCurrencyCache = { code: resolved, ts: Date.now() }
+    return resolved
   } catch (err) {
     console.error('[currency] getSystemCurrency failed:', err)
   }

@@ -33,7 +33,7 @@ async function createReservationInvoice(
   // (e.g. a retried create-with-rooms call), realign it instead of inserting
   // a second one.
   const existing = await prisma.invoices.findFirst({
-    where: { reservation_id: reservationId, deleted_at: null, status: { notIn: ['void', 'cancelled'] } },
+    where: { reservation_id: reservationId, deleted_at: null, status: { not: 'void' } },
     select: { id: true, status: true },
     orderBy: { created_at: 'asc' },
   })

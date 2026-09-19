@@ -1,6 +1,8 @@
-﻿'use client'
+'use client'
 
+import { InfoHint } from '@/shared/components/InfoHint'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useResource } from '@/shared/data/useResource'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useTranslation } from '@/i18n/hooks/useTranslation'
 import { FloatingInput } from '@/shared/components/FloatingField'
@@ -47,6 +49,21 @@ async function fetchJson<T>(url: string): Promise<T | null> {
   return json?.data ?? null
 }
 
+type PriceOverrides = Record<string, Record<string, number>>
+const NO_OVERRIDES: PriceOverrides = {}
+
+async function fetchCompanyPriceOverrides(contactId: string): Promise<PriceOverrides> {
+  const rows = await fetchJson<Array<{ roomCategory: string; occupancyCode: string; price: number }>>(
+    `/api/contacts/${contactId}/price-overrides`,
+  )
+  const overrides: PriceOverrides = {}
+  for (const row of rows ?? []) {
+    overrides[row.roomCategory] ??= {}
+    overrides[row.roomCategory][row.occupancyCode] = Number(row.price)
+  }
+  return overrides
+}
+
 export function NewReservationPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -55,7 +72,7 @@ export function NewReservationPage() {
   const lockedContact = Boolean(lockedContactId)
   const { locale, t } = useTranslation()
   const searchRef = useRef<HTMLDivElement>(null)
-  const { formatCurrency } = useCurrency()
+  const { formatCurrency, vatRate: vatPercent, serviceChargeRate: serviceChargePercent } = useCurrency()
 
   const [roomTypes, setRoomTypes] = useState<RoomType[]>([])
   const [roomTypesLoading, setRoomTypesLoading] = useState(true)
@@ -70,6 +87,12 @@ export function NewReservationPage() {
   const [showResults, setShowResults] = useState(false)
   const [searchLoading, setSearchLoading] = useState(false)
   const [selectedContact, setSelectedContact] = useState<ContactResult | null>(null)
+  // Negotiated company rates (roomCategory -> occupancy -> price); none for individuals.
+  const companyId = selectedContact?.type === 'company' ? selectedContact.id : null
+  const { data: companyPriceOverrides = NO_OVERRIDES } = useResource(
+    companyId ? `/api/contacts/${companyId}/price-overrides` : null,
+    () => fetchCompanyPriceOverrides(companyId!),
+  )
   const [newContactModalOpen, setNewContactModalOpen] = useState(false)
 
   // Pre-select the contact passed from the contact details page (?contactId=&name=)
@@ -95,13 +118,12 @@ export function NewReservationPage() {
   const [roomOccupancies, setRoomOccupancies] = useState<Record<string, ('S' | 'D' | 'T')[]>>({})
   const [submitting, setSubmitting] = useState(false)
   const [serverError, setServerError] = useState<string | null>(null)
-  const [companyPriceOverrides, setCompanyPriceOverrides] = useState<Record<string, Record<string, number>>>({})
   // ponytail: tax/service_charge rates were hardcoded 10/14 and mismatched the
   // /settings PricingTab. Load them once from accounting_settings so the
   // preview matches the persisted reservation (server's pricingService reads
   // the same keys).
-  const [serviceChargeRate, setServiceChargeRate] = useState(0.10)
-  const [vatRate, setVatRate] = useState(0.14)
+  const serviceChargeRate = serviceChargePercent / 100
+  const vatRate = vatPercent / 100
 
   const nights = checkIn && checkOut
     ? Math.max(0, Math.round((new Date(checkOut + 'T12:00:00').getTime() - new Date(checkIn + 'T12:00:00').getTime()) / 86400000))
@@ -139,7 +161,7 @@ export function NewReservationPage() {
       if (occupancies.length === 0) return sum
       return sum + occupancies.reduce((roomSum, occ) => roomSum + getRoomPrice(rt, occ) * nights, 0)
     }, 0),
-    [roomTypes, roomOccupancies, nights, companyPriceOverrides, selectedContact, roomTypePricing, lineOverrides],
+    [roomTypes, roomOccupancies, getRoomPrice, nights],
   )
   const serviceCharge = subtotal * serviceChargeRate
   const tax = (subtotal + serviceCharge) * vatRate
@@ -185,20 +207,6 @@ export function NewReservationPage() {
         setRoomTypesLoading(false)
       }
 
-      // Load service_charge_rate and vat_rate from accounting_settings.
-      try {
-        const res = await fetch('/api/accounting/settings')
-        if (res.ok) {
-          const json = await res.json()
-          const settings: Array<{ key: string; value: { rate?: number } }> = json.data ?? []
-          const sc = settings.find((s) => s.key === 'service_charge_rate')
-          const vr = settings.find((s) => s.key === 'vat_rate')
-          if (sc?.value?.rate != null) setServiceChargeRate(Number(sc.value.rate) / 100)
-          if (vr?.value?.rate != null) setVatRate(Number(vr.value.rate) / 100)
-        }
-      } catch (err) {
-        console.error('[NewReservationPage] failed to load tax settings:', err)
-      }
     })())
 
     return () => {
@@ -284,33 +292,6 @@ export function NewReservationPage() {
     }
   }, [checkIn, checkOut, datesValid, roomTypes.length])
 
-  useEffect(() => {
-    if (!selectedContact || selectedContact.type !== 'company') {
-      setCompanyPriceOverrides({})
-      return
-    }
-
-    let cancelled = false
-
-    ;(async () => {
-      const data = await fetchJson<Array<{ roomCategory: string; occupancyCode: string; price: number }>>(
-        `/api/contacts/${selectedContact.id}/price-overrides`,
-      )
-
-      if (!cancelled) {
-        const overrides: Record<string, Record<string, number>> = {}
-        for (const row of data ?? []) {
-          if (!overrides[row.roomCategory]) overrides[row.roomCategory] = {}
-          overrides[row.roomCategory][row.occupancyCode] = Number(row.price)
-        }
-        setCompanyPriceOverrides(overrides)
-      }
-    })()
-
-    return () => {
-      cancelled = true
-    }
-  }, [selectedContact])
 
   function selectContact(contact: ContactResult) {
     setSelectedContact(contact)
@@ -447,7 +428,8 @@ export function NewReservationPage() {
           onClick={() => router.push(`/${locale}/reservations`)}
           className="inline-flex items-center rounded-lg border border-[#EAEAEA] bg-white px-3 py-1.5 text-sm font-medium text-[#787774] transition-colors hover:bg-[#F9F9F8] hover:text-[#1A1A1A]"
         >
-          &larr; Back
+          <span aria-hidden="true" className="me-1 rtl:rotate-180">&larr;</span>
+          {t('common.back')}
         </button>
 
         <header>
@@ -466,10 +448,11 @@ export function NewReservationPage() {
           <section className="space-y-4">
             {/* Guest card */}
             <div className="rounded-xl border border-[#EAEAEA] bg-white p-5">
-              <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-[#787774]">{t('reservations.new.guest')}</p>
+              <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-[#787774]">{t('reservations.new.guest')}<InfoHint text={t('reservations.new.hints.guest')} /></p>
               <div ref={searchRef} className="relative">
                 <FloatingInput
                   label={t('reservations.new.searchGuest')}
+                  type="search"
                   value={searchQuery}
                   disabled={lockedContact}
                   onChange={(event) => {
@@ -534,6 +517,7 @@ export function NewReservationPage() {
                     <button
                       type="button"
                       onClick={() => setNewContactModalOpen(true)}
+                      data-tooltip={t('reservations.new.hints.addContact')}
                       className="sticky bottom-0 flex w-full items-center justify-center gap-1.5 border-t border-[#EAEAEA] bg-[#F9F9F8] px-3 py-2.5 text-sm font-medium text-[#555555] transition-colors hover:bg-[#F5F5F5]"
                     >
                       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -548,7 +532,7 @@ export function NewReservationPage() {
 
             {/* Stay dates card */}
             <div className="rounded-xl border border-[#EAEAEA] bg-white p-5">
-              <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-[#787774]">{t('reservations.new.stayDates')}</p>
+              <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-[#787774]">{t('reservations.new.stayDates')}<InfoHint text={t('reservations.new.hints.stayDates')} /></p>
               <div className="grid gap-3 sm:grid-cols-2">
                 <FloatingInput
                   label={t('reservations.new.checkIn')}
@@ -584,13 +568,13 @@ export function NewReservationPage() {
             <div className="rounded-xl border border-[#EAEAEA] bg-white p-5">
               <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-widest text-[#787774]">{t('reservations.new.roomDistribution')}</p>
+                  <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-[#787774]">{t('reservations.new.roomDistribution')}<InfoHint text={t('reservations.new.hints.roomDistribution')} /></p>
                   <p className="mt-0.5 text-sm font-medium text-[#1A1A1A]">{t('reservations.new.chooseByType')}</p>
                 </div>
                 <div className="w-32">
                   <FloatingInput
                     label={t('reservations.new.totalRooms')}
-                    type="number"
+                    type="number" inputMode="numeric" step={1}
                     min={1}
                     value={totalRooms > 0 ? String(totalRooms) : ''}
                     onChange={(event) => setTotalRooms(toPositiveInteger(event.target.value, 0))}
@@ -660,7 +644,7 @@ export function NewReservationPage() {
                             onClick={() => updateRoomTypeCount(roomType.id, Math.max(0, requested - 1))}
                             disabled={!canDecrease}
                             className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#EAEAEA] bg-white text-sm font-semibold text-[#555555] transition-colors hover:bg-[#F5F5F5] disabled:cursor-not-allowed disabled:opacity-30"
-                            aria-label={`Decrease ${roomType.name} rooms`}
+                            aria-label={t('reservations.new.hints.decreaseRooms').replace('{type}', roomType.name)}
                           >
                             &minus;
                           </button>
@@ -672,7 +656,7 @@ export function NewReservationPage() {
                             onClick={() => updateRoomTypeCount(roomType.id, requested + 1)}
                             disabled={!canIncrease}
                             className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#EAEAEA] bg-white text-sm font-semibold text-[#555555] transition-colors hover:bg-[#F5F5F5] disabled:cursor-not-allowed disabled:opacity-30"
-                            aria-label={`Increase ${roomType.name} rooms`}
+                            aria-label={t('reservations.new.hints.increaseRooms').replace('{type}', roomType.name)}
                           >
                             +
                           </button>
@@ -694,7 +678,9 @@ export function NewReservationPage() {
                                       key={code}
                                       type="button"
                                       onClick={() => updateRoomOccupancy(roomType.id, idx, code)}
-                                      className={`min-w-[22px] rounded px-1.5 py-0.5 text-[10px] font-semibold transition-colors ${
+                                      aria-pressed={active}
+                                      data-tooltip={t(`reservations.new.occupancy.${code}`)}
+                                      className={`min-h-7 min-w-7 rounded px-1.5 py-0.5 text-[11px] font-semibold transition-colors ${
                                         active
                                           ? 'bg-white text-[#1A1A1A]'
                                           : 'bg-[#333333] text-[#BBBBBB] hover:bg-[#444444] hover:text-white'
@@ -784,7 +770,7 @@ export function NewReservationPage() {
                                       <span className="text-[10px] text-[#787774] line-through">{formatCurrency(std)}</span>
                                     )}
                                     <input
-                                      type="number"
+                                      type="number" inputMode="decimal" onWheel={(event) => event.currentTarget.blur()}
                                       min="0"
                                       step="any"
                                       value={lineOverrides[key] ?? ''}
@@ -816,12 +802,12 @@ export function NewReservationPage() {
                   </div>
                   {/* Service charge */}
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-[#787774]">{t('accounting.invoices.serviceCharge')}</span>
+                    <span className="flex items-center gap-1.5 text-xs text-[#787774]">{t('accounting.invoices.serviceCharge')}<InfoHint text={t('reservations.new.hints.serviceCharge')} /></span>
                     <span className="text-sm text-[#1A1A1A]">{formatCurrency(serviceCharge)}</span>
                   </div>
                   {/* Tax */}
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-[#787774]">{t('accounting.settings.vatRate')}</span>
+                    <span className="flex items-center gap-1.5 text-xs text-[#787774]">{t('accounting.settings.vatRate')}<InfoHint text={t('reservations.new.hints.vat')} /></span>
                     <span className="text-sm text-[#1A1A1A]">{formatCurrency(tax)}</span>
                   </div>
                   {/* Total */}

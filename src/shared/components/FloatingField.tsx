@@ -11,6 +11,26 @@ interface FloatingSelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   wrapperClassName?: string
 }
 
+// Sensible per-type behavior; any prop passed explicitly wins.
+function inputTypeDefaults(type: InputHTMLAttributes<HTMLInputElement>['type']): InputHTMLAttributes<HTMLInputElement> {
+  switch (type) {
+    case 'number':
+      return {
+        inputMode: 'decimal',
+        // Stop the mouse wheel from silently changing amounts while scrolling the page.
+        onWheel: (event) => event.currentTarget.blur(),
+      }
+    case 'email':
+      return { inputMode: 'email', autoComplete: 'email', dir: 'ltr', spellCheck: false, autoCapitalize: 'none' }
+    case 'tel':
+      return { inputMode: 'tel', autoComplete: 'tel', dir: 'ltr' }
+    case 'search':
+      return { inputMode: 'search', autoComplete: 'off', enterKeyHint: 'search' }
+    default:
+      return {}
+  }
+}
+
 export function FloatingInput({
   className = '',
   label,
@@ -21,6 +41,7 @@ export function FloatingInput({
   return (
     <label className={`floating-field ${wrapperClassName}`}>
       <input
+        {...inputTypeDefaults(props.type)}
         {...props}
         className={`form-control floating-control ${trailing ? 'pr-11' : ''} ${className}`}
         placeholder=""

@@ -73,16 +73,38 @@ export function TableActionsMenu({ actions, ariaLabel }: TableActionsMenuProps) 
       closeMenu()
     }
 
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        closeMenu()
+        buttonRef.current?.focus()
+        return
+      }
+      if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return
+      const items = Array.from(menuRef.current?.querySelectorAll<HTMLButtonElement>('[role="menuitem"]') ?? [])
+      if (!items.length) return
+      event.preventDefault()
+      const index = items.indexOf(document.activeElement as HTMLButtonElement)
+      const step = event.key === 'ArrowDown' ? 1 : -1
+      items[(index + step + items.length) % items.length]?.focus()
+    }
+
     document.addEventListener('mousedown', handlePointerDown)
+    document.addEventListener('keydown', handleKeyDown)
     window.addEventListener('resize', closeMenu)
     window.addEventListener('scroll', closeMenu, true)
 
     return () => {
       document.removeEventListener('mousedown', handlePointerDown)
+      document.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('resize', closeMenu)
       window.removeEventListener('scroll', closeMenu, true)
     }
   }, [closeMenu, open, updatePosition])
+
+  // Move focus to the first item once the menu is positioned (keyboard users land inside it).
+  useEffect(() => {
+    if (open && position) menuRef.current?.querySelector<HTMLButtonElement>('[role="menuitem"]')?.focus()
+  }, [open, position])
 
   if (!actions.length) return null
 
@@ -92,12 +114,17 @@ export function TableActionsMenu({ actions, ariaLabel }: TableActionsMenuProps) 
         ref={buttonRef}
         aria-controls={dropdownId}
         aria-expanded={open}
+        aria-haspopup="menu"
         aria-label={ariaLabel}
-        className="grid h-8 w-8 place-items-center rounded-lg text-lg leading-none text-[#787774] transition-colors hover:bg-[#F5F5F5] hover:text-[#1A1A1A]"
+        className="grid h-9 w-9 place-items-center rounded-lg text-[#787774] transition-colors hover:bg-[#F5F5F5] hover:text-[#1A1A1A] focus-visible:outline-2 focus-visible:outline-[#1A1A1A]"
         onClick={toggleMenu}
         type="button"
       >
-        ...
+        <svg aria-hidden="true" className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="5" cy="12" r="1.8" />
+          <circle cx="12" cy="12" r="1.8" />
+          <circle cx="19" cy="12" r="1.8" />
+        </svg>
       </button>
 
       {open && position
@@ -106,15 +133,18 @@ export function TableActionsMenu({ actions, ariaLabel }: TableActionsMenuProps) 
               ref={menuRef}
               className="fixed z-[120] w-44 overflow-hidden rounded-xl border border-[#EAEAEA] bg-white p-1.5 text-sm shadow-[0_18px_40px_rgba(16,26,36,0.14)]"
               id={dropdownId}
+              role="menu"
+              aria-label={ariaLabel}
               onClick={(event) => event.stopPropagation()}
               style={{ left: position.left, top: position.top }}
             >
               {actions.map((action) => (
                 <button
-                  className={`block w-full rounded-lg px-3 py-2 text-start transition-colors ${
+                  role="menuitem"
+                  className={`block w-full rounded-lg px-3 py-2 text-start transition-colors focus:outline-none ${
                     action.destructive
-                      ? 'text-[#9F2F2D] hover:bg-[#FDEBEC]'
-                      : 'text-[#333333] hover:bg-[#F5F5F5]'
+                      ? 'text-[#9F2F2D] hover:bg-[#FDEBEC] focus:bg-[#FDEBEC]'
+                      : 'text-[#333333] hover:bg-[#F5F5F5] focus:bg-[#F5F5F5]'
                   }`}
                   key={action.label}
                   onClick={() => handleSelect(action)}

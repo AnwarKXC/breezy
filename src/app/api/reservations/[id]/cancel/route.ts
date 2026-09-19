@@ -67,7 +67,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
             service_charge: 0,
             paid_amount: totalFee,
             remaining_balance: 0,
-            status: 'paid',
+            status: 'paid' as const,
             issue_date: today,
             due_date: today,
             paid_at: now,
@@ -109,7 +109,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
           await tx.invoice_items.create({ data: cancellationItem(invoiceId, totalFee) })
           await tx.payments.create({
-            data: { invoice_id: invoiceId, type: 'other', amount: totalFee, description: 'Cancellation fee', created_by: session.id },
+            data: { invoice_id: invoiceId, method: 'other', amount: totalFee, description: 'Cancellation fee', created_by: session.id },
           })
           const invoice = await tx.invoices.findUnique({ where: { id: invoiceId } })
           createdInvoice = invoice ? toRow('invoices', invoice) : null

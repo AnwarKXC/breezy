@@ -1,6 +1,8 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, useCallback, type ReactNode, useMemo } from 'react'
+import { isCurrencyCode } from '@/shared/static/currencies'
+import { createContext, useContext, useCallback, useMemo, useSyncExternalStore, type ReactNode } from 'react'
+import { useResource } from '@/shared/data/useResource'
 import type { CurrencyCode } from '@/shared/utils/types'
 import { CURRENCY_SYMBOLS } from '@/shared/utils/types'
 import { invalidateDisplayCurrency } from '@/shared/currency/client'
@@ -27,13 +29,13 @@ interface CurrencyContextType {
 
 const CurrencyContext = createContext<CurrencyContextType | null>(null)
 
-const DEFAULT_CURRENCY: CurrencyCode = 'USD'
+const DEFAULT_CURRENCY: CurrencyCode = 'EGP'
 const STORAGE_KEY = 'hotel_currency'
 
 function getStoredCurrency(): CurrencyCode | null {
   try {
     const stored = localStorage.getItem(STORAGE_KEY)
-    if (stored === 'USD' || stored === 'EGP' || stored === 'EUR') return stored
+    if (isCurrencyCode(stored)) return stored
   } catch (error) { console.error('[CurrencyContext] Failed to read stored currency:', error) }
   return null
 }
@@ -42,87 +44,92 @@ function storeCurrency(code: CurrencyCode) {
   try { localStorage.setItem(STORAGE_KEY, code) } catch (error) { console.error('[CurrencyContext] Failed to store currency:', error) }
 }
 
+type Setting = { key: string; value: Record<string, unknown> }
+
+const SETTINGS_KEY = '/api/accounting/settings'
+const RATES_KEY = '/api/currency'
+
+// Roles without accounting access get 403 here; they simply use the defaults.
+async function fetchSettings(): Promise<Setting[]> {
+  const res = await fetch(SETTINGS_KEY)
+  if (!res.ok) return []
+  const settings = ((await res.json()).data ?? []) as Setting[]
+  const code = settings.find((s) => s.key === 'currency')?.value?.code
+  if (isCurrencyCode(code)) storeCurrency(code)
+  return settings
+}
+
+// Failures are non-fatal: formatCurrency falls back to the source symbol.
+async function fetchRates(): Promise<Record<string, number> | null> {
+  const res = await fetch(RATES_KEY)
+  if (!res.ok) return null
+  return ((await res.json())?.data?.rates ?? null) as Record<string, number> | null
+}
+
+function subscribeStorage(onChange: () => void) {
+  window.addEventListener('storage', onChange)
+  return () => window.removeEventListener('storage', onChange)
+}
+
+function readSettingRate(settings: Setting[] | undefined, key: string, fallback: number) {
+  const rate = settings?.find((s) => s.key === key)?.value?.rate
+  return typeof rate === 'number' ? rate : fallback
+}
+
+function withCurrency(settings: Setting[] = [], code: CurrencyCode): Setting[] {
+  const value = { code, symbol: CURRENCY_SYMBOLS[code] }
+  return settings.some((s) => s.key === 'currency')
+    ? settings.map((s) => (s.key === 'currency' ? { ...s, value } : s))
+    : [...settings, { key: 'currency', value }]
+}
+
 export function CurrencyProvider({ children }: { children: ReactNode }) {
-  const [currencyCode, setCurrencyCode] = useState<CurrencyCode>(DEFAULT_CURRENCY)
-  const [rates, setRates] = useState<Record<string, number> | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [vatRate, setVatRate] = useState(0)
-  const [serviceChargeRate, setServiceChargeRate] = useState(0)
+  // Settings and FX rates are independent (/api/currency resolves the system
+  // currency server-side), so they load in parallel through the shared cache.
+  const settings = useResource(SETTINGS_KEY, fetchSettings)
+  const fx = useResource(RATES_KEY, fetchRates)
+  // Last known currency: avoids a flash of the default before settings load.
+  // The server snapshot is null so hydration always matches.
+  const storedCurrency = useSyncExternalStore(subscribeStorage, getStoredCurrency, () => null)
 
-  useEffect(() => {
-    // Read from localStorage first to avoid hydration mismatch
-    const stored = getStoredCurrency()
-    if (stored && stored !== DEFAULT_CURRENCY) setCurrencyCode(stored)
+  const savedCode = settings.data?.find((s) => s.key === 'currency')?.value?.code
+  const currencyCode: CurrencyCode = isCurrencyCode(savedCode) ? savedCode : storedCurrency ?? DEFAULT_CURRENCY
+  const rates = fx.data ?? null
+  // Same fallbacks the server prices with (pricingService / currency/server) when a setting is unset.
+  const vatRate = readSettingRate(settings.data, 'vat_rate', 14)
+  const serviceChargeRate = readSettingRate(settings.data, 'service_charge_rate', 10)
+  const loading = settings.isLoading
 
-    async function load() {
-      try {
-        const res = await fetch('/api/accounting/settings')
-        if (res.ok) {
-          const json = await res.json()
-          const settings: Array<{ key: string; value: Record<string, unknown> }> = json.data ?? []
-          const currencySetting = settings.find((s) => s.key === 'currency')
-          if (currencySetting?.value?.code) {
-            const code = currencySetting.value.code as CurrencyCode
-            setCurrencyCode(code)
-            storeCurrency(code)
-          }
-          const vatSetting = settings.find((s) => s.key === 'vat_rate')
-          if (typeof vatSetting?.value?.rate === 'number') setVatRate(vatSetting.value.rate as number)
-          const serviceSetting = settings.find((s) => s.key === 'service_charge_rate')
-          if (typeof serviceSetting?.value?.rate === 'number') setServiceChargeRate(serviceSetting.value.rate as number)
-        }
-      } catch (error) {
-        console.error('[CurrencyContext] Failed to load currency settings:', error)
-      } finally {
-        setLoading(false)
-      }
-
-      // Load FX rates for the resolved system currency. Failures are
-      // non-fatal: formatCurrency falls back to the source symbol.
-      try {
-        const fxRes = await fetch('/api/currency')
-        if (fxRes.ok) {
-          const fxJson = await fxRes.json()
-          if (fxJson?.data?.rates) setRates(fxJson.data.rates)
-        }
-      } catch (error) {
-        console.error('[CurrencyContext] Failed to load FX rates:', error)
-      }
-    }
-    void load()
-  }, [])
-
+  const { mutate: mutateSettings } = settings
+  const { refresh: refreshRates } = fx
   const setCurrency = useCallback(async (code: CurrencyCode) => {
     const prev = currencyCode
-    setCurrencyCode(code)
+    const revert = () => {
+      mutateSettings((current) => withCurrency(current, prev))
+      storeCurrency(prev)
+    }
+    mutateSettings((current) => withCurrency(current, code))
     storeCurrency(code)
     // PDF exports resolve the currency through their own cached fetch; drop it
     // so a download taken right after the switch is not still in `prev`.
     invalidateDisplayCurrency()
     try {
-      const symbol = CURRENCY_SYMBOLS[code]
-      const res = await fetch('/api/accounting/settings', {
+      const res = await fetch(SETTINGS_KEY, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key: 'currency', value: { code, symbol } }),
+        body: JSON.stringify({ key: 'currency', value: { code, symbol: CURRENCY_SYMBOLS[code] } }),
       })
       if (!res.ok) {
         console.error('Currency save failed:', res.status)
-        setCurrencyCode(prev)
-        storeCurrency(prev)
+        revert()
         return
       }
-      // Refresh FX rates whenever the system currency changes.
-      const fxRes = await fetch('/api/currency')
-      if (fxRes.ok) {
-        const fxJson = await fxRes.json()
-        if (fxJson?.data?.rates) setRates(fxJson.data.rates)
-      }
+      // Rates are based on the system currency, so refresh them after a switch.
+      await refreshRates()
     } catch {
-      setCurrencyCode(prev)
-      storeCurrency(prev)
+      revert()
     }
-  }, [currencyCode])
+  }, [currencyCode, mutateSettings, refreshRates])
 
   const convert = useCallback(
     (amount: number, from: CurrencyCode = currencyCode) => {

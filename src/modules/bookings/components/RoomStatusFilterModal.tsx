@@ -48,7 +48,7 @@ export function RoomStatusFilterModal({ isOpen, onClose, current, onApply }: Roo
             <div>
               <label className="mb-1 block text-xs font-medium text-[#787774]">{t('bookings.fromDate')}</label>
               <input
-                type="date"
+                type="date" max={endDate || undefined}
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
                 className="w-full rounded-lg border border-[#EAEAEA] px-3 py-2 text-sm text-[#333333] outline-none transition-colors focus:border-gray-400 focus:ring-1 focus:ring-gray-200"
@@ -57,7 +57,7 @@ export function RoomStatusFilterModal({ isOpen, onClose, current, onApply }: Roo
             <div>
               <label className="mb-1 block text-xs font-medium text-[#787774]">{t('bookings.toDate')}</label>
               <input
-                type="date"
+                type="date" min={startDate || undefined}
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
                 className="w-full rounded-lg border border-[#EAEAEA] px-3 py-2 text-sm text-[#333333] outline-none transition-colors focus:border-gray-400 focus:ring-1 focus:ring-gray-200"

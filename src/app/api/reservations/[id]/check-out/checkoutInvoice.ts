@@ -1,3 +1,4 @@
+import type { Tables } from '@/services/db/rowTypes'
 import type { Invoice, InvoiceItem, Payment } from '@/modules/accounting/types'
 
 type MoneyValue = number | string | null | undefined
@@ -190,9 +191,9 @@ export function buildCheckoutInvoiceDraft(input: CheckoutInvoiceDraftInput): Che
 }
 
 export function mapCheckoutInvoiceForPdf(
-  row: Record<string, any>,
-  itemRows: Record<string, any>[] = [],
-  paymentRows: Record<string, any>[] = [],
+  row: Tables<'invoices'>,
+  itemRows: Tables<'invoice_items'>[] = [],
+  paymentRows: Tables<'payments'>[] = [],
   rooms: CheckoutRoomDraft[] = [],
 ): Invoice & { payments?: Payment[] } {
   const roomDetails = new Map(rooms.map((room) => [room.room?.number, room]))
@@ -260,7 +261,7 @@ export function mapCheckoutInvoiceForPdf(
     id: payment.id,
     invoiceId: payment.invoice_id,
     invoiceNumber: null,
-    type: payment.type,
+    method: payment.method,
     amount: money(payment.amount),
     description: payment.description ?? null,
     createdBy: payment.created_by ?? null,

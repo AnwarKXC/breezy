@@ -3,6 +3,7 @@
 import { useMemo } from 'react'
 import { useTranslation } from '@/i18n/hooks/useTranslation'
 import { Card } from '@/shared/components/Card'
+import { InfoHint } from '@/shared/components/InfoHint'
 import type { Room } from '@/modules/rooms/types'
 import type { RoomType } from '@/modules/room-types/types'
 import type { RoomTypePricing } from '@/modules/pricing/types'
@@ -59,13 +60,15 @@ export function RoomStatusPanel({
   return (
     <Card padding="md">
       <div className="flex items-center justify-between">
-        <h3 className="text-base font-semibold text-[#1A1A1A]">
+        <h3 className="flex items-center gap-1.5 text-base font-semibold text-[#1A1A1A]">
           {t('bookings.roomStatusTitle')}
+          <InfoHint text={t('bookings.hints.roomStatus')} />
         </h3>
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={onFilterClick}
+            data-tooltip={t('bookings.hints.roomFilter')}
             className="rounded-lg px-2.5 py-1 text-xs font-medium text-[#787774] transition-colors hover:bg-[#F5F5F5] hover:text-[#333333]"
           >
             {t('bookings.filter')}
@@ -74,6 +77,7 @@ export function RoomStatusPanel({
             <button
               type="button"
               onClick={onRefresh}
+              data-tooltip={t('bookings.hints.refresh')}
               className="rounded-lg px-2 py-1 text-xs font-medium text-[#1A1A1A] transition-colors hover:bg-[#F5F5F5]"
             >
               {t('bookings.refresh')}

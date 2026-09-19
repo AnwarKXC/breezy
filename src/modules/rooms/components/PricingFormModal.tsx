@@ -56,7 +56,7 @@ export function PricingFormModal({
   onChange={value => onFormChange({ room_type_id: value })}
   /> <span className="floating-label">{t('rooms.type')}</span> </div> <FloatingInput
   label={t('rooms.price')}
-  type="number"
+  type="number" inputMode="decimal"
   min={0}
   step="0.01"
   value={form.price}
@@ -69,12 +69,12 @@ export function PricingFormModal({
   onChange={currency => onFormChange({ currency })}
     /> <span className="floating-label">{t('rooms.pricingForm.currency')}</span> </div> <FloatingInput
    label={t('rooms.detail.from')}
-   type="date"
+   type="date" max={form.effective_until || undefined}
    value={form.effective_from}
    onChange={e => onFormChange({ effective_from: e.target.value })}
    /> <FloatingInput
    label={t('rooms.detail.to')}
-  type="date"
+  type="date" min={form.effective_from || undefined}
   value={form.effective_until}
   onChange={e => onFormChange({ effective_until: e.target.value })}
   /> </div> {error && (

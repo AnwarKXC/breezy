@@ -109,7 +109,7 @@ export function DiscountInvoiceDialog({ invoice, t, onClose, onApplied }: Props)
           </label>
           <input
             id="invoice-discount-amount"
-            type="number"
+            type="number" inputMode="decimal" onWheel={(event) => event.currentTarget.blur()}
             min={0}
             step="0.01"
             value={amount}

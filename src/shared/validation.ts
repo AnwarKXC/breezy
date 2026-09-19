@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { isCountryCode } from '@/shared/static/countries'
 
 export function zodErrorMessage(error: z.ZodError): string {
   return error.issues.map((issue) => {
@@ -27,6 +28,9 @@ export const RoomCreateSchema = z.object({
   floor: z.number().int().min(-5).max(200),
   room_type_id: z.string().uuid(),
   status: z.enum(['available', 'occupied', 'maintenance', 'cleaning', 'dirty']).optional(),
+  occupancy_status: z.enum(['vacant', 'occupied']).optional(),
+  housekeeping_status: z.enum(['clean', 'dirty', 'cleaning', 'inspected']).optional(),
+  operational_status: z.enum(['active', 'maintenance', 'out_of_order', 'blocked']).optional(),
   price: z.number().min(0).optional(),
   capacity: z.number().int().min(1).max(50).optional(),
   amenities: z.any().optional(),
@@ -61,7 +65,7 @@ export const PricingCreateSchema = z.object({
   price_single: z.number().min(0).optional(),
   price_double: z.number().min(0).optional(),
   price_triple: z.number().min(0).optional(),
-  currency: z.string().length(3).default('USD'),
+  currency: z.string().length(3).default('EGP'),
   effective_from: z.string().datetime().nullable().optional(),
   effective_until: z.string().datetime().nullable().optional(),
 })
@@ -70,7 +74,7 @@ export const PriceOverrideSchema = z.object({
   room_category: z.string().min(1),
   occupancy_code: z.enum(['S', 'D', 'T']),
   price: z.number().min(0),
-  currency: z.string().length(3).default('USD'),
+  currency: z.string().length(3).default('EGP'),
 })
 
 export const AccountingInvoiceItemSchema = z.object({
@@ -140,7 +144,7 @@ export const AccountingInvoiceUpdateSchema = AccountingInvoiceBaseSchema.partial
 
 export const AccountingPaymentCreateSchema = z.object({
   invoice_id: z.string().uuid(),
-  type: z.enum(['instapay', 'vodafone_cash', 'cash', 'bank_transfer', 'visa', 'card', 'online', 'ota', 'company_credit', 'other']),
+  method: z.enum(['instapay', 'vodafone_cash', 'cash', 'bank_transfer', 'visa', 'card', 'online', 'ota', 'company_credit', 'other']),
   amount: z.coerce.number().finite(),
   description: optionalText(500),
 })
@@ -353,13 +357,20 @@ export const CheckoutSchema = z.object({
 const contactPhoneSchema = z.string().min(6).max(20).regex(/^[+\d\s()-]{6,20}$/)
 const contactEmailSchema = z.string().email().max(300)
 
+// ISO 3166-1 alpha-2 code ('' clears the field on update).
+export const countryCodeSchema = z
+  .string()
+  .trim()
+  .toUpperCase()
+  .refine((value): boolean => value === '' || isCountryCode(value), 'Invalid country')
+
 export const ContactCreateSchema = z.object({
   type: z.enum(['company', 'individual']),
   name: z.string().trim().min(1, 'Name is required').max(200),
   phone: contactPhoneSchema.optional(),
   email: contactEmailSchema.optional(),
   logo: z.string().max(500).optional(),
-  country: z.string().trim().max(100).optional(),
+  country: countryCodeSchema.optional(),
   city: z.string().trim().max(100).optional(),
   responsiblePerson: z.string().trim().max(200).optional(),
   idPassport: z.string().trim().max(100).optional(),
@@ -371,7 +382,7 @@ export const ContactUpdateSchema = z.object({
   phone: contactPhoneSchema.optional(),
   email: contactEmailSchema.optional(),
   logo: z.string().max(500).optional(),
-  country: z.string().trim().max(100).optional(),
+  country: countryCodeSchema.optional(),
   city: z.string().trim().max(100).optional(),
   responsiblePerson: z.string().trim().max(200).optional(),
   idPassport: z.string().trim().max(100).optional(),
