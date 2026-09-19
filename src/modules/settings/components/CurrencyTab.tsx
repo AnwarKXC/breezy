@@ -11,15 +11,6 @@ export function CurrencyTab() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-semibold tracking-tight text-[#1A1A1A]">
-          {t('settings.currency.title')}
-        </h2>
-        <p className="mt-1 text-sm font-medium text-[#787774]">
-          {t('settings.currency.subtitle')}
-        </p>
-      </div>
-
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {CURRENCY_CODES.map((code) => {
           const active = currencyCode === code

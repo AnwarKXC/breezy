@@ -68,15 +68,6 @@ export function PricingTab() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-semibold tracking-tight text-[#1A1A1A]">
-          {t('settings.pricing.title')}
-        </h2>
-        <p className="mt-1 text-sm font-medium text-[#787774]">
-          {t('settings.pricing.subtitle')}
-        </p>
-      </div>
-
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div>
           <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">

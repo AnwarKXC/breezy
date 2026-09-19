@@ -1595,7 +1595,7 @@
   },
   "settings": {
     "title": "Settings",
-    "subtitle": "Manage room types, rooms, and pricing",
+    "subtitle": "Rooms, tax and currency for the property",
     "errors": {
       "permissionDenied": "You do not have permission to access settings.",
       "invalidSession": "Sign in again to continue managing settings."
@@ -1603,19 +1603,13 @@
     "manageRooms": "Manage room types, rooms, and pricing",
     "manageCurrency": "Change system currency",
     "managePricing": "Configure service charge and VAT percentages",
-    "pricing": {
-      "title": "Service Charge & VAT",
-      "subtitle": "Set the percentages applied to room charges during reservation"
-    },
     "tabs": {
       "roomTypes": "Room Types",
       "rooms": "Rooms",
-      "pricing": "Pricing",
+      "pricing": "Tax & service charge",
       "currency": "Currency"
     },
     "currency": {
-      "title": "System Currency",
-      "subtitle": "Choose the currency used across the entire system",
       "USD": "United States Dollar",
       "EGP": "Egyptian Pound",
       "EUR": "Euro"
