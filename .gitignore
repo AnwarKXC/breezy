@@ -1,0 +1,98 @@
+ # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies 
+/node_modules
+**/node_modules/
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+.history
+# testing
+/coverage
+
+# next.js
+/.next/
+# alternate NEXT_DIST_DIR targets, so a build can run without clobbering the
+# dev server's manifests in /.next
+/.next-*/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+!.env.example
+
+# migration exports may contain user data
+/scripts/migrate-firebase-to-supabase/exports/
+/scripts/migrate-firebase-to-supabase/transformed/
+
+# local tooling/cache
+/.opencode/
+/graphify-out/cache/
+/src/graphify-out/
+/supabase/.temp/
+
+# e2e test artifacts
+/test-results/
+/reports/
+/playwright-report/
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# tooling artifacts
+/superpowers/
+/.superpowers/
+/docs/plans/
+/docs/superpowers/
+
+# generic logs
+*.log
+
+# IDE
+.idea/
+
+# build output
+dist/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Rust build
+target/
+
+# generated graph cache (large blobs)
+/graphify-out/
+
+# scratch files
+contact-page-response.txt
+dev-output.txt
+ts-errors.txt
+
+# node compile cache (machine-local, regenerated on every run)
+/node-compile-cache/
+
+# playwright-mcp page dumps (throwaway session artifacts)
+/.playwright-mcp/
+src/generated/

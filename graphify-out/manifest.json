@@ -1,0 +1,4454 @@
+{
+  "D:\\ai-practise\\hotel-system\\eslint.config.mjs": {
+    "mtime": 1782734695.747262,
+    "hash": "6c4307ffa009658f5c97f5629094c0c2"
+  },
+  "D:\\ai-practise\\hotel-system\\next-env.d.ts": {
+    "mtime": 1788037092.1685483,
+    "hash": "2a74d3909800ca5467fa83b0ab4a4890"
+  },
+  "D:\\ai-practise\\hotel-system\\next.config.ts": {
+    "mtime": 1784743438.6222174,
+    "hash": "c7538831874a0b46c16050d9b4ce1bd9"
+  },
+  "D:\\ai-practise\\hotel-system\\playwright.config.ts": {
+    "mtime": 1780378257.233708,
+    "hash": "c1d4445cb352593c5a906446d5e6360e"
+  },
+  "D:\\ai-practise\\hotel-system\\postcss.config.mjs": {
+    "mtime": 1778116226.5255487,
+    "hash": "481fac0fdecd70e1821cc30b86030c1a"
+  },
+  "D:\\ai-practise\\hotel-system\\repro-new.mjs": {
+    "mtime": 1787534086.853836,
+    "hash": "1fb898ab9508072633e0c4824d343304"
+  },
+  "D:\\ai-practise\\hotel-system\\vitest.config.ts": {
+    "mtime": 1782734696.1643085,
+    "hash": "8f5e6113f27c638707d80cec97ef21ea"
+  },
+  "D:\\ai-practise\\hotel-system\\vitest.empty.ts": {
+    "mtime": 1778889187.1638193,
+    "hash": "97b214023a92a133a4df15bdfa51ee47"
+  },
+  "D:\\ai-practise\\hotel-system\\vitest.setup.tsx": {
+    "mtime": 1778889874.30292,
+    "hash": "aa20c39721c4924ecd07f9eb539a9177"
+  },
+  "D:\\ai-practise\\hotel-system\\coverage\\block-navigation.js": {
+    "mtime": 1782690653.3351822,
+    "hash": "13c8dd65c9b9571b0b4960aeaf3fab0a"
+  },
+  "D:\\ai-practise\\hotel-system\\coverage\\prettify.js": {
+    "mtime": 1782690653.3431332,
+    "hash": "6051903a2f7363ee232a01bd32f60b6a"
+  },
+  "D:\\ai-practise\\hotel-system\\coverage\\sorter.js": {
+    "mtime": 1782690653.3391833,
+    "hash": "e2f5129270684bf835820ca4433b4abb"
+  },
+  "D:\\ai-practise\\hotel-system\\e2e\\accounting.spec.ts": {
+    "mtime": 1780554249.4480627,
+    "hash": "d6f9f189a97cc811bb2133fbfe523b14"
+  },
+  "D:\\ai-practise\\hotel-system\\e2e\\admin.spec.ts": {
+    "mtime": 1780381183.3764853,
+    "hash": "fd18e893b344a62da3b33d1fe79b0c4b"
+  },
+  "D:\\ai-practise\\hotel-system\\e2e\\auth.spec.ts": {
+    "mtime": 1780381076.1244335,
+    "hash": "ecabaa400fc121f5187d16658ee72a48"
+  },
+  "D:\\ai-practise\\hotel-system\\e2e\\authorization.spec.ts": {
+    "mtime": 1780381197.914973,
+    "hash": "40e5bc79b926ccecfafc52f3517f3a65"
+  },
+  "D:\\ai-practise\\hotel-system\\e2e\\guest-booking.spec.ts": {
+    "mtime": 1780376859.0145633,
+    "hash": "191d1f7c0c2872e913998b24fed7d183"
+  },
+  "D:\\ai-practise\\hotel-system\\e2e\\mobile.spec.ts": {
+    "mtime": 1780376855.5892775,
+    "hash": "0f07e875c59a3fc488099237f90cd2a8"
+  },
+  "D:\\ai-practise\\hotel-system\\e2e\\reservation-api.spec.ts": {
+    "mtime": 1784743438.5909667,
+    "hash": "222541f42d5abbd7e959f7c46f14ae5a"
+  },
+  "D:\\ai-practise\\hotel-system\\e2e\\validation.spec.ts": {
+    "mtime": 1780380199.2738068,
+    "hash": "f51f987a5de1cf4496b75c3ef970edcd"
+  },
+  "D:\\ai-practise\\hotel-system\\e2e\\helpers\\auth.ts": {
+    "mtime": 1780381091.8373325,
+    "hash": "44084057e9d2eceb9afe20dc215c1f15"
+  },
+  "D:\\ai-practise\\hotel-system\\e2e\\helpers\\selectors.ts": {
+    "mtime": 1780376826.738386,
+    "hash": "840a59e49ad5877efd31019f901b31ae"
+  },
+  "D:\\ai-practise\\hotel-system\\e2e\\helpers\\test-data.ts": {
+    "mtime": 1780380727.159713,
+    "hash": "57ee48fef01ccbcc4b858f8809993c89"
+  },
+  "D:\\ai-practise\\hotel-system\\public\\sw.js": {
+    "mtime": 1784743441.166323,
+    "hash": "145f1d92864eaa7fccd73f71b6b0e4ee"
+  },
+  "D:\\ai-practise\\hotel-system\\scripts\\apply-minimalist-ui.ps1": {
+    "mtime": 1784743441.166323,
+    "hash": "f860c4df0252186258a1873889ef7b72"
+  },
+  "D:\\ai-practise\\hotel-system\\scripts\\create-e2e-report.ts": {
+    "mtime": 1780447384.0943718,
+    "hash": "1389c9cd6c5c0073e07b3a9e7c6c066e"
+  },
+  "D:\\ai-practise\\hotel-system\\scripts\\replace-button-colors.ps1": {
+    "mtime": 1783305514.1651042,
+    "hash": "94532edf9fbf7ac57dc6165d48b77549"
+  },
+  "D:\\ai-practise\\hotel-system\\scripts\\sanitize-logs.mjs": {
+    "mtime": 1778437710.8222241,
+    "hash": "b728afe08fdda81373583c997d95ba17"
+  },
+  "D:\\ai-practise\\hotel-system\\scripts\\migrate-firebase-to-supabase\\bootstrap-admin-profile.sql": {
+    "mtime": 1778557961.4362123,
+    "hash": "9604b14d4a8d04a52478f49d4b40b758"
+  },
+  "D:\\ai-practise\\hotel-system\\scripts\\migrate-firebase-to-supabase\\export-firebase.mjs": {
+    "mtime": 1778557961.437214,
+    "hash": "a27620e2ed72e84418c840e208e3d232"
+  },
+  "D:\\ai-practise\\hotel-system\\scripts\\migrate-firebase-to-supabase\\import-supabase.mjs": {
+    "mtime": 1778557961.437214,
+    "hash": "a848d3ee2d18dbc9230c38394e0a761d"
+  },
+  "D:\\ai-practise\\hotel-system\\scripts\\migrate-firebase-to-supabase\\insert-migration-audit-log.sql": {
+    "mtime": 1778557961.4382167,
+    "hash": "c608a62ff1383dec006d78db094210ab"
+  },
+  "D:\\ai-practise\\hotel-system\\scripts\\migrate-firebase-to-supabase\\migrate.mjs": {
+    "mtime": 1778557961.4392166,
+    "hash": "dc98e0f2e600e484e4d9789da7aa7a7c"
+  },
+  "D:\\ai-practise\\hotel-system\\scripts\\migrate-firebase-to-supabase\\sanitize-audit-logs.mjs": {
+    "mtime": 1778557961.4392166,
+    "hash": "214095bd5decba24f211d62f86af093e"
+  },
+  "D:\\ai-practise\\hotel-system\\scripts\\migrate-firebase-to-supabase\\shared.mjs": {
+    "mtime": 1778557961.4402182,
+    "hash": "a3b3c2a1a4ca0f7f48419be99155d3a9"
+  },
+  "D:\\ai-practise\\hotel-system\\scripts\\migrate-firebase-to-supabase\\transform.mjs": {
+    "mtime": 1778557961.441214,
+    "hash": "30cde15dfaffc6ac802abf9b14e6aaa7"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\004-supabase-schema-design\\verification\\catalog-checks.sql": {
+    "mtime": 1782743123.8061223,
+    "hash": "eb1c2ac9cf84c8e9377b8cd58a0f1a4c"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\004-supabase-schema-design\\verification\\data-smoke-tests.sql": {
+    "mtime": 1782743123.8270185,
+    "hash": "2133faa5ce86df797fb64aa4f1e37f09"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\proxy.ts": {
+    "mtime": 1787154922.8402987,
+    "hash": "6fbbcdcdf5860c15524325b1667bfa03"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\layout.tsx": {
+    "mtime": 1785340733.797041,
+    "hash": "db61b4e4bea182bae6f8250c45ec00dd"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\manifest.ts": {
+    "mtime": 1778116226.8255472,
+    "hash": "d9da828586c6183b8b5dd9b1b99bf6dd"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\page.tsx": {
+    "mtime": 1778123482.8605762,
+    "hash": "e26e0b333afd7046b75581677b91634c"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\pwa-client.tsx": {
+    "mtime": 1778116226.8255472,
+    "hash": "930652b911567fc18a1748b1d3918dea"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\accounting\\expense-categories\\route.ts": {
+    "mtime": 1783352242.6901226,
+    "hash": "1eab093fb54edadf8412c63b6e93f8a7"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\accounting\\expenses\\route.ts": {
+    "mtime": 1780456156.0710793,
+    "hash": "794ecdb97d4201192a31947976e289aa"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\accounting\\finance\\route.ts": {
+    "mtime": 1780418835.3557177,
+    "hash": "fc5d3fe769b06cd82c3c4f484b1600d2"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\accounting\\invoices\\route.ts": {
+    "mtime": 1782805906.0625453,
+    "hash": "9f49bf94ca224363fd555c25a9b772a2"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\accounting\\invoices\\next-number\\route.ts": {
+    "mtime": 1780446682.9964726,
+    "hash": "0b3b8b5bfe6f8a756aa5b48b63f61ce2"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\accounting\\invoices\\[id]\\route.ts": {
+    "mtime": 1787418611.9132872,
+    "hash": "7803f7c7a9ebcf1b9aed048e7dd39a63"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\accounting\\invoices\\[id]\\events\\route.ts": {
+    "mtime": 1780501626.854178,
+    "hash": "8077e163ce81587c1070e595def83941"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\accounting\\invoices\\[id]\\issue\\route.ts": {
+    "mtime": 1780536352.2770417,
+    "hash": "91aecdec08299a9a77415d1dec1cec1c"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\accounting\\invoices\\[id]\\items\\route.ts": {
+    "mtime": 1782954477.578001,
+    "hash": "32a1f192c026f4d334455d02f5dbcb01"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\accounting\\invoices\\[id]\\ledger\\route.ts": {
+    "mtime": 1780501618.0274184,
+    "hash": "85a05b3496bad4297b8d8e4642704349"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\accounting\\invoices\\[id]\\refund\\route.ts": {
+    "mtime": 1780539938.2316148,
+    "hash": "241387baff975c544468e7cf239b0fe3"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\accounting\\invoices\\[id]\\void\\route.ts": {
+    "mtime": 1780456176.0176864,
+    "hash": "78dd2b322b6c37392518bae5b57ef920"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\accounting\\ledger\\route.ts": {
+    "mtime": 1780446692.345783,
+    "hash": "b756269904f78f700657f91997904785"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\accounting\\lookups\\route.ts": {
+    "mtime": 1780455958.6597755,
+    "hash": "83cc2389a808e2940789384de0b84359"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\accounting\\overview\\route.ts": {
+    "mtime": 1780446676.8163533,
+    "hash": "9a6bcecad9e42d9e2c9a1cba9d388c4f"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\accounting\\payments\\route.ts": {
+    "mtime": 1785018068.504962,
+    "hash": "3b46165718f7a0969c596150ba215920"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\accounting\\payments\\[id]\\refund\\route.ts": {
+    "mtime": 1780456183.3063884,
+    "hash": "ab47b11064339e81ca5ce464d3f826a0"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\accounting\\reports\\[type]\\route.ts": {
+    "mtime": 1780446694.722407,
+    "hash": "37a0e85913eee711bbb129bdaab09922"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\accounting\\settings\\route.ts": {
+    "mtime": 1780456190.4547253,
+    "hash": "9e5a5efcf501611486578b64fb03220f"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\auth\\session\\route.ts": {
+    "mtime": 1784002369.001841,
+    "hash": "0564ded5b1908c9d41bab4567010e8c8"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\bookings\\[id]\\extra-charges\\route.ts": {
+    "mtime": 1788017183.345743,
+    "hash": "4a8a7e7304fd53999b2feb1d9b67327d"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\contacts\\contacts-analytics.test.ts": {
+    "mtime": 1778891680.8755927,
+    "hash": "d02bad83a533a8fcc40afbefeae8e4dd"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\contacts\\contacts-id.test.ts": {
+    "mtime": 1778891937.8709197,
+    "hash": "45880bd2997a5e3056ca48ee6bd1b502"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\contacts\\contacts-price-overrides.test.ts": {
+    "mtime": 1778891829.5728486,
+    "hash": "2b6c238636021cb5bd5ee901938f7965"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\contacts\\contacts.test.ts": {
+    "mtime": 1778891656.7521653,
+    "hash": "1b2a649283e268a7117aaeb0df3bf4b5"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\contacts\\route.ts": {
+    "mtime": 1785106254.5304637,
+    "hash": "ba838f69c4e2f01843b30e23310e04c5"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\contacts\\analytics\\route.ts": {
+    "mtime": 1780368613.6917453,
+    "hash": "789d6a8d67cdf53be72d75f51ca311a3"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\contacts\\bookings\\route.ts": {
+    "mtime": 1787409847.2942905,
+    "hash": "9ebe034050ac035c8a9ef3032390f549"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\contacts\\[id]\\route.ts": {
+    "mtime": 1785106554.1626804,
+    "hash": "e883294e0dd0b5ed7a61361912ad50c8"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\contacts\\[id]\\price-overrides\\route.ts": {
+    "mtime": 1784002369.0038414,
+    "hash": "185019eb17e2e4477ee557887bd1db85"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\csp-report\\route.ts": {
+    "mtime": 1788017490.7822578,
+    "hash": "9da939b669bb62addd56b58450aa339f"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\currency\\route.ts": {
+    "mtime": 1785968664.1914728,
+    "hash": "688854b31fc47d9f4f265845c91529c3"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\dashboard\\route.ts": {
+    "mtime": 1778891579.6065075,
+    "hash": "374ebfe3ca9abfeef9aabd798f58e487"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\logs\\route.ts": {
+    "mtime": 1784743441.1871574,
+    "hash": "863189b62f4ffce1638beedff53a9f35"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\logs\\analytics\\route.ts": {
+    "mtime": 1778891584.064475,
+    "hash": "0113b971b384d0b7b9f23b97696237ce"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\pricing\\route.ts": {
+    "mtime": 1784743441.1871574,
+    "hash": "7752429e0e5838cd4e19f1427e0a0d35"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\pricing\\[id]\\route.ts": {
+    "mtime": 1785106240.354279,
+    "hash": "6f92dc150381b26df43d10bcb65f0e58"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\reservations\\route.ts": {
+    "mtime": 1785106563.1443279,
+    "hash": "5762f348cf4f957a0a356c6c471fc6bb"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\reservations\\availability\\route.ts": {
+    "mtime": 1784743441.1871574,
+    "hash": "76e77580d60ea515250e051a92dda801"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\reservations\\create-with-rooms\\route.ts": {
+    "mtime": 1788035499.2210004,
+    "hash": "e54cfefe90e16bfff0126ce4021e0534"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\reservations\\year-overview\\route.ts": {
+    "mtime": 1787520762.7560914,
+    "hash": "c89c83aeb3eca193dc03753977fa9a07"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\reservations\\[id]\\route.ts": {
+    "mtime": 1788035372.1421847,
+    "hash": "68099dd586758c95e1a7fc8ba3362a22"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\reservations\\[id]\\cancel\\route.ts": {
+    "mtime": 1788018799.3438623,
+    "hash": "dd7f886bffd0da643fef370935669284"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\reservations\\[id]\\change-room\\route.ts": {
+    "mtime": 1788018817.3290875,
+    "hash": "8267ca36facbb0143ee32676448b33ec"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\reservations\\[id]\\check-in\\route.ts": {
+    "mtime": 1784002369.023196,
+    "hash": "0245f2b3e3860ca840aad3c4c363bc31"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\reservations\\[id]\\check-out\\checkoutInvoice.test.ts": {
+    "mtime": 1784743441.1871574,
+    "hash": "75661f967423949f73d28bf9f4cc9e54"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\reservations\\[id]\\check-out\\checkoutInvoice.ts": {
+    "mtime": 1787154922.268386,
+    "hash": "7e05a772f8b78917dfcd6db8568570fe"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\reservations\\[id]\\check-out\\route.ts": {
+    "mtime": 1787417695.321874,
+    "hash": "47c1ef42d27ca17612dee71356696c5a"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\reservations\\[id]\\confirm\\route.ts": {
+    "mtime": 1784743441.1871574,
+    "hash": "32354de6311cf6b3dc445b2478b5afd4"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\reservations\\[id]\\extend\\route.ts": {
+    "mtime": 1788018823.0394735,
+    "hash": "98369d154bddeb332c10988bf52f063d"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\reservations\\[id]\\extras\\route.ts": {
+    "mtime": 1785106176.79566,
+    "hash": "d694070a4ab325e38f34738ee0d0ce68"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\reservations\\[id]\\holds\\route.ts": {
+    "mtime": 1785106188.639765,
+    "hash": "64e7709deb76216e15c7ea04091e7c36"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\reservations\\[id]\\no-show\\route.ts": {
+    "mtime": 1788018836.5014527,
+    "hash": "e571545d90217a60ad958a187539622f"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\reservations\\[id]\\notes\\route.ts": {
+    "mtime": 1785106168.091669,
+    "hash": "e4fca01fa2bf74f98f73f84db061a8ef"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\reservations\\[id]\\rooms\\price\\route.ts": {
+    "mtime": 1787961112.1249437,
+    "hash": "b162690ef301ac57cfb504455f7d8121"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\room-types\\route.ts": {
+    "mtime": 1785345517.163588,
+    "hash": "fe62762c06d2de3127c8f7ce89753c2b"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\room-types\\[id]\\route.ts": {
+    "mtime": 1785106227.0802622,
+    "hash": "358a740a97898789fcaffd7cda540ad5"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\rooms\\route.ts": {
+    "mtime": 1785345510.9539235,
+    "hash": "f42843021f84e66c429733c0de6ffc0b"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\rooms\\auto-clean\\route.ts": {
+    "mtime": 1788017538.3290706,
+    "hash": "dd59535dcb91c8d84cc09d009297b446"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\rooms\\[id]\\route.ts": {
+    "mtime": 1785106213.5097864,
+    "hash": "5229ee39a95ef85756b5ec4b89417f49"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\rooms\\[id]\\history\\route.ts": {
+    "mtime": 1785942406.9647577,
+    "hash": "d2a8fab8acdf3ae25e7e0c39e543fcac"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\users\\route.ts": {
+    "mtime": 1785106281.3925407,
+    "hash": "24d11d40655acee5cb04fe9bebe114ec"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\users\\analytics\\route.ts": {
+    "mtime": 1778600739.9458528,
+    "hash": "995c18fc70e638a5527abe0803f920c1"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\api\\users\\[id]\\route.ts": {
+    "mtime": 1785106295.0959854,
+    "hash": "7c544afb1bff7a320ceed6827d24a007"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\offline\\page.tsx": {
+    "mtime": 1784743441.199633,
+    "hash": "2ca19b5da8f9b181dfd4de88c77f1134"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\offline\\retry-button.tsx": {
+    "mtime": 1784743441.199633,
+    "hash": "e396e52c65c822308389ec4862a5e1bc"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\[locale]\\layout.tsx": {
+    "mtime": 1784743441.1871574,
+    "hash": "056d58f4bb08259ab45031c070cb23ff"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\[locale]\\(auth)\\layout.tsx": {
+    "mtime": 1784743441.1728096,
+    "hash": "d06d2484a8920efaba939dc28d4eef7a"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\[locale]\\(auth)\\login\\page.tsx": {
+    "mtime": 1786223896.7121596,
+    "hash": "419867adfb44427d5f3153415036f94a"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\[locale]\\(dashboard)\\layout.tsx": {
+    "mtime": 1778116226.7261827,
+    "hash": "6582dea09c43bae0c3db3bcf476ea6b5"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\[locale]\\(dashboard)\\loading.tsx": {
+    "mtime": 1778893666.0821931,
+    "hash": "0df52d5cce7dbe69408729ff8331080d"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\[locale]\\(dashboard)\\page.tsx": {
+    "mtime": 1783341105.075699,
+    "hash": "4abffe84a4cfe9eb3d1229df940cd0d0"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\[locale]\\(dashboard)\\accounting\\page.tsx": {
+    "mtime": 1784743441.1728096,
+    "hash": "4ccc1224675f99edbf327dd2ddc11aaf"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\[locale]\\(dashboard)\\contacts\\page.tsx": {
+    "mtime": 1784743441.1728096,
+    "hash": "db6af00561343bd634c86b5240574a94"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\[locale]\\(dashboard)\\contacts\\[id]\\ContactDetailsView.tsx": {
+    "mtime": 1787572736.333372,
+    "hash": "5f6071336ad7d35f32f0dee16a70eba0"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\[locale]\\(dashboard)\\contacts\\[id]\\page.tsx": {
+    "mtime": 1787154922.252393,
+    "hash": "a543a7b85e3d8b94cd5c498ab28ee55a"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\[locale]\\(dashboard)\\logs\\page.tsx": {
+    "mtime": 1784743441.1728096,
+    "hash": "40b1b13e5769460fdac503fba1854047"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\[locale]\\(dashboard)\\reservations\\page.tsx": {
+    "mtime": 1784743441.181823,
+    "hash": "aed57cb5c81c4edc8c67fb2965c5fa50"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\[locale]\\(dashboard)\\reservations\\new\\page.tsx": {
+    "mtime": 1787408000.3690405,
+    "hash": "789e8d115790e19f4b0def698b67e6df"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\[locale]\\(dashboard)\\reservations\\year-view\\page.tsx": {
+    "mtime": 1787508547.5407603,
+    "hash": "ac3d2be39abd8217c0e0e261a0c649e0"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\[locale]\\(dashboard)\\reservations\\[id]\\page.tsx": {
+    "mtime": 1787535425.1961691,
+    "hash": "c511b5a7031b2feae9eefd00f49e42f5"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\[locale]\\(dashboard)\\reservations\\[id]\\edit\\page.tsx": {
+    "mtime": 1784743441.1728096,
+    "hash": "00f990b6707eb01da85bc4357b93320e"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\[locale]\\(dashboard)\\rooms\\[id]\\page.tsx": {
+    "mtime": 1784743441.1829913,
+    "hash": "b3952a6a4fbc271b61dd2ce83c513cdc"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\[locale]\\(dashboard)\\settings\\page.tsx": {
+    "mtime": 1784743441.1829913,
+    "hash": "2ca5c815f85b17e51d1fe51ca9e4eba9"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\[locale]\\(dashboard)\\users\\page.tsx": {
+    "mtime": 1784743441.1871574,
+    "hash": "b433762955bd6044dee2e2e28919ebac"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\[locale]\\(dashboard)\\users\\[id]\\loading.tsx": {
+    "mtime": 1785334536.8452237,
+    "hash": "45ebe8ab006029ed5b30e59c5f73d121"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\[locale]\\(dashboard)\\users\\[id]\\page.tsx": {
+    "mtime": 1784765860.3988943,
+    "hash": "dd397dc8ad93578836d8c5fc20f58c25"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\[locale]\\(dashboard)\\users\\[id]\\UserDetailsView.tsx": {
+    "mtime": 1785335325.9267764,
+    "hash": "7e0a24a8b1ec7f4a3875d489cfbd6358"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\[locale]\\dashboard\\page.tsx": {
+    "mtime": 1787420473.4671216,
+    "hash": "f6661c9e0a3d57954d99f332d304da25"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\[locale]\\unauthorized\\page.tsx": {
+    "mtime": 1784743441.1871574,
+    "hash": "eb24071a0cd794975a55728ce88f36b5"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\components\\AOSInit.tsx": {
+    "mtime": 1784743441.199633,
+    "hash": "f8d326a5db5baa84635ab7426854f34a"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\components\\layout\\BottomNav.tsx": {
+    "mtime": 1784743441.199633,
+    "hash": "e03f783778d55fd2fc8bb79a451b679b"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\components\\layout\\DashboardShell.tsx": {
+    "mtime": 1785335173.4182968,
+    "hash": "23795784a5dbc8ac1108f668e4738c22"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\components\\layout\\index.ts": {
+    "mtime": 1785335180.4027221,
+    "hash": "d41027e359f4ece49c202b7f876f50e2"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\components\\layout\\LayoutIcons.tsx": {
+    "mtime": 1782734696.1045647,
+    "hash": "d3e077686fc715681455e1bb65d3f64c"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\components\\layout\\ModulePlaceholder.tsx": {
+    "mtime": 1784743441.199633,
+    "hash": "78e947ed2c187b852d3531870b964e39"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\components\\layout\\Navbar.tsx": {
+    "mtime": 1785336074.4502656,
+    "hash": "35502acaee757f33efd9c5ee744f41cc"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\components\\layout\\NavigationLoader.tsx": {
+    "mtime": 1785335583.1383688,
+    "hash": "2dbff181f0bbc7dfdb47bfeb0d76efb3"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\components\\layout\\NotificationsMenu.tsx": {
+    "mtime": 1784743441.199633,
+    "hash": "a5f9f40100cb8a795b37c90cc5c0e913"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\components\\layout\\ProfileMenu.tsx": {
+    "mtime": 1785336081.4533546,
+    "hash": "9334837f65c86b488fb990a863df5a82"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\components\\layout\\Sidebar.tsx": {
+    "mtime": 1785336074.909492,
+    "hash": "64711e42f26619e49ec7cb82f0d41558"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\components\\layout\\SidebarNavLink.tsx": {
+    "mtime": 1784743441.199633,
+    "hash": "330f262d4c1b720f2e931b4ef53a64e5"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\components\\layout\\SidebarSocialLinks.tsx": {
+    "mtime": 1784743441.199633,
+    "hash": "99410ddba4cf9bc49110bff26c1f0181"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\components\\layout\\TopbarActions.tsx": {
+    "mtime": 1784743441.2140412,
+    "hash": "af2df55f7a9530f3aafb5daa12ac5e3e"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\config\\access.ts": {
+    "mtime": 1778116226.8411677,
+    "hash": "45448662aaa51a75c6f72e1a48642e6b"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\config\\actionPermissions.ts": {
+    "mtime": 1787418500.7725449,
+    "hash": "dab727fefebca2e6e6197691ef2d2282"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\config\\navigation.ts": {
+    "mtime": 1784743441.2160397,
+    "hash": "37ecc59d906a75bec98d85a8b782a168"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\config\\permissions.ts": {
+    "mtime": 1787154922.2943912,
+    "hash": "31736c31b6b283475370b00971d727a2"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\config\\rbac.ts": {
+    "mtime": 1778116226.8411677,
+    "hash": "41c13791b79986b9302ca5306c26593b"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\config\\roles.ts": {
+    "mtime": 1778116226.8411677,
+    "hash": "b0ad0157153a7e2d0322197d0149689e"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\data\\dashboard.data.ts": {
+    "mtime": 1778116226.8411677,
+    "hash": "e42c6a275f89d3cd1f8021a236ee1048"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\data\\index.ts": {
+    "mtime": 1778116226.8411677,
+    "hash": "d2b058dd52c3950abdccda0ba92eb5f3"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\data\\selectors.ts": {
+    "mtime": 1778434686.007084,
+    "hash": "fcd447ff6b423be2ce938ea163208ea5"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\data\\types.ts": {
+    "mtime": 1778116226.8411677,
+    "hash": "a184edb10819eb0486e15adc0822ff11"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\hooks\\index.ts": {
+    "mtime": 1779171485.548568,
+    "hash": "78b386711ac5a4661e845e4578b8fa7c"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\hooks\\useDebounce.ts": {
+    "mtime": 1779170452.8603525,
+    "hash": "ee9298230091a22cd89417bfa105bb31"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\hooks\\useMediaQuery.ts": {
+    "mtime": 1779171484.7039115,
+    "hash": "301ba6854459d779fe24342094b06941"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\i18n\\config.ts": {
+    "mtime": 1778116226.856792,
+    "hash": "749516ee92307a137843aaaa86cef138"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\i18n\\provider.tsx": {
+    "mtime": 1787154922.4290597,
+    "hash": "a30c8b1edb564eb1a77011cffc747e39"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\i18n\\components\\index.ts": {
+    "mtime": 1778116226.856792,
+    "hash": "1ed57efde523d65f1b3088b07e353087"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\i18n\\components\\LanguageSwitcher.tsx": {
+    "mtime": 1783305524.1935234,
+    "hash": "db32920e7bc828e175d17f06f18fb25d"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\i18n\\components\\LocaleContext.tsx": {
+    "mtime": 1778116226.856792,
+    "hash": "34cc7fdbd913c91ae82263fdd79ef2f6"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\i18n\\components\\LocaleSync.tsx": {
+    "mtime": 1778116226.856792,
+    "hash": "6b8a1f41bff1a1477861440a8ec4e04b"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\i18n\\hooks\\useTranslation.ts": {
+    "mtime": 1784743441.2170408,
+    "hash": "b3905607fce4e435e0003e964132dba4"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\index.ts": {
+    "mtime": 1780528124.1835947,
+    "hash": "161f3dec5d02fe5b18dd3621fa4b34f0"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\types.ts": {
+    "mtime": 1787336532.9326067,
+    "hash": "ce699fab171e7c0f1f60fcf4da92a720"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\AccountingDashboardTab.tsx": {
+    "mtime": 1784743441.2191403,
+    "hash": "a01093dcf8cc435e9b076ed9382f22a4"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\AccountingPage.tsx": {
+    "mtime": 1784743441.2191403,
+    "hash": "ad4931b47ecb6c1daa14bf290e9cb833"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\AccountingPageSkeleton.tsx": {
+    "mtime": 1784743441.2191403,
+    "hash": "aad7012ac86e0f486ded59d61c76925c"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\ContactSelect.tsx": {
+    "mtime": 1784743441.2191403,
+    "hash": "0e948e48cf13a3fc94c6249e59cefde3"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\DefaultPricingTab.tsx": {
+    "mtime": 1784743441.2191403,
+    "hash": "79a15a01bae43d5966a2cf3e7483a820"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\DeleteInvoiceDialog.tsx": {
+    "mtime": 1785344456.8148181,
+    "hash": "28b3a7948a1a9c9e342e9e1fe81c1fe2"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\ExpenseAnalyticsCards.tsx": {
+    "mtime": 1784743441.2191403,
+    "hash": "1a033ce390308628c2a262c05755571a"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\ExpenseFormModal.tsx": {
+    "mtime": 1785021833.961202,
+    "hash": "632df9d765ec8962e820afbeb4525164"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\ExpenseGridCard.tsx": {
+    "mtime": 1784743441.2191403,
+    "hash": "b620a727209075601601c4e0d402277e"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\ExpenseManager.tsx": {
+    "mtime": 1787335905.2662694,
+    "hash": "125875a9bbb6cc4aa3f2b03e4c5793e3"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\ExpenseReportSection.tsx": {
+    "mtime": 1787334107.928697,
+    "hash": "a8f627004329d391ab168b0734fdad73"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\ExpenseTable.tsx": {
+    "mtime": 1784743441.2191403,
+    "hash": "23fa4d4434927e0247eb17f449ab6d51"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\ExpenseToolbar.tsx": {
+    "mtime": 1787334106.202176,
+    "hash": "3b90f375af512a970914971659cbc3e8"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\FinanceTable.tsx": {
+    "mtime": 1784743441.2324774,
+    "hash": "48e8e9b94acafe82a3ca0e920c5eb742"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\FinancialHealthCards.tsx": {
+    "mtime": 1784743441.2334785,
+    "hash": "75644b8fbaa99de1eef413796fb0858f"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\InvoiceComposerModal.tsx": {
+    "mtime": 1787338446.3479881,
+    "hash": "7b05ed8c34dcbcbac84ed6df9ed7f32d"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\InvoiceDetailModal.tsx": {
+    "mtime": 1787948808.3340113,
+    "hash": "d9451f4ea8cad0d0b46fdc5339c453d4"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\InvoiceEventsTab.tsx": {
+    "mtime": 1784743441.2348876,
+    "hash": "0e77727b44a63249352fa2924c53b97c"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\InvoiceGridCard.tsx": {
+    "mtime": 1787154922.6003008,
+    "hash": "a611616a46cb3581c08bb91797835e4e"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\InvoiceItemsTab.tsx": {
+    "mtime": 1784743441.2348876,
+    "hash": "6c888a1963e71ecbf900961987127e22"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\InvoiceLedgerTab.tsx": {
+    "mtime": 1787414261.1895926,
+    "hash": "d02f783c2d6d6a80d55280cd70edd544"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\InvoiceOverviewTab.tsx": {
+    "mtime": 1785970987.04809,
+    "hash": "081463521ef52e34d3aad57aa02cd9c2"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\InvoicePaymentsModal.tsx": {
+    "mtime": 1786022445.1370132,
+    "hash": "e243d2c0fe04a43b25a7fdd8ff0348c7"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\InvoicePaymentsTab.tsx": {
+    "mtime": 1784743441.2348876,
+    "hash": "941aedb36849ed23b40519f6012d9904"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\InvoicesTab.tsx": {
+    "mtime": 1787419307.354407,
+    "hash": "856be6adc1601e8a90e58bbd22b945a3"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\InvoiceSummaryCards.tsx": {
+    "mtime": 1787416542.6166718,
+    "hash": "dc36d0e130955f033893b927572e2dbd"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\InvoiceWizard.tsx": {
+    "mtime": 1785342033.5443716,
+    "hash": "30b62cf1cf0c5baae6ee6eff359efd51"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\InvoiceWizardBookingSummary.tsx": {
+    "mtime": 1784743441.2348876,
+    "hash": "3957ca7e455e17357d545e600dd71989"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\InvoiceWizardStepBooking.tsx": {
+    "mtime": 1784743441.2348876,
+    "hash": "54dc5fac503ec1321d9459683d719d64"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\InvoiceWizardStepCharges.tsx": {
+    "mtime": 1784743441.2348876,
+    "hash": "b3193dc3d20a3de86d2c5af2afe68d89"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\InvoiceWizardStepConfirm.tsx": {
+    "mtime": 1784743441.2348876,
+    "hash": "ac6f5fc9f2fea1e0c0ef10ccf79483f1"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\InvoiceWizardStepPayment.tsx": {
+    "mtime": 1784743441.2348876,
+    "hash": "4440525ce4e07d7cf1931f92281e59d5"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\InvoiceWizardWarnings.tsx": {
+    "mtime": 1784743441.2348876,
+    "hash": "51e9bac656f39a5c9ca20dce93b9bfcc"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\LedgerTab.tsx": {
+    "mtime": 1787415345.691757,
+    "hash": "a25342b5fcd8e111eb72d7ec80147a03"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\PaymentsTab.tsx": {
+    "mtime": 1787336323.107842,
+    "hash": "9d4305f41795350711d543c7ccbbbd77"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\RefundConfirmDialog.tsx": {
+    "mtime": 1786022445.1380172,
+    "hash": "ef3e1e79588d03f2f5ea61322d2aefb9"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\ReportsTab.tsx": {
+    "mtime": 1787948808.3340113,
+    "hash": "cc5f83715c369b1a4adf4c3fd270dfd4"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\SettingsTab.tsx": {
+    "mtime": 1784743441.266252,
+    "hash": "ab454fd16a0d4aa50124635d3232c702"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\components\\VoidConfirmDialog.tsx": {
+    "mtime": 1786022445.139013,
+    "hash": "6c4b004ab6466a80c8d37abff6b38279"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\hooks\\index.ts": {
+    "mtime": 1780528122.7939253,
+    "hash": "d8fe386d53f712f3cd75bcc1b62d364c"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\hooks\\useAccounting.ts": {
+    "mtime": 1784743441.266252,
+    "hash": "58aed8255e7a12c59fb71805b9966779"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\hooks\\useAccountingOverview.ts": {
+    "mtime": 1784743441.266252,
+    "hash": "0d4eeebfd99a49c56930c0231d5d20c7"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\hooks\\useBookingValidation.ts": {
+    "mtime": 1783391286.923884,
+    "hash": "36587a37f146d24d867c16b7048c5d45"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\hooks\\useExpenses.ts": {
+    "mtime": 1784743441.266252,
+    "hash": "6a6f59be2fd3ea29d1791758c7f85aa7"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\hooks\\useFinanceTable.ts": {
+    "mtime": 1780418868.0986805,
+    "hash": "e0600951e0f2a663cf1e4e260507e1ac"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\hooks\\useInvoiceDetail.ts": {
+    "mtime": 1787336547.4843638,
+    "hash": "a89ca8203f361f2472d36fdc37656d5f"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\hooks\\useInvoices.ts": {
+    "mtime": 1784743441.266252,
+    "hash": "323c4e1d8887cb9b9d0d3e9a3864e67a"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\hooks\\useInvoiceWizard.ts": {
+    "mtime": 1787154922.7423003,
+    "hash": "3732c3eaf1cae7cd77f261ef90f4c89e"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\hooks\\useLedger.ts": {
+    "mtime": 1784743441.266252,
+    "hash": "08741a9327f78ab11cec4a865a5ee5c6"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\hooks\\usePayments.ts": {
+    "mtime": 1784743441.266252,
+    "hash": "ea7b33d2331cf3284c7d2da969a8d065"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\services\\accountingApiClient.ts": {
+    "mtime": 1783352277.4110777,
+    "hash": "06bd3b30be00170030c1b109711b12cc"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\services\\accountingService.ts": {
+    "mtime": 1788036767.805073,
+    "hash": "ba82d439e5cb7545fedb2acd0e407eaa"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\services\\accountingUtils.ts": {
+    "mtime": 1788015830.2632134,
+    "hash": "cc454eec7e86614ab750b967c12cf300"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\services\\activityLogService.ts": {
+    "mtime": 1782734696.1151614,
+    "hash": "2492dfd3e2d881276608383cbd945069"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\services\\deriveInvoiceStatus.test.ts": {
+    "mtime": 1785970611.4038656,
+    "hash": "dafda51059911a252a554e5001464d41"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\services\\deriveInvoiceStatus.ts": {
+    "mtime": 1785970349.8692484,
+    "hash": "799765a0cb566d4a41518af2341ba278"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\services\\expenseService.ts": {
+    "mtime": 1788015960.8443034,
+    "hash": "fb86d42f12da3da1265502f9b7df0568"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\services\\exportService.ts": {
+    "mtime": 1784743441.266252,
+    "hash": "189a7aadb901a2e9f2d8aaf327d7e65a"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\services\\index.ts": {
+    "mtime": 1783352286.1185296,
+    "hash": "4d4b3c5ab55cf057044f0991dc97b95a"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\services\\invoiceService.ts": {
+    "mtime": 1788035834.4720378,
+    "hash": "dacec09bbb6d34c66be951713ea478ba"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\services\\ledgerAmounts.test.ts": {
+    "mtime": 1787414325.5002177,
+    "hash": "cfb1f196b605a33725f2dc8187b6f132"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\services\\ledgerAmounts.ts": {
+    "mtime": 1787414205.823083,
+    "hash": "0bd72802f3732c6390835d91f8004252"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\services\\ledgerService.ts": {
+    "mtime": 1788015919.7763057,
+    "hash": "bdc06db1827604e96b52565019d09a78"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\services\\paymentService.ts": {
+    "mtime": 1788018007.9930537,
+    "hash": "15d4778cac81ec052c9699f60a66cb5d"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\services\\reportsService.ts": {
+    "mtime": 1788015954.5160835,
+    "hash": "38950cf4cfd15bb3dc4f3f200a87a51e"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\services\\serviceSecurity.ts": {
+    "mtime": 1787418530.6514134,
+    "hash": "2286657b580fa54135f2d90b3e36ee4d"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\services\\types.mappers.test.ts": {
+    "mtime": 1787333833.410734,
+    "hash": "68bcd3daeb14c5fafd3cfd5bfb416ccd"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\store\\accountingSlice.ts": {
+    "mtime": 1788020988.080307,
+    "hash": "a6c0713982c42528cf97f9defc8879c0"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\utils\\expenseCsvExport.ts": {
+    "mtime": 1787334432.034015,
+    "hash": "b3c323c59be3c78f525245887da11fa1"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\utils\\expenseListPdfExport.ts": {
+    "mtime": 1784743441.2828946,
+    "hash": "1ffdba22285e4394cfe7c6fe3cf172ff"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\utils\\expensePeriod.test.ts": {
+    "mtime": 1787141300.264702,
+    "hash": "53455b2be670a5907403feb8e7b2b376"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\utils\\expensePeriod.ts": {
+    "mtime": 1787141356.7469862,
+    "hash": "6576be6873db3ba2a452bf28d8171e31"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\utils\\invoiceCsvExport.ts": {
+    "mtime": 1783391285.1070561,
+    "hash": "30edd467b15e5f11ae0bb3dfe81c38db"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\utils\\invoiceListPdfExport.ts": {
+    "mtime": 1784002369.0846379,
+    "hash": "10eb87ad07f3c873af92ccdb1af3ad81"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\utils\\invoicePdfExport.test.ts": {
+    "mtime": 1785125836.028151,
+    "hash": "9261f41261cf33b01e978b23a12d1a23"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\utils\\invoicePdfExport.ts": {
+    "mtime": 1787948808.3406024,
+    "hash": "2821fd4199819b21d53bf391d1252cd7"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\utils\\invoiceWizardState.test.ts": {
+    "mtime": 1787141915.074326,
+    "hash": "13c5ac31684d1cf41a1b455f9a0b5301"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\utils\\invoiceWizardState.ts": {
+    "mtime": 1787056589.3991458,
+    "hash": "9ca81719b8c80ade150303c5c9901135"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\utils\\invoiceWizardValidation.test.ts": {
+    "mtime": 1786223896.7121596,
+    "hash": "c0f08c646f3d72afc68923b4a2a6b55c"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\utils\\invoiceWizardValidation.ts": {
+    "mtime": 1787333954.597946,
+    "hash": "3a2ff3b920f2cb65e8f50773a9798fce"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\utils\\reportCsvExport.ts": {
+    "mtime": 1785023662.1242933,
+    "hash": "c237db69417a8a5ca7982ca3cb941268"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\accounting\\utils\\reportPdfExport.ts": {
+    "mtime": 1785025697.974316,
+    "hash": "0964ada1e5cc52973c47be1924a5bf6a"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\auth\\AuthStateSync.tsx": {
+    "mtime": 1784002369.086636,
+    "hash": "ea38b2d0ef7cb9a8da654c40096b5894"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\auth\\index.ts": {
+    "mtime": 1778116226.8724177,
+    "hash": "c779abb1e75eae243e2a4acd19a1904d"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\auth\\hooks\\index.ts": {
+    "mtime": 1778116226.856792,
+    "hash": "5fab40babd8feaa5cf1449bc8ba3a1ae"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\auth\\hooks\\useAuth.ts": {
+    "mtime": 1779479078.0730357,
+    "hash": "b1cb1ece6538657e436b911740dbe6bc"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\index.ts": {
+    "mtime": 1782736182.0157795,
+    "hash": "5acda30d3864d20eab39448e8e029d86"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\types.ts": {
+    "mtime": 1784743441.349582,
+    "hash": "49e03d483649cc38d64995775433e6fb"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\components\\AddExtraChargeModal.tsx": {
+    "mtime": 1785344497.9943006,
+    "hash": "fa32d9f039a77ae73671e464c8834f9c"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\components\\BookingActionModals.tsx": {
+    "mtime": 1785336757.545847,
+    "hash": "a7ea14391e8e414efb02ccd40387504a"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\components\\BookingDeleteModal.tsx": {
+    "mtime": 1785344513.695708,
+    "hash": "38098c1d0d36cb44a5a613e9ed4ffa8f"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\components\\BookingDetailModal.tsx": {
+    "mtime": 1784743441.2828946,
+    "hash": "f6da51a9ea5d96ee9c5b83241336c4ab"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\components\\BookingFormModal.tsx": {
+    "mtime": 1787574581.0358725,
+    "hash": "f495ed846d2ce3f9692feb2d6407930f"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\components\\BookingListFilterModal.tsx": {
+    "mtime": 1785344515.9927354,
+    "hash": "6e4b7f5ba6a0aa57e16c5007283691d4"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\components\\BookingListPanel.tsx": {
+    "mtime": 1784743441.296186,
+    "hash": "8b1ccb2a3a7977f3497ffbe2d84a5266"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\components\\BookingsPage.tsx": {
+    "mtime": 1787508547.5922427,
+    "hash": "51c5bba80deae066ef6cd22e321f6361"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\components\\BookingsTable.tsx": {
+    "mtime": 1784743441.3018868,
+    "hash": "7b7306cf2754c15581ca2d47a4166c6d"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\components\\BookingStatsCards.tsx": {
+    "mtime": 1784743441.296186,
+    "hash": "9708ffbfba3b0d562bb0ea5839e3016a"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\components\\BookingSummaryCard.tsx": {
+    "mtime": 1784743441.2971866,
+    "hash": "19b582711ae7cddc014b1c4b26905167"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\components\\BookingToolbar.tsx": {
+    "mtime": 1784743441.2981853,
+    "hash": "caac79dc647f26320fbf6261a64518be"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\components\\ChangeRoomDialog.tsx": {
+    "mtime": 1784743441.3190548,
+    "hash": "208e265c91ca4d801436ed8905f4bfc2"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\components\\CheckoutConfirmModal.tsx": {
+    "mtime": 1787417493.2088785,
+    "hash": "84b1d295b4d3b315b0e99a78c2d171d9"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\components\\CleanTimer.tsx": {
+    "mtime": 1784002369.0946405,
+    "hash": "5ea1756a938b3d31174c6eed6a55d2b0"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\components\\DateRangeFilterModal.tsx": {
+    "mtime": 1785344647.8283243,
+    "hash": "a6ff6a3437b37c09049e31d50198e718"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\components\\ExtendBookingModal.tsx": {
+    "mtime": 1785344495.4529011,
+    "hash": "ec2f819a76cc46b6b3678b43e807a257"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\components\\GuestInfoSection.tsx": {
+    "mtime": 1785029742.2538369,
+    "hash": "da73c5bb9544ed3fa8a34a8985b54032"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\components\\GuestSearchSection.tsx": {
+    "mtime": 1785336472.8627446,
+    "hash": "47c4d288eb44ec82a5229a3d7c36de93"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\components\\index.ts": {
+    "mtime": 1784002369.105055,
+    "hash": "9c7be82abbd972d5674584d5e66ebb2c"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\components\\RoomDetailsModal.tsx": {
+    "mtime": 1784743441.3328695,
+    "hash": "842a2e49c03dc0e0430416e69ce0428f"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\components\\RoomSelectionGrid.tsx": {
+    "mtime": 1785029517.8671646,
+    "hash": "97be08cc4310bb7d0dad58d2f680d354"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\components\\RoomStatusCell.tsx": {
+    "mtime": 1784743441.3328695,
+    "hash": "7fe60ebb06fc31690b23f7ad8587e059"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\components\\RoomStatusFilterModal.tsx": {
+    "mtime": 1785344518.2721334,
+    "hash": "a8f56a38e26bb094b518acc185e580f9"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\components\\RoomStatusGrid.tsx": {
+    "mtime": 1784743441.3328695,
+    "hash": "a3fc30ccdba00e487514a7c38b24df22"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\components\\RoomStatusPanel.tsx": {
+    "mtime": 1784743441.3328695,
+    "hash": "50aaeabfa183dbbf3169ea140cf87732"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\hooks\\index.ts": {
+    "mtime": 1784002369.105055,
+    "hash": "cb5601828f15ddce14b0d42bb5db9652"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\hooks\\useBookingActions.ts": {
+    "mtime": 1788017239.1661909,
+    "hash": "24e2684478c1f40d77e67d640e128f23"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\hooks\\useBookingFilters.ts": {
+    "mtime": 1786223896.7121596,
+    "hash": "36d080d1697ae5829837b2529cabe3c9"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\hooks\\useBookingForm.ts": {
+    "mtime": 1784743441.3328695,
+    "hash": "883146945448c1acf84669afe256300a"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\hooks\\useBookings.ts": {
+    "mtime": 1787154922.8193045,
+    "hash": "f0cbd573a8b3c657034516695368a6b6"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\hooks\\useCheckoutHandler.ts": {
+    "mtime": 1784743441.3328695,
+    "hash": "d01cf597438aeee1c33f9c578b271fcc"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\services\\bookingService.ts": {
+    "mtime": 1787154922.8202996,
+    "hash": "30f9fbaa64b3caba7d8b81e0aa0a5675"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\services\\index.ts": {
+    "mtime": 1778116226.91929,
+    "hash": "108183556cbd2d0b1bbcd41d1324f7c3"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\services\\periodRange.test.ts": {
+    "mtime": 1787149094.630214,
+    "hash": "01f10b77e64ef32a881d1085db85dcbb"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\utils\\bookingCsvExport.ts": {
+    "mtime": 1779016316.3303514,
+    "hash": "0269db472fe99a3e8c6ce14dee059773"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\utils\\bookingPdfExport.ts": {
+    "mtime": 1784002369.105055,
+    "hash": "5778086cd4529125fe7e3357ec98b092"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\utils\\deriveRoomAvailability.ts": {
+    "mtime": 1788035889.7090302,
+    "hash": "636ac7709752846eafc8921800338e9c"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\utils\\deriveRoomPrice.ts": {
+    "mtime": 1784002369.105055,
+    "hash": "58a1968912ca0997a97779617601c0dc"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\utils\\index.ts": {
+    "mtime": 1782735792.300685,
+    "hash": "84373369cfa056fbba20b038024cde83"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\utils\\roomStatusStyles.ts": {
+    "mtime": 1784743441.349582,
+    "hash": "d2c9a2b162f3348a0cb4591e8e3ae78b"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\constants.ts": {
+    "mtime": 1778716911.5812848,
+    "hash": "a0fb205e2d2dae2b926819f49b68c3c2"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\index.ts": {
+    "mtime": 1778718549.777905,
+    "hash": "69c6e7bcbd8a52f251add6cb4be322ad"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\types.ts": {
+    "mtime": 1778823878.9520805,
+    "hash": "37782296c0eb00324d4aa6a852737974"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\components\\BookingsSection.tsx": {
+    "mtime": 1787330173.954945,
+    "hash": "9a00d83904181ba68789b053ed74782a"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\components\\ContactBookingList.tsx": {
+    "mtime": 1784743441.349582,
+    "hash": "12ca46603f5a792f8a6b3636bc93d348"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\components\\ContactCard.test.tsx": {
+    "mtime": 1784002369.105055,
+    "hash": "d0b10c64ffbb36a664c7501352f90e39"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\components\\ContactCard.tsx": {
+    "mtime": 1787324798.6831493,
+    "hash": "7d8bbd88decd94bfe59f312c56649f6f"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\components\\ContactForm.tsx": {
+    "mtime": 1785116515.3936498,
+    "hash": "8bd16d6272d187941641da3812ada6c6"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\components\\ContactInfoCard.tsx": {
+    "mtime": 1785339564.528623,
+    "hash": "74ca3cf6fdee8754f1c742ecd7fe0884"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\components\\ContactInvoiceList.tsx": {
+    "mtime": 1784743441.349582,
+    "hash": "de457dbe5da672fba1ae7f2ff90adfa7"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\components\\ContactsAnalytics.test.tsx": {
+    "mtime": 1784002369.105055,
+    "hash": "aacde327b38841b8fe5b698c717dc150"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\components\\ContactsAnalytics.tsx": {
+    "mtime": 1784743441.349582,
+    "hash": "0ffab56f9f47c2db39c8552697de1794"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\components\\ContactsHeader.tsx": {
+    "mtime": 1784743441.349582,
+    "hash": "7180be959bc8fde80028dc23259e9919"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\components\\ContactsPage.tsx": {
+    "mtime": 1787330325.865404,
+    "hash": "816fbc5ba1f0357a6963055ad05fb377"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\components\\ContactsPagination.tsx": {
+    "mtime": 1784002369.105055,
+    "hash": "4604a135aa817845060e87beda425212"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\components\\ContactsStates.test.tsx": {
+    "mtime": 1784002369.105055,
+    "hash": "a4da7cb6356227b15f1937f37149c047"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\components\\ContactsStates.tsx": {
+    "mtime": 1786223896.7121596,
+    "hash": "e7c8f3cd0d3fcc28101b2cb67db6d517"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\components\\ContactsTable.test.tsx": {
+    "mtime": 1784002369.105055,
+    "hash": "3cda369e8536d3f2092f2d0ef678ba5f"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\components\\ContactsTable.tsx": {
+    "mtime": 1787327304.0479207,
+    "hash": "3ce79891040d6bc2159feb754c96c955"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\components\\ContactsToolbar.tsx": {
+    "mtime": 1784743441.349582,
+    "hash": "0d18e499851ddf9f926b711e3c7a69c2"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\components\\ContactTypeBadge.tsx": {
+    "mtime": 1784743441.349582,
+    "hash": "e83eb3908f268ec02f2191063f69008b"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\components\\ContactTypeSelector.tsx": {
+    "mtime": 1784743441.349582,
+    "hash": "2628e6af1d814e862e2357f4c0deea66"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\components\\index.ts": {
+    "mtime": 1778719236.3134906,
+    "hash": "e4fb7430186210648752d987efb5cb6e"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\components\\InvoiceModal.test.tsx": {
+    "mtime": 1784002369.105055,
+    "hash": "8316cb048af484be7e1341c133f99cc8"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\components\\InvoiceModal.tsx": {
+    "mtime": 1784743441.349582,
+    "hash": "d35863210dee3ae2e9814303b20b2b1d"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\components\\InvoicesSection.tsx": {
+    "mtime": 1787948808.3411171,
+    "hash": "1089744898e043b105caba0649fdd807"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\components\\LogoUpload.tsx": {
+    "mtime": 1784743441.349582,
+    "hash": "6c43e0f15e0885b982d0688eda9bbcd8"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\components\\PriceOverridesSection.test.tsx": {
+    "mtime": 1784002369.1206832,
+    "hash": "5d38b0202416eaae9fc8a21c40559e63"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\components\\PriceOverridesSection.tsx": {
+    "mtime": 1784743441.3652115,
+    "hash": "ec18f9f09bf9ccfd428d893a4196c7af"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\hooks\\index.ts": {
+    "mtime": 1779015668.059064,
+    "hash": "259e62fb602626ada807348e74ffcaf6"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\hooks\\useContactDetails.ts": {
+    "mtime": 1787569069.5440493,
+    "hash": "e316ddd529d0831a9f9122244745889d"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\hooks\\useContactForm.test.ts": {
+    "mtime": 1778890096.0454166,
+    "hash": "10c557788d67230e2545334343245ab8"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\hooks\\useContactForm.ts": {
+    "mtime": 1785116477.2845714,
+    "hash": "1b7b12b0a00dad61fdc4bbac19407343"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\hooks\\useContactsExport.ts": {
+    "mtime": 1779015889.7950914,
+    "hash": "f4183f6a948e3a79d587e15326431846"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\hooks\\useContactsView.test.ts": {
+    "mtime": 1778890062.3341775,
+    "hash": "9ec58072de91115ba18cd47720d39854"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\hooks\\useContactsView.ts": {
+    "mtime": 1779124565.6503768,
+    "hash": "7a55fac9e55cc06f3938ac71cac839be"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\services\\activityLogService.ts": {
+    "mtime": 1778722046.2066355,
+    "hash": "58cdcb39403cab5d2ba3a1a6d422297b"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\services\\contactsApiClient.ts": {
+    "mtime": 1788020856.7307973,
+    "hash": "e610d5a12f3265854fb242e82dfa3f10"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\services\\contactService.integration.test.ts": {
+    "mtime": 1778891684.5312493,
+    "hash": "21b59bbe94aa6cd0731c73ba3884b3ad"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\services\\contactService.test.ts": {
+    "mtime": 1778888975.1587827,
+    "hash": "5d86a94887203aff8ff955ccb4b33660"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\services\\contactService.ts": {
+    "mtime": 1788026313.1762426,
+    "hash": "fd7f3c73d1cde5519b59492cf4b24ab3"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\services\\index.ts": {
+    "mtime": 1778717869.1495993,
+    "hash": "6982a0dacc47a985d2609b44b0886a8d"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\services\\invoiceActivityLogService.ts": {
+    "mtime": 1778885840.4273005,
+    "hash": "32a3f1afa61b601b76d9640ae9d5e583"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\services\\invoiceService.integration.test.ts": {
+    "mtime": 1788020169.5350156,
+    "hash": "1d04c0ed9093906a5cb17a965afd361e"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\services\\invoiceService.ts": {
+    "mtime": 1786022445.1429496,
+    "hash": "a40958f576f95b4b565fcd0cd198b2e2"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\services\\logoUploadService.ts": {
+    "mtime": 1778818931.3686311,
+    "hash": "b24319b7aa77f8e9281b9204e3124279"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\services\\priceOverrideService.integration.test.ts": {
+    "mtime": 1788020136.8321085,
+    "hash": "a5ee0e1054e2cb659b322931db7cf62b"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\services\\priceOverrideService.ts": {
+    "mtime": 1779634503.8335054,
+    "hash": "e75712b19d2bedf5350d59232066f011"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\services\\serviceSecurity.ts": {
+    "mtime": 1778722436.4366462,
+    "hash": "c06cc005b3b7afba92d3e0509c83da70"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\services\\__mocks__\\activityLogService.ts": {
+    "mtime": 1778889249.9297285,
+    "hash": "69d1abe89cd7da070ea2e12f1ca16406"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\services\\__mocks__\\serviceSecurity.ts": {
+    "mtime": 1778889249.35316,
+    "hash": "639225c11f37a3ef4a77593a207021c7"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\types\\invoiceTypes.ts": {
+    "mtime": 1786022445.1429496,
+    "hash": "229802dc98fd942660f686f762775963"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\utils\\contactCsvExport.ts": {
+    "mtime": 1779015653.8522494,
+    "hash": "a46b117016c2d01914589ec0272a1f26"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\utils\\contactErrors.test.ts": {
+    "mtime": 1778888967.0397427,
+    "hash": "ade871225ef0c3bf8a1b34f9acd5bff2"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\utils\\contactErrors.ts": {
+    "mtime": 1785110763.0125248,
+    "hash": "ecc852bab8a7fc9ffda654904ae85186"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\utils\\contactPdfExport.ts": {
+    "mtime": 1785345460.3894603,
+    "hash": "7f164bb69225f1a3fd31fd0373f7d939"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\utils\\contactValidation.test.ts": {
+    "mtime": 1788020040.3726583,
+    "hash": "384494e0831d237e18ab68e941b53dfc"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\utils\\contactValidation.ts": {
+    "mtime": 1785109338.510239,
+    "hash": "d8d65842378256ded9b70cf135c49b7d"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\utils\\invoiceCsvExport.ts": {
+    "mtime": 1779016322.0953662,
+    "hash": "93350f9bd7e412f2203f935875766907"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\utils\\invoicePdfExport.ts": {
+    "mtime": 1784002369.1266954,
+    "hash": "2a11c962802ed1f12aa47c3ccc281b1c"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\utils\\priceOverrideLookup.test.ts": {
+    "mtime": 1778888969.079425,
+    "hash": "55ee71d10012c89f33f0a131cb6b9208"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\contacts\\utils\\priceOverrideLookup.ts": {
+    "mtime": 1778722514.0951397,
+    "hash": "f16babc074214cd9efd6aa4fa7735cc6"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\dashboard\\DashboardPage.tsx": {
+    "mtime": 1784743441.3680973,
+    "hash": "a97cc80e8bc6295f17069f600d5fc626"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\dashboard\\index.ts": {
+    "mtime": 1778612187.449234,
+    "hash": "f3797132d4d4511bf91696637c54c303"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\dashboard\\types.ts": {
+    "mtime": 1778116226.950541,
+    "hash": "3e7ee5c50afa000f00032c27885c6ada"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\dashboard\\components\\dashboard-types.ts": {
+    "mtime": 1778612333.463052,
+    "hash": "b3d9abeb4c4302689030fb55e785ebf1"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\dashboard\\components\\GoalsCard.tsx": {
+    "mtime": 1784743441.3680973,
+    "hash": "c0378d12b99566cdf4025efec7e8ac21"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\dashboard\\components\\index.ts": {
+    "mtime": 1778116226.9349184,
+    "hash": "1d999fe3c99455d0f88841a52a4d2e11"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\dashboard\\components\\OverviewCard.tsx": {
+    "mtime": 1784743441.3680973,
+    "hash": "9a56c0efc1ffeab34a16a488d753ece0"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\dashboard\\components\\ProgressCards.tsx": {
+    "mtime": 1784743441.3680973,
+    "hash": "9a4bfefb2db992421921f083b27f7cc0"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\dashboard\\components\\ProjectCards.tsx": {
+    "mtime": 1784743441.3680973,
+    "hash": "9fce958a8df346007741444f8b4157fa"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\dashboard\\components\\TaskCards.tsx": {
+    "mtime": 1784743441.3829358,
+    "hash": "830fca8c33690bffb55c4f47978592f9"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\dashboard\\components\\ToolbarButtons.tsx": {
+    "mtime": 1784743441.3829358,
+    "hash": "310ec698e1781b3d8bc98f565b84eb42"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\dashboard\\hooks\\index.ts": {
+    "mtime": 1778116226.9349184,
+    "hash": "1b380b890156eb671b545b1a798f42f8"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\dashboard\\hooks\\useDashboardOverview.ts": {
+    "mtime": 1778612165.1336899,
+    "hash": "fafc184f63b6c021702b3574408918f6"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\dashboard\\services\\dashboardApiClient.ts": {
+    "mtime": 1788020890.236469,
+    "hash": "af900d3d0f0cc6dbc68deba9d43a34da"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\dashboard\\services\\dashboardService.ts": {
+    "mtime": 1779634421.2925105,
+    "hash": "8df52ac10522b5b93c9f5c8a724bdbe2"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\dashboard\\services\\index.ts": {
+    "mtime": 1778612093.8414283,
+    "hash": "47ce0004b1459d80dcbb74a48d114723"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\dashboard\\store\\dashboardSlice.ts": {
+    "mtime": 1788021180.708137,
+    "hash": "3f7b717657fa4328b3f14561f8c3314d"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\dashboard\\store\\index.ts": {
+    "mtime": 1778612141.0375123,
+    "hash": "a2afe8a6e3a37dcc47c8bf996d467581"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\dashboard\\store\\__tests__\\dashboardSlice.test.ts": {
+    "mtime": 1788024446.7559435,
+    "hash": "a04fe138722ac7be80db61bb64f786ee"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\guests\\index.ts": {
+    "mtime": 1778116226.950541,
+    "hash": "96245bc8e8ce9530598b4feb3b8b42cf"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\guests\\types.ts": {
+    "mtime": 1778116226.950541,
+    "hash": "badb79fda3e93bef547c8dfff8279556"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\guests\\hooks\\index.ts": {
+    "mtime": 1778116226.950541,
+    "hash": "bb47173294936c38f667141feebaaf19"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\guests\\hooks\\useGuests.ts": {
+    "mtime": 1778694099.0785868,
+    "hash": "6f9e05277a19b2f5ac8c75227dfef84d"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\logs\\index.ts": {
+    "mtime": 1778116226.950541,
+    "hash": "8963a331eb9a4c780b10e3a0488d357d"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\logs\\types.ts": {
+    "mtime": 1784743441.3829358,
+    "hash": "950444353ffbedc34bb017e7b45111f4"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\logs\\components\\index.ts": {
+    "mtime": 1778116226.950541,
+    "hash": "18aefc1a28812337ca616288ad19be1d"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\logs\\components\\LogsAnalytics.tsx": {
+    "mtime": 1784743441.3829358,
+    "hash": "bd19ccb9585eb8d5368de1fa648d5719"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\logs\\components\\LogsPage.tsx": {
+    "mtime": 1784743441.3829358,
+    "hash": "2296300456ba6f3b0793bb86bb5115e4"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\logs\\components\\LogsPagination.tsx": {
+    "mtime": 1784743441.3829358,
+    "hash": "a5cf561f9a69efceb10709f4064e7082"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\logs\\components\\LogsStates.tsx": {
+    "mtime": 1784743441.3829358,
+    "hash": "c161d111a1b678eec34f6ddfa1240c0c"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\logs\\components\\LogsTable.tsx": {
+    "mtime": 1785339026.8209612,
+    "hash": "ade0e0b129c597874cf6c11aadbd7ccb"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\logs\\components\\LogsToolbar.tsx": {
+    "mtime": 1784743441.3829358,
+    "hash": "be68cc9231f74da9c9745cbcd24198f2"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\logs\\hooks\\logsPagination.ts": {
+    "mtime": 1778609601.8874402,
+    "hash": "d0df65fa962174bf2b2821f48e6e1ea8"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\logs\\hooks\\useLogs.ts": {
+    "mtime": 1784743441.3829358,
+    "hash": "5ccb076d2bed403a4c7bb8a33d00c51e"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\logs\\hooks\\useLogsConfig.ts": {
+    "mtime": 1778609584.2239943,
+    "hash": "64ee8312ba8c976b8c703fccf2092139"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\logs\\hooks\\useLogsExport.ts": {
+    "mtime": 1778456973.4923768,
+    "hash": "0e5fde126af3ed8f4cdc8824075593c9"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\logs\\hooks\\useLogsRequestState.ts": {
+    "mtime": 1778609625.2177603,
+    "hash": "c9be5dfdc8a629f4348fe684b3f63906"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\logs\\services\\logsApiClient.ts": {
+    "mtime": 1788020883.55521,
+    "hash": "c3342be06642c3e544983645cd7ee1d2"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\logs\\services\\logsCsvExport.ts": {
+    "mtime": 1778437535.3123648,
+    "hash": "05bb03b414bcb64df37a542777b870d9"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\logs\\services\\logsPdfExport.ts": {
+    "mtime": 1784743441.3829358,
+    "hash": "0ff686e0a0241a5d4c9fc74e27a0afc1"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\logs\\utils\\logDisplay.ts": {
+    "mtime": 1784743441.3829358,
+    "hash": "e4a3d44546d8d04e9ea1dfdcb9d06858"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\logs\\utils\\__tests__\\logDisplay.test.ts": {
+    "mtime": 1788021049.5466633,
+    "hash": "14b1954de123e1d660658fdb952de122"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\pricing\\index.ts": {
+    "mtime": 1779232209.9195282,
+    "hash": "526e93a368096ce9c344f01b7aaefeb5"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\pricing\\types.ts": {
+    "mtime": 1784743441.3829358,
+    "hash": "a2eef8a90ef8b0a9c090db77f42fe20f"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\pricing\\components\\PricingManagement.tsx": {
+    "mtime": 1785942407.0164251,
+    "hash": "9ebaba8117339384b4fdb596a93a61bc"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\pricing\\components\\PricingTab.tsx": {
+    "mtime": 1785338894.7930484,
+    "hash": "410d4abd48cfbbb04eba2da9be4747c7"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\pricing\\hooks\\index.ts": {
+    "mtime": 1779232209.9195282,
+    "hash": "400b1d7f52213ae5d7d34c043ec13b30"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\pricing\\hooks\\usePricing.ts": {
+    "mtime": 1779232209.9185293,
+    "hash": "b3aafa96f81ad864e3b46889e252580b"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\pricing\\services\\index.ts": {
+    "mtime": 1779232209.9195282,
+    "hash": "c07297b8a1cb4932dbd602e8c32010eb"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\pricing\\services\\pricingApiClient.ts": {
+    "mtime": 1779232209.9185293,
+    "hash": "4b0e4619c879ebcc5506fe8abae41340"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\pricing\\services\\pricingService.ts": {
+    "mtime": 1779638652.2188275,
+    "hash": "3eb795480467bbdfa0993817472ceabd"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\pricing\\store\\pricingSlice.ts": {
+    "mtime": 1779232210.0141213,
+    "hash": "c224939e95e5919101b2c984ba8259aa"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\pricing\\types\\__tests__\\types.test.ts": {
+    "mtime": 1788020515.2204604,
+    "hash": "bd398f2feb65d0f099a84196b998fa28"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\index.ts": {
+    "mtime": 1782776186.925425,
+    "hash": "526e93a368096ce9c344f01b7aaefeb5"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\types.ts": {
+    "mtime": 1788035365.1478636,
+    "hash": "cab5a7e77bbe1a8844816b315eacaebd"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\components\\ChangeRoomModal.tsx": {
+    "mtime": 1786029720.0079174,
+    "hash": "f9b2e95aad01af0cd5170fa06da0f1b1"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\components\\DayDetailPopover.test.tsx": {
+    "mtime": 1787524481.7198074,
+    "hash": "cb30a867014c1dd46a784851211abf22"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\components\\DayDetailPopover.tsx": {
+    "mtime": 1787522135.0994914,
+    "hash": "48332cb0081736ce6966a9e4164cfa2c"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\components\\EditPriceModal.tsx": {
+    "mtime": 1787508478.782076,
+    "hash": "7547bc6bfd442b18226f38bc3fed14d9"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\components\\GuestForm.tsx": {
+    "mtime": 1784743441.3829358,
+    "hash": "9255476e9c577807c0b06ab8d0dc14c5"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\components\\GuestRoomSelector.tsx": {
+    "mtime": 1784743441.3829358,
+    "hash": "9f91d53a164af9eb48048e829786f1e1"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\components\\MonthCalendarCard.test.tsx": {
+    "mtime": 1787524088.9386423,
+    "hash": "e9e9a5f9dace0271863163910c4fc229"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\components\\MonthCalendarCard.tsx": {
+    "mtime": 1787521271.315125,
+    "hash": "331016208d2b44818a2217f6cf147bde"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\components\\NewContactModal.tsx": {
+    "mtime": 1785337312.4774096,
+    "hash": "ed780178cb8874dbfe8b255a64eb0c4e"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\components\\NewReservationPage.tsx": {
+    "mtime": 1787950490.0539124,
+    "hash": "705d67ddffaba563517e1eef8098d12f"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\components\\ReservationActions.tsx": {
+    "mtime": 1786223896.7121596,
+    "hash": "ca41c75d0d1cdcd3ed96f718429ef0b4"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\components\\ReservationDetailHeader.tsx": {
+    "mtime": 1787574988.8379316,
+    "hash": "6921de56225965d9a3324319941ca705"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\components\\ReservationDetailPage.tsx": {
+    "mtime": 1787508478.928438,
+    "hash": "3506f59fff3eb3ede68592c7a13dcb85"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\components\\ReservationEditPage.tsx": {
+    "mtime": 1788035377.6090677,
+    "hash": "49048e8d1facb3dd545c50da529be708"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\components\\ReservationNotes.tsx": {
+    "mtime": 1785337189.3316762,
+    "hash": "45aeb27002110e5e3177cbbf2d7cb641"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\components\\ReservationPricingSummary.tsx": {
+    "mtime": 1784743441.3995905,
+    "hash": "0b27cc7a299c00b44eb589911a13bdef"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\components\\ReservationRoomToggler.tsx": {
+    "mtime": 1784743441.3995905,
+    "hash": "f89a2d50dfb756c741329a40a8489b73"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\components\\RoomGuestCard.tsx": {
+    "mtime": 1787508478.9517598,
+    "hash": "825e49a6721b89bc87926e8fbcdb4509"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\components\\SheetView.test.tsx": {
+    "mtime": 1787530207.781299,
+    "hash": "1d1e1d3e150e662f4a200ce5cd47cfbb"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\components\\SheetView.tsx": {
+    "mtime": 1787575068.597185,
+    "hash": "1a100ea1d53317e8f679ac4f9d1f5be2"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\components\\YearOverviewPage.tsx": {
+    "mtime": 1787568052.4826188,
+    "hash": "7963371803649aefa59238f991723cb9"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\hooks\\useNewReservation.ts": {
+    "mtime": 1784743441.3995905,
+    "hash": "dc74e9c414f92726c9e87b2409fc0a7f"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\hooks\\useReservationEdit.ts": {
+    "mtime": 1784743441.3995905,
+    "hash": "d75eab2adb5e648c944cdc56236e4ff6"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\services\\index.ts": {
+    "mtime": 1782946512.4566755,
+    "hash": "f390582ad94207f0dfd995a94873485c"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\services\\invoiceIntegrationService.ts": {
+    "mtime": 1784743441.3995905,
+    "hash": "54f018f9d4f9f2680115de1cac2cf93d"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\services\\lifecycleService.ts": {
+    "mtime": 1784002369.147259,
+    "hash": "34754bff000b712de1e75693ad7fb3be"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\services\\paymentService.ts": {
+    "mtime": 1784002369.1482582,
+    "hash": "086d8a500b6b30d21a273105733a0c78"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\services\\pricingService.ts": {
+    "mtime": 1788026313.1766887,
+    "hash": "7b3af701acd17e44c2eb1712d8cc8720"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\services\\__tests__\\getEffectiveRate.test.ts": {
+    "mtime": 1787154839.5664485,
+    "hash": "77a4fd62433b368793b2e50049beb91f"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\services\\__tests__\\lifecycleService.test.ts": {
+    "mtime": 1786223896.7121596,
+    "hash": "455deb26704a20056eb8fd10ca42f960"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\services\\__tests__\\pricingService.test.ts": {
+    "mtime": 1787961239.160963,
+    "hash": "7e4335bd566a769ca72be16916dbb4fe"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\utils\\csvExport.test.ts": {
+    "mtime": 1787523962.3357203,
+    "hash": "1878f89e29abd1ab7dbe1d8e94aaddc8"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\utils\\csvExport.ts": {
+    "mtime": 1787522375.2398014,
+    "hash": "f5f741f6e3d1c698733642157e968227"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\utils\\dayMap.test.ts": {
+    "mtime": 1787523644.862633,
+    "hash": "f0fcaeb56c035c45406ee0b477e499d5"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\utils\\dayMap.ts": {
+    "mtime": 1787524907.1561315,
+    "hash": "a75f97f681a8417672b5d7b09c4e6630"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\utils\\excelExport.test.ts": {
+    "mtime": 1787568875.9072676,
+    "hash": "e9810fceb897260f2772c61c3a0cc348"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\utils\\excelExport.ts": {
+    "mtime": 1787567666.4079537,
+    "hash": "757186509d1bf66d5ffe9ad8e6c9b848"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\utils\\occupancy.test.ts": {
+    "mtime": 1787523856.6457505,
+    "hash": "6006b667e28bfa60fac955ab6162da9a"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\utils\\occupancy.ts": {
+    "mtime": 1787519898.6087437,
+    "hash": "139b1ad8d1acc268049c5100ab6e1337"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\utils\\yearViewPdfExport.test.ts": {
+    "mtime": 1787562612.717681,
+    "hash": "045aaf32d80d3ac2b9156c37d12e1650"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\reservations\\utils\\yearViewPdfExport.ts": {
+    "mtime": 1787948808.3423693,
+    "hash": "2f04dc5f1a46b8108084a5e41ff2b0fd"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\room-types\\constants.ts": {
+    "mtime": 1779228398.2868452,
+    "hash": "eaf94705ab96ba40171d65d12c39eb60"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\room-types\\index.ts": {
+    "mtime": 1779228401.4973018,
+    "hash": "6d714bb72c3f4f3bdf39f5dadbe221f9"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\room-types\\types.ts": {
+    "mtime": 1779456509.225917,
+    "hash": "5fd6b15e08a3529dcf4d237f6c2a5783"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\room-types\\components\\CreateRoomTypeModal.tsx": {
+    "mtime": 1785345592.7286272,
+    "hash": "cbad0b0918f5448315f88b91919a331f"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\room-types\\components\\RoomTypesTab.tsx": {
+    "mtime": 1785338797.3323433,
+    "hash": "3247ccf0cebb46a9e975b7696c81a80b"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\room-types\\hooks\\index.ts": {
+    "mtime": 1779229567.736946,
+    "hash": "c943d9c699fc1d83fca5555c7b6db2c2"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\room-types\\hooks\\useRoomTypes.ts": {
+    "mtime": 1785345496.655105,
+    "hash": "75ebf6573d9cd8c8ec08e8ed8153ccea"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\room-types\\services\\index.ts": {
+    "mtime": 1779228401.1231637,
+    "hash": "4a2ec34b8b293dc9ea0fb9c4b54f228a"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\room-types\\services\\roomTypeApiClient.ts": {
+    "mtime": 1779229567.7189467,
+    "hash": "c396226830268adb6a688dad115e727f"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\room-types\\services\\roomTypeService.ts": {
+    "mtime": 1779639119.1622527,
+    "hash": "8f646dee8b15845a7c42b1026e024e99"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\room-types\\store\\roomTypesSlice.ts": {
+    "mtime": 1779229567.742945,
+    "hash": "f2e7213a9392a155e7be576ef2f81b72"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\room-types\\types\\__tests__\\types.test.ts": {
+    "mtime": 1788020507.1045392,
+    "hash": "95cd895e58141abd9e92cb98dd051e8e"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\rooms\\index.ts": {
+    "mtime": 1779231755.5474243,
+    "hash": "da444b33637d33df1e74bd37482f730d"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\rooms\\types.ts": {
+    "mtime": 1784002369.1532593,
+    "hash": "ee85eb031145617eb0c949a9422d936e"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\rooms\\components\\PricingFormModal.tsx": {
+    "mtime": 1785344447.0114672,
+    "hash": "d279eb2ca1b81475ec44e4c8db3f2657"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\rooms\\components\\RoomBulkModal.tsx": {
+    "mtime": 1785344455.0020988,
+    "hash": "35d46a111a0e6cbdb23e341320aaae46"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\rooms\\components\\RoomDetailPage.tsx": {
+    "mtime": 1786022445.1429496,
+    "hash": "3946afd9754b0545ab19f04a039453bb"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\rooms\\components\\RoomManagement.tsx": {
+    "mtime": 1786022445.1679997,
+    "hash": "3e5e3fa5445f73aa71f52bbd7f2e5222"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\rooms\\components\\RoomOverviewSection.tsx": {
+    "mtime": 1785338452.0195825,
+    "hash": "9424377bdf9f9ea9832ff4cad844638b"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\rooms\\components\\RoomPricingSection.tsx": {
+    "mtime": 1785338353.7302985,
+    "hash": "befe3e16a5943d813ef8967144542a52"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\rooms\\components\\RoomRenameModal.tsx": {
+    "mtime": 1785344449.6361196,
+    "hash": "40202033755dcb47d0420424bbd65b6d"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\rooms\\components\\RoomsTab.tsx": {
+    "mtime": 1785942407.0334227,
+    "hash": "54f69dbf607336262a561eef380ea3ba"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\rooms\\components\\RoomTypesSection.tsx": {
+    "mtime": 1785338300.4357219,
+    "hash": "098481b0db917f64cf98aac35f7a4541"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\rooms\\hooks\\index.ts": {
+    "mtime": 1779242117.0370355,
+    "hash": "e563e3a2348e896267d89bafd8ed3b9a"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\rooms\\hooks\\useAdminRooms.ts": {
+    "mtime": 1785345487.7097716,
+    "hash": "bd583ae179cd42dc87343f4120cd4b59"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\rooms\\hooks\\useRoomManagement.ts": {
+    "mtime": 1784743441.4161956,
+    "hash": "35b3d1f50f23e4db899c4a60e3daaeb5"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\rooms\\hooks\\useRooms.ts": {
+    "mtime": 1788019050.850382,
+    "hash": "18c38152265bc23be27239072b390c37"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\rooms\\services\\index.ts": {
+    "mtime": 1788019160.54919,
+    "hash": "7d587af461b4ed4883df4dfc67173bd0"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\rooms\\services\\roomLifecycle.ts": {
+    "mtime": 1788019135.2026937,
+    "hash": "759b4fa1dce94c731807034d32bb2882"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\rooms\\services\\roomsApiClient.ts": {
+    "mtime": 1779448631.7810254,
+    "hash": "250eda5b5929a2bd3cb066be456b09c3"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\rooms\\services\\__tests__\\roomLifecycle.test.ts": {
+    "mtime": 1788019180.273915,
+    "hash": "0c07bb4ed6c3cc051cb575ae3c449f6f"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\rooms\\store\\roomsSlice.ts": {
+    "mtime": 1779229991.2406251,
+    "hash": "95f56a13cfc1827f4d92d925a36b4116"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\settings\\components\\CurrencyTab.tsx": {
+    "mtime": 1784743441.4161956,
+    "hash": "51a3ed9e50ccf760ec4d0c5881773bc8"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\settings\\components\\PricingTab.tsx": {
+    "mtime": 1785942407.0528212,
+    "hash": "dca216b7fb5549c45aba5ab5666c0829"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\settings\\components\\SettingsPage.tsx": {
+    "mtime": 1784767647.3874195,
+    "hash": "c16c7b24cad1c960e4aa250f20055008"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\settings\\services\\serviceSecurity.ts": {
+    "mtime": 1783345227.2399576,
+    "hash": "7b04ff263faeb875d57c587c285cfdf9"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\index.ts": {
+    "mtime": 1778116227.0442905,
+    "hash": "ef1ec0e6d8f6d04d3cee262d44c4da5f"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\roles.ts": {
+    "mtime": 1778116227.0442905,
+    "hash": "18976effaee74ed85739e123578213d0"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\types.ts": {
+    "mtime": 1784743441.4328609,
+    "hash": "adf6cdf1fc815cfa382e8ae2689101f3"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\components\\index.ts": {
+    "mtime": 1778116226.966168,
+    "hash": "49aa91f644fb1968e20db2a6d0e4c069"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\components\\UserDetailsPage.tsx": {
+    "mtime": 1784743441.4323845,
+    "hash": "2d8160c0b646403364717a8a7a957502"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\components\\UserForm.tsx": {
+    "mtime": 1784743441.4328609,
+    "hash": "0201c24206077d27836695198ce7401a"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\components\\UserIcons.tsx": {
+    "mtime": 1784002369.1692605,
+    "hash": "63cf18a317dab33aa5f33528c242250f"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\components\\UsersAnalytics.tsx": {
+    "mtime": 1784743441.4328609,
+    "hash": "c2680904cd6cc498f7d475f0b981bae0"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\components\\UsersGrid.tsx": {
+    "mtime": 1784743441.4328609,
+    "hash": "dcae4685bb3395e1ffac3e2217956e8a"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\components\\UsersHeader.tsx": {
+    "mtime": 1784743441.4328609,
+    "hash": "a5e13aa2be2eca9ef8fd3c6104424693"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\components\\UsersPage.tsx": {
+    "mtime": 1785334559.4300716,
+    "hash": "1fda93b813bcc087d51490ed5dc4c6a0"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\components\\UsersPagination.tsx": {
+    "mtime": 1784743441.4328609,
+    "hash": "6b8b3d65a5addcad95b0b4bc5598672c"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\components\\UsersStates.tsx": {
+    "mtime": 1784743441.4328609,
+    "hash": "2987a9910af319b6651b9e9e7c4cd9dd"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\components\\UsersTable.tsx": {
+    "mtime": 1784743441.4328609,
+    "hash": "eafe25fa4539e7dc03c68d84c2059176"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\components\\UsersToolbar.tsx": {
+    "mtime": 1784743441.4328609,
+    "hash": "db0a46b8ec6045b56bb92ba2e98e3cd6"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\hooks\\index.ts": {
+    "mtime": 1778116227.0130427,
+    "hash": "1741510ddfe379f818ced7d4f7d5ce7a"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\hooks\\useCreateUser.ts": {
+    "mtime": 1778116227.0130427,
+    "hash": "987580c76b1984f6d4f20181d55415e7"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\hooks\\useUserDetailsLabels.ts": {
+    "mtime": 1778120328.0112813,
+    "hash": "818d5a4acd491b421af579463c6d1c01"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\hooks\\useUserForm.ts": {
+    "mtime": 1778557961.498608,
+    "hash": "de0da145234a310420ad1d8b66808756"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\hooks\\useUsers.ts": {
+    "mtime": 1778453743.9544055,
+    "hash": "f4082b3175b688d4f23f484b45cd8e04"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\hooks\\useUsersExport.ts": {
+    "mtime": 1778456831.8151546,
+    "hash": "407401a81d492ea98f605cbff3d4cf98"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\hooks\\useUsersPageLabels.ts": {
+    "mtime": 1779634675.5422592,
+    "hash": "00bb8ec26eb09cf5ce00ecbc10b1d424"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\hooks\\useUsersView.ts": {
+    "mtime": 1784743441.4328609,
+    "hash": "8a90b2979aa6845a88ce5dc8c8de5300"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\services\\activityLogService.ts": {
+    "mtime": 1778437832.0355828,
+    "hash": "4d245758176e58d1e4e917730868ac5a"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\services\\authErrors.ts": {
+    "mtime": 1788016925.688834,
+    "hash": "4aa21795b674149146077f0cf167ad82"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\services\\authorization.ts": {
+    "mtime": 1778557961.5036087,
+    "hash": "0e632bf10dcc1c5d8f3c99d2b5c8da2c"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\services\\authRequest.ts": {
+    "mtime": 1788016919.8178282,
+    "hash": "305383654d184b39551042cc86230f21"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\services\\authService.ts": {
+    "mtime": 1778557961.5026095,
+    "hash": "598f6e15bb3ef3504d890325e65499c3"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\services\\authSession.ts": {
+    "mtime": 1778557961.5026095,
+    "hash": "111461edefe1caf8c5bab98419634e21"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\services\\authTypes.ts": {
+    "mtime": 1778116227.0442905,
+    "hash": "7767013dca146a9bc45c216fa97ca9a9"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\services\\index.ts": {
+    "mtime": 1778116227.0442905,
+    "hash": "5433e2c776c4e8265feac6b918082678"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\services\\routeErrors.ts": {
+    "mtime": 1778557961.5036087,
+    "hash": "b7e6a753594c785c71b92d40686d66e5"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\services\\server.ts": {
+    "mtime": 1784743441.4328609,
+    "hash": "d8c651c86e6ba5f8bfeb85601d47d46c"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\services\\serviceSecurity.ts": {
+    "mtime": 1778116227.0442905,
+    "hash": "ae9521e12fde277896fe1d922a10bcc4"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\services\\userAuthSync.ts": {
+    "mtime": 1788016896.090063,
+    "hash": "867b669191f71fe296ce494bd064271e"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\services\\userCreateStore.ts": {
+    "mtime": 1778557961.5046096,
+    "hash": "d620d17886b0f82de5d3bc65bb440651"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\services\\userMapper.ts": {
+    "mtime": 1778557961.50561,
+    "hash": "b64c6b6d0f054e0f6ae82efde670a1e0"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\services\\userQueryService.ts": {
+    "mtime": 1779634348.4871142,
+    "hash": "fab2b97c9d4135cadb6eb9975c2ed623"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\services\\userResponse.ts": {
+    "mtime": 1778557961.50561,
+    "hash": "6f7be0a8c90d64fbdb39ed870b48ca2e"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\services\\usersApiClient.ts": {
+    "mtime": 1788020864.7945743,
+    "hash": "94722b8b1e3f1dda230b55ea78759cbc"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\services\\userService.ts": {
+    "mtime": 1788016914.6727521,
+    "hash": "9b676c5ff94da1c8384f5f147c047422"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\services\\userStore.ts": {
+    "mtime": 1778557961.5066097,
+    "hash": "70daaaabfdfca85ec31e0446448b867b"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\store\\index.ts": {
+    "mtime": 1778453879.9997187,
+    "hash": "d483fbc766b1d23bb7817dc7b99270d5"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\store\\usersSlice.ts": {
+    "mtime": 1786223896.7121596,
+    "hash": "f7b5893f9a44ad3148e6c69359826154"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\utils\\userCsvExport.ts": {
+    "mtime": 1784743441.4328609,
+    "hash": "71d617b20c1e332f3f793a5d8cdbf135"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\utils\\userErrors.ts": {
+    "mtime": 1778557961.5106113,
+    "hash": "807352ad38f11aaa63ed1d596c6af16a"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\utils\\userFormValidation.ts": {
+    "mtime": 1785106360.7643702,
+    "hash": "c6d02848ad8f535b8cd0ccd53fc4ba56"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\utils\\userPdfExport.test.ts": {
+    "mtime": 1785123456.229597,
+    "hash": "2751b2bf43ec2fcf3d7d41552564902f"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\utils\\userPdfExport.ts": {
+    "mtime": 1785123432.5208988,
+    "hash": "de153237f8d1c23f454b7ab85c9d9a5c"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\users\\utils\\userUi.ts": {
+    "mtime": 1785123432.5208988,
+    "hash": "59033ead78765c6c37dfffa0c1458d3a"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\pwa\\index.ts": {
+    "mtime": 1778116227.0599144,
+    "hash": "247ffec974b6fc47e277e12f1ebd2c83"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\pwa\\register-sw.ts": {
+    "mtime": 1779192347.0204961,
+    "hash": "9e331da735578291890a494b3ea8c03b"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\pwa\\service-worker.js": {
+    "mtime": 1778611221.85753,
+    "hash": "13a3ac984cf75056b53c6cded68cff3c"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\pwa\\use-force-update.ts": {
+    "mtime": 1778116227.0599144,
+    "hash": "ad59aa1bb31e96032071e40b7e0f4ba9"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\pwa\\components\\InstallPrompt.tsx": {
+    "mtime": 1783305524.0294983,
+    "hash": "32d16173b84a9767a9f2e53c3cd7e406"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\baseCrudService.ts": {
+    "mtime": 1784743441.4328609,
+    "hash": "3a6427259106bf410696489a2afb2e4e"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\bookingService.ts": {
+    "mtime": 1784979517.5178843,
+    "hash": "ce5fb87ebf5c25c394038dec9981cd7a"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\checkExtensionConflict.ts": {
+    "mtime": 1784743441.4328609,
+    "hash": "11910a2c8408c46b739ad41bed5adf40"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\dashboardService.ts": {
+    "mtime": 1782974351.7014751,
+    "hash": "f0f0dd9e9bbd0cbce579b027c846bb97"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\guestService.ts": {
+    "mtime": 1784743441.4495378,
+    "hash": "8b2135841c3f36ba674b62b4c4d867c4"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\index.ts": {
+    "mtime": 1778116227.0599144,
+    "hash": "99decf355e298dd1bb2d2ef87b9a020f"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\reservationService.ts": {
+    "mtime": 1785120430.0304193,
+    "hash": "e6bfb4e840379447e4f8e3852945a5d1"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\roomService.ts": {
+    "mtime": 1784743441.4495378,
+    "hash": "d305b1a30e827ff420053387b73a1f73"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\auth\\authService.ts": {
+    "mtime": 1788019552.9316907,
+    "hash": "28fc7dc5e136401dd1bc3aa3ebdac4f2"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\auth\\index.ts": {
+    "mtime": 1778116227.0599144,
+    "hash": "2933cd05ae2c4f8c034475ea0981fcaf"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\auth\\profileLookup.ts": {
+    "mtime": 1779638622.990821,
+    "hash": "488632053e584ad74a60378402cc6d46"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\auth\\roleCache.test.ts": {
+    "mtime": 1788019662.6222165,
+    "hash": "d3b28fb9d8694691e686b065291a397a"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\auth\\roleCache.ts": {
+    "mtime": 1787144427.023869,
+    "hash": "e364edc1f56a2ae8f41c51571cf3f847"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\auth\\roleClaim.test.ts": {
+    "mtime": 1788019698.7954576,
+    "hash": "41b19901a1e0f2f421b0caa43ad0ca3b"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\auth\\roleClaim.ts": {
+    "mtime": 1787144858.4643917,
+    "hash": "cc401dbb2aafd1763baca9c6cb04b305"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\auth\\roleService.ts": {
+    "mtime": 1788019569.884569,
+    "hash": "2e2269f5f02d2cc6d5f23570d51fbf04"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\auth\\serverSession.ts": {
+    "mtime": 1787154922.8493006,
+    "hash": "4a8f0b5e4ee9cd704795aa0adf497967"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\auth\\sessionService.ts": {
+    "mtime": 1788019599.6143167,
+    "hash": "139c53ae03b2304236eff64a1d649696"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\auth\\types.ts": {
+    "mtime": 1788019532.579274,
+    "hash": "81b6d3cad93aff8eb610e481e82be560"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\logs\\actorProfiles.ts": {
+    "mtime": 1778557961.516612,
+    "hash": "d8508359c6819b3037342ba0e612475b"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\logs\\index.ts": {
+    "mtime": 1778116227.0599144,
+    "hash": "7cb2aed8e4b842baea348377867a372c"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\logs\\logAccess.ts": {
+    "mtime": 1778610306.3887255,
+    "hash": "e6de7d9a20d9b265f240bff357da26a7"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\logs\\logAction.ts": {
+    "mtime": 1784743441.4495378,
+    "hash": "f53f8fbe5fe135955c8a6d0311dd1609"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\logs\\logActorNames.ts": {
+    "mtime": 1778610410.822022,
+    "hash": "f69bc169019ffe9324375728a3d608fd"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\logs\\logAnalyticsService.ts": {
+    "mtime": 1784743441.4495378,
+    "hash": "3004adedeaf4c225b4a8a9e1ad0a1b0b"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\logs\\logRows.ts": {
+    "mtime": 1778610411.2043705,
+    "hash": "07f06deedea70c7a5a6d6463c311e920"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\logs\\logSanitizer.ts": {
+    "mtime": 1778437423.9403832,
+    "hash": "3285da05f6b047f4f5e14014d0f07089"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\logs\\logService.ts": {
+    "mtime": 1784743441.4495378,
+    "hash": "9a5e396e178d1e4cb2b911be5ff9a242"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\logs\\logServiceError.ts": {
+    "mtime": 1778610306.5750868,
+    "hash": "a667f0b6c96b4b8507175174b7fcbd10"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\logs\\logTime.ts": {
+    "mtime": 1778609992.9661763,
+    "hash": "5f7b8f534b4bc3f0577b7a23c14d2247"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\logs\\routeErrors.ts": {
+    "mtime": 1778116227.0599144,
+    "hash": "2f297f05b2574e5b5deaeb0e1c53e243"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\supabase\\admin.ts": {
+    "mtime": 1780371376.2284698,
+    "hash": "d7e659e9de337923cd84c5209cdb5fea"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\supabase\\client.ts": {
+    "mtime": 1779166236.4617736,
+    "hash": "76f1b2158aa8cfab69a7ad561533901a"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\supabase\\database.types.ts": {
+    "mtime": 1787410369.2981486,
+    "hash": "da4671926daa1d440cb59c952b2f31e8"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\supabase\\env.ts": {
+    "mtime": 1778557961.5216107,
+    "hash": "cfdf13e375c7df1af254673d3edcf008"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\supabase\\errors.ts": {
+    "mtime": 1779638923.889703,
+    "hash": "cf8829af0269f077327942f0f387aa41"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\supabase\\index.ts": {
+    "mtime": 1778557961.5216107,
+    "hash": "6a4b38bcc2c24dba257bbca689c3eaf4"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\supabase\\proxy.ts": {
+    "mtime": 1778557961.5226102,
+    "hash": "87f1d17ddefa21bbc83d40d46c339fc5"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\supabase\\server.ts": {
+    "mtime": 1779169308.9871814,
+    "hash": "6270236bca177c662777ff36a8f65461"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\supabase\\__mocks__\\admin.ts": {
+    "mtime": 1787495263.5733318,
+    "hash": "4e51e01b5253b2634a9086349c803e96"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\supabase\\__mocks__\\server.ts": {
+    "mtime": 1782734696.1151614,
+    "hash": "bab50c49d6111d13ad579e05fcbef280"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\constants.ts": {
+    "mtime": 1785942407.0528212,
+    "hash": "f28fe4d4ee5cd0ae2d4ebe57c607371b"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\csrf.ts": {
+    "mtime": 1784743441.5495296,
+    "hash": "13a4626961e305ba7633cf81d24fceb1"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\csrfClient.ts": {
+    "mtime": 1784743441.5495296,
+    "hash": "26905099dd90c0a32d05aacdcb0080b5"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\index.ts": {
+    "mtime": 1779634539.754217,
+    "hash": "7fe8cfa3b2fb7a5d25ae3ea8df114eb6"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\rateLimit.ts": {
+    "mtime": 1784743441.5495296,
+    "hash": "2eca123fc34ba52cf74b19776bde9cc9"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\rateLimitStore.ts": {
+    "mtime": 1784743441.5495296,
+    "hash": "9e1b290c1767baa3f27fe414b87ec62a"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\routeAuth.ts": {
+    "mtime": 1786223896.7277858,
+    "hash": "f6f7b1e2e96890f6a523add9c9025e36"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\secureEndpoint.ts": {
+    "mtime": 1784743441.5495296,
+    "hash": "81447cb8e6dfb6d2077475410ac4badb"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\validation.ts": {
+    "mtime": 1788019034.1656458,
+    "hash": "9ff9e48d19e4c66a6aaec51b25e93ed6"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\analytics\\index.ts": {
+    "mtime": 1778116227.0599144,
+    "hash": "0194464fa3bec5271eff514194b57483"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\analytics\\types.ts": {
+    "mtime": 1778116227.0599144,
+    "hash": "ebdfe8f1340775cbda6d265e07570597"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\AnalyticsCard.tsx": {
+    "mtime": 1784743441.4495378,
+    "hash": "90ee0f23dcdda97aa2e0d7b0f6fd380a"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\AnalyticsGrid.tsx": {
+    "mtime": 1784743441.4495378,
+    "hash": "aa5a05ed4b3e152f6d94747432fdc349"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\AOS.tsx": {
+    "mtime": 1784743441.4495378,
+    "hash": "2178fa19c90f0332f3c136aabe70a2a2"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\Card.tsx": {
+    "mtime": 1784743441.4495378,
+    "hash": "3697c62a6f427dd2f5d38d50500605df"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\CsrfBootstrap.tsx": {
+    "mtime": 1784743441.4871354,
+    "hash": "99d8bb26b1c4e668f2b36944ff643cc9"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\DeleteConfirmationDialog.tsx": {
+    "mtime": 1786223896.7277858,
+    "hash": "a24f96c1252c1026043b08480dd6ffa0"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\DropdownSelect.tsx": {
+    "mtime": 1784743441.5161467,
+    "hash": "c76f2cdf7b1168a160247fb61a063f8c"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\EmptyState.tsx": {
+    "mtime": 1784743441.5161467,
+    "hash": "c153366c6a42ae954c09cf04d2abbc80"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\ErrorBoundary.tsx": {
+    "mtime": 1784743441.5161467,
+    "hash": "bb8b8111b76402ab3b3c6232c3f166bd"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\FloatingField.tsx": {
+    "mtime": 1782946512.4900753,
+    "hash": "566e7be2a751febd7c1354cf7e3d081c"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\GlobalLoadingBar.tsx": {
+    "mtime": 1787321447.8296337,
+    "hash": "55896df0e0f3f299b17ccb2216756310"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\Grid.tsx": {
+    "mtime": 1784743441.5161467,
+    "hash": "09134402f4c5209c2482cba1ba217540"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\GridView.tsx": {
+    "mtime": 1784743441.5161467,
+    "hash": "36d84906aa1999a91139cd9c7e313619"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\Loader.tsx": {
+    "mtime": 1784743441.5161467,
+    "hash": "9f22c76d9c5c0a5e2e2622f34924598e"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\Modal.tsx": {
+    "mtime": 1785341702.1345398,
+    "hash": "cd580c55e1691b187e4c042141d4d8e7"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\PageSkeleton.tsx": {
+    "mtime": 1785107466.343772,
+    "hash": "6b7b1327d3d927460d797fada4b875c3"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\Pagination.tsx": {
+    "mtime": 1785336103.4546585,
+    "hash": "9599307e6257591889fdc44e5f33226b"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\RowView.tsx": {
+    "mtime": 1784743441.5328069,
+    "hash": "5512002188007927f83b9cdd9587ebff"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\Skeleton.tsx": {
+    "mtime": 1784743441.5328069,
+    "hash": "e662cb436839e2f617d967e9733850f2"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\SkeletonCard.tsx": {
+    "mtime": 1783130596.281319,
+    "hash": "7cbb5e696e4199dce624ffe2e3d6b70c"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\SkeletonGrid.tsx": {
+    "mtime": 1778116227.1224132,
+    "hash": "d7123a9e52fc5f97c3043ae700d0c383"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\SkeletonTable.tsx": {
+    "mtime": 1784743441.5328069,
+    "hash": "a21f9fc9093110f14f1266433588f9b0"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\StaggerContainer.tsx": {
+    "mtime": 1778116227.1224132,
+    "hash": "099e3657adf0e62f3e7e4e7000583ca9"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\StatusBadge.tsx": {
+    "mtime": 1785336104.9472399,
+    "hash": "01b2916ab56185a6e89966667eb78d31"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\Table.tsx": {
+    "mtime": 1787322228.9575205,
+    "hash": "b54fde9a2846fa879a553289984f47f6"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\TableActionsMenu.tsx": {
+    "mtime": 1784743441.5328069,
+    "hash": "c41c0dda86987aad50d12a7bd5e6491d"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\TableCheckbox.tsx": {
+    "mtime": 1784743441.5328069,
+    "hash": "f01d3ddeb140aa10d04753a3418c032a"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\TableDesktopView.tsx": {
+    "mtime": 1787323430.345965,
+    "hash": "fde7ebbfebb023accfb13fcd0794f6ca"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\TableMobileView.tsx": {
+    "mtime": 1787323460.0486863,
+    "hash": "a23cfa6683cdfc2576d6bdcadab217d0"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\TablePagination.tsx": {
+    "mtime": 1785336100.2446473,
+    "hash": "f8ca54914c4deb8ca7c58accf8bfe066"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\Tag.tsx": {
+    "mtime": 1784743441.5328069,
+    "hash": "926ba8f6af9210e230a701b5babf896b"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\useTableState.ts": {
+    "mtime": 1778611289.4411187,
+    "hash": "7e12bc9a564b2d7ba130e805c33debfc"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\toolbar\\index.tsx": {
+    "mtime": 1778823163.555988,
+    "hash": "d3fdb376261d89515047e4f712555685"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\toolbar\\ToolbarExportGroup.tsx": {
+    "mtime": 1785026953.7005827,
+    "hash": "a7b4828622b5ddaa6450f069c07a678c"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\toolbar\\ToolbarFilterSelect.tsx": {
+    "mtime": 1778822945.3284109,
+    "hash": "5b559221fa068d6a7c81a1fdc5946cca"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\toolbar\\ToolbarSearch.tsx": {
+    "mtime": 1778822944.0916655,
+    "hash": "8bd51652f2ac04042ae767fa8a455174"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\components\\toolbar\\ToolbarViewToggle.tsx": {
+    "mtime": 1784743441.5328069,
+    "hash": "1f0de51f282a9f5c81d73abb9654cf3d"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\contexts\\CurrencyContext.tsx": {
+    "mtime": 1786223896.7277858,
+    "hash": "970fba3b23aa16e9660137a5e3c228a9"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\crud\\index.ts": {
+    "mtime": 1785345531.8047059,
+    "hash": "8f59bbadf418d46fea6d8fcc5aeb2e82"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\currency\\server.ts": {
+    "mtime": 1785976624.832528,
+    "hash": "a5847264326979ed892c27bf3b11b052"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\hooks\\index.ts": {
+    "mtime": 1778116227.1224132,
+    "hash": "359a321a25c07e8dee1bc65c3c4a77c4"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\hooks\\useClickOutside.ts": {
+    "mtime": 1778116227.1224132,
+    "hash": "780301dca646e9c55d9e00a95acbb512"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\hooks\\useDebounce.ts": {
+    "mtime": 1778116227.1224132,
+    "hash": "764e5a7e26a4854218dfcafd0d65936e"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\hooks\\useInitialFetch.ts": {
+    "mtime": 1780448514.016646,
+    "hash": "31c855ac8af96e6396db9dbf3616ffc6"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\hooks\\useLocalStorage.ts": {
+    "mtime": 1778116227.1224132,
+    "hash": "310a5a60f63b41a6d18cda64889137cf"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\hooks\\useStaggerAnimation.ts": {
+    "mtime": 1778116227.1224132,
+    "hash": "c122ad6558fa98fa2cc37745081f7cab"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\hooks\\useTable.ts": {
+    "mtime": 1778116227.1224132,
+    "hash": "ea84b290532aea82d4b0d7a6c73b4579"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\pagination\\cursor.test.ts": {
+    "mtime": 1778435992.4535737,
+    "hash": "9f538047ba70fabb7d185f366cefbbd5"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\pagination\\cursor.ts": {
+    "mtime": 1778435938.324906,
+    "hash": "224668af187b51bef0e70ad71e1fd36f"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\pagination\\types.ts": {
+    "mtime": 1778453743.2047527,
+    "hash": "949cebd69e0f739cddc813a97687ac53"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\rbac\\requireModuleAccess.ts": {
+    "mtime": 1787407934.748405,
+    "hash": "6deb360e20fa8cc5512efe06906a25d6"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\rbac\\useCan.ts": {
+    "mtime": 1787408020.0264208,
+    "hash": "0fbc2ef855925e9581017f7ce2d5e2d1"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\table\\CursorTableFooter.tsx": {
+    "mtime": 1784743441.5495296,
+    "hash": "ac5d92fb477f3f4bc7386f12d5e2472b"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\table\\index.ts": {
+    "mtime": 1778454691.3846445,
+    "hash": "f0dd959c135747938db85002d313adec"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\table\\types.ts": {
+    "mtime": 1787322197.3298323,
+    "hash": "0f3352512dc54cc9bdf9c72035dd2edd"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\toast\\index.tsx": {
+    "mtime": 1779193248.0755978,
+    "hash": "65c4844405808d00e6ba97f306829e34"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\toast\\toastEvents.ts": {
+    "mtime": 1779127148.1740198,
+    "hash": "7a21e91478de4438a9848d89cbf5506d"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\utils\\arabicPdfFonts.generated.ts": {
+    "mtime": 1785124344.5465608,
+    "hash": "e21d8f5f794fbfc1e069a735148e0b44"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\utils\\date.ts": {
+    "mtime": 1784743441.5495296,
+    "hash": "5975f3209640618790fce3bbdc57d71b"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\utils\\index.ts": {
+    "mtime": 1780587262.3730376,
+    "hash": "e6f4b1449c8fd43f0193b95aafd41d1e"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\utils\\invoiceNumber.ts": {
+    "mtime": 1787420417.0339956,
+    "hash": "d9bf0c370afb97d7fc66ee628308e111"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\utils\\pdfMake.test.ts": {
+    "mtime": 1785125433.7305949,
+    "hash": "e0f9cf2fc7aa836bdfd9cc449c0e1b0e"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\utils\\pdfMake.ts": {
+    "mtime": 1787948808.345393,
+    "hash": "3accd0a94dcb531b1cce4dc0ccd3c611"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\utils\\sanitizeError.ts": {
+    "mtime": 1780373305.2550397,
+    "hash": "b209e02da2a38c39f73f2faa25a87d3e"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\utils\\types.ts": {
+    "mtime": 1780453659.4348974,
+    "hash": "f58b82cfd835e8add2ac4e2b2c5f3fdb"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\__tests__\\validation.test.ts": {
+    "mtime": 1787950490.0539124,
+    "hash": "af3324dbc234a1c8b59e6a3c4a0e1f3c"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\store\\authSlice.ts": {
+    "mtime": 1782947923.1860442,
+    "hash": "103c1a46403fb75f2d9f69a8376adced"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\store\\hooks.ts": {
+    "mtime": 1778116227.1224132,
+    "hash": "aadf280975cfa2f509f648add0015aa6"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\store\\index.ts": {
+    "mtime": 1780413770.0879755,
+    "hash": "68719061705742fb17fe725b5f20c9a3"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\store\\provider.tsx": {
+    "mtime": 1778116227.1224132,
+    "hash": "4a1737d1df540ae4f70d0fbb164f8aec"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\store\\slices\\uiSlice.ts": {
+    "mtime": 1786223896.7277858,
+    "hash": "dfe608db5eb63c27df6c6ed774e7cbd1"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\types\\auth.ts": {
+    "mtime": 1778557961.5286107,
+    "hash": "00ed30e4475500c705380b5994a212f2"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\types\\logs.ts": {
+    "mtime": 1784743441.5495296,
+    "hash": "3cc7d57d8d92921c2044c94ce184fe83"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260511222525_initial_app_schema.sql": {
+    "mtime": 1778557961.529611,
+    "hash": "f9e14baef3b0e5dfe3d4f338eaa56713"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260511222709_harden_initial_app_schema.sql": {
+    "mtime": 1778557961.5456116,
+    "hash": "3fb44c19a1123e565cae3ba310546bb1"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260512120000_add_rooms_and_guests.sql": {
+    "mtime": 1778557961.5466096,
+    "hash": "6e0ce14279b715648476427acf1da665"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260514000000_add_contacts_and_price_overrides.sql": {
+    "mtime": 1778717089.1077788,
+    "hash": "bf615e67f1f58f38fd51395347b88175"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260515000000_audit_fixes.sql": {
+    "mtime": 1778818976.387673,
+    "hash": "996027c512d08d9e1ad09e4b350630d8"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260516000000_add_invoices.sql": {
+    "mtime": 1778885742.853862,
+    "hash": "9d6927e1a130665a04436765f9834ccd"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260517000000_add_contact_id_to_bookings.sql": {
+    "mtime": 1778887100.4394336,
+    "hash": "b0821f0df55819a53227fc860cd79ff3"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260518000000_performance_indexes.sql": {
+    "mtime": 1778891617.7385063,
+    "hash": "e0c919e4f57f4a71cda113f5bfa4a8dc"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260520000000_add_room_types_and_pricing.sql": {
+    "mtime": 1779227476.4334574,
+    "hash": "9e7d29ec2627ea31ea6c9898cf50ceb5"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260524000000_add_soft_deletes.sql": {
+    "mtime": 1779634246.604539,
+    "hash": "18cb8f7ea2730ddfc3517960565aed96"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260602000001_add_payment_type_and_payments.sql": {
+    "mtime": 1780413545.2035816,
+    "hash": "8fa83c18a2a29ac15559687887af7abd"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260602000002_add_expense_categories.sql": {
+    "mtime": 1780413545.8203063,
+    "hash": "853cd0cee1e6d20bbacf48ba9a83b9e9"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260602000003_add_expenses.sql": {
+    "mtime": 1780413546.8123975,
+    "hash": "e3d5b6a8d82f35375a0d9a3b373832b7"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260602000004_add_accounting_rls_and_seed.sql": {
+    "mtime": 1780413548.4028218,
+    "hash": "adccdd71afb82be23736970d7e98175a"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260603000001_add_enhanced_accounting.sql": {
+    "mtime": 1780460158.546806,
+    "hash": "8f394020823cc0c82a7fff6905ad4c33"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260603000002_repair_enhanced_accounting_schema.sql": {
+    "mtime": 1780460201.0243955,
+    "hash": "3f7b060e0df7ff3c43ee54f3ee172a0c"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260603000003_add_invoice_payment_method.sql": {
+    "mtime": 1780495949.5454183,
+    "hash": "ae3a8e17df41c07eb1e9a44877eda05b"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260604000001_enhance_invoice_items.sql": {
+    "mtime": 1780501275.7636747,
+    "hash": "2937cf4b409e267e2615088986046192"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260630000001_add_reservation_schema.sql": {
+    "mtime": 1782776094.1363325,
+    "hash": "e67b8d5b596a0594b4e975c03267af38"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260630000002_add_availability_and_hold_rpcs.sql": {
+    "mtime": 1784743441.5495296,
+    "hash": "97202d056ba5b46305e623f6d6f39ccc"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260630000003_add_reservation_id_to_invoices.sql": {
+    "mtime": 1782778123.9599843,
+    "hash": "03323dce3dc3f3a1619c6d400b4f6597"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260630000004_add_dirty_room_status_and_auto_clean.sql": {
+    "mtime": 1782789876.018119,
+    "hash": "64b681bccd8a9eba9a970ffeee58c8f2"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260702000000_add_create_reservation_with_rooms_rpc.sql": {
+    "mtime": 1783123583.8234918,
+    "hash": "1552a0dfe1dc84fa70e68d80d3710805"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260704000000_add_room_status_history_to_rpc.sql": {
+    "mtime": 1783123545.9803085,
+    "hash": "1dc5dd197b045fd240ce06788308ab4d"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260704000001_auto_checkin_reservations.sql": {
+    "mtime": 1783131662.7447639,
+    "hash": "7c9deec412c27b48bd5accd5d75c1a9d"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260704000002_create_reservation_hold_rpc.sql": {
+    "mtime": 1784743441.5495296,
+    "hash": "11d9c30ddb9ca767d2a7e7be4bc3c1c9"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260704000003_add_reservation_guests_delete_policy.sql": {
+    "mtime": 1783148594.1663282,
+    "hash": "afafe3319c1e704403f7381fc8d41e60"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260707000000_set_company_id_on_reservation.sql": {
+    "mtime": 1784743441.5495296,
+    "hash": "fce635f384c40e27d5f9c2a82ea12fd4"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260707000001_fix_reservations_update_rls.sql": {
+    "mtime": 1783386342.9694974,
+    "hash": "126d46a979b0f89abc8e1f0b7f41873c"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260712000001_fix_reservation_holds_columns.sql": {
+    "mtime": 1784743441.5495296,
+    "hash": "7c60747dda5967b5dac910f23356c645"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260712000002_add_profiles_deleted_at.sql": {
+    "mtime": 1784743441.5495296,
+    "hash": "b2a1b12246055bd8629f3d1d36dd31ed"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260712000003_add_reservation_status_check.sql": {
+    "mtime": 1784743441.5495296,
+    "hash": "c51d3e687706a7525df4a2b495ba82c2"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260714000000_add_contact_id_to_reservation_guests.sql": {
+    "mtime": 1784743441.5495296,
+    "hash": "8894eeee86b1bf6435c3f6747d80fa6a"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260714000002_company_override_on_create_reservation.sql": {
+    "mtime": 1784743441.5756185,
+    "hash": "c244b648f2a570beb39b0ce513561759"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260714234922_add_sdt_occupancy_pricing.sql": {
+    "mtime": 1784743441.5766733,
+    "hash": "47152f3bfd8269e0cd730ed75940412a"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260716000001_auto_cancel_missed_checkin.sql": {
+    "mtime": 1784743441.5766733,
+    "hash": "374757b11ab8704307dabc5dc3136f3f"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260726000001_add_expense_categories_name_ar.sql": {
+    "mtime": 1785021437.2449286,
+    "hash": "57dbc3dca6f23adefdc13bc26b27ef46"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260805000001_fix_invoice_audit_and_refunds.sql": {
+    "mtime": 1785936599.0049734,
+    "hash": "2fc131e3ea2efc8ebdc1ae5a9ba8f471"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260806000001_fix_room_availability_standard_pricing.sql": {
+    "mtime": 1786028822.705051,
+    "hash": "1e5e18a4ed89ccce87586cfa1d4af941"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260806000002_add_occupancy_prices_to_room_availability.sql": {
+    "mtime": 1786029575.408748,
+    "hash": "f6c0a8c568daa532568a2b46199f01f5"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260809000001_fix_create_reservation_ignore_deleted_reservations.sql": {
+    "mtime": 1786232312.395333,
+    "hash": "69383427b4518c24c42414650c4579bc"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260819000001_performance_auth_indexes.sql": {
+    "mtime": 1787144614.986606,
+    "hash": "c11897f60b0deabc42bf763505f419fc"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260819000002_fix_create_reservation_room_double_selection.sql": {
+    "mtime": 1787154454.692275,
+    "hash": "288c9326d7f018b78ed75f2babf2bf7d"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260821000000_rename_debit_credit_to_income_outcome.sql": {
+    "mtime": 1787332972.5570283,
+    "hash": "d13409065eec9c164708f0793b455d88"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260821000001_fix_accountant_read_access.sql": {
+    "mtime": 1787314364.5692828,
+    "hash": "9c85fb3968d121e222f4972e36577b95"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260822000001_allow_accountant_write_reservations.sql": {
+    "mtime": 1787411917.4142091,
+    "hash": "9817a48d089749b8ec29c70e804f6fe0"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260822000002_allow_reservation_writers_room_status_updates.sql": {
+    "mtime": 1787412872.2798429,
+    "hash": "f2b5da7bf475465eeee2ff0499d55fd9"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260822000003_fix_payment_ledger_sides.sql": {
+    "mtime": 1787414288.6717944,
+    "hash": "e511147a0c9ccead11a16fdddf4e6959"
+  },
+  "D:\\ai-practise\\hotel-system\\supabase\\migrations\\20260822000004_cash_basis_ledger_cleanup.sql": {
+    "mtime": 1787415367.792016,
+    "hash": "ec4c14f0e4a8fea8cd30c4f73d95d4a9"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\build-vfs.js": {
+    "mtime": 1784743441.5823338,
+    "hash": "74020b3310517dc7603c47ac06349db9"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\fonts\\Roboto.js": {
+    "mtime": 1784743441.732748,
+    "hash": "4d20b149b9f1e56fddf97e74d90bb166"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\base.js": {
+    "mtime": 1784743441.8327868,
+    "hash": "d966935ac9aeedeb32a53864c4cac8b0"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\columnCalculator.js": {
+    "mtime": 1784743441.8327868,
+    "hash": "2e6f47df0bdf1db339f490da07655103"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\DocMeasure.js": {
+    "mtime": 1784743441.814595,
+    "hash": "598bbb8b78023d54b47196bf6be0276c"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\DocPreprocessor.js": {
+    "mtime": 1784743441.8178601,
+    "hash": "009d3f5c11fea3ccaa4611ca980415ed"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\DocumentContext.js": {
+    "mtime": 1784743441.8178601,
+    "hash": "9fe82639d44d4728505dbfe5327e43d6"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\ElementWriter.js": {
+    "mtime": 1784743441.8178601,
+    "hash": "7aa201b45ec8d471bc49dc543ce1f17b"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\index.js": {
+    "mtime": 1784743441.8448281,
+    "hash": "58078aace7d331f57b8f09b9deb8ab11"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\LayoutBuilder.js": {
+    "mtime": 1784743441.8178601,
+    "hash": "8a431c7823f142c44db352675185a088"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\Line.js": {
+    "mtime": 1784743441.8178601,
+    "hash": "af25a4b74eb789f35078ea32a8cba090"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\OutputDocument.js": {
+    "mtime": 1784743441.8178601,
+    "hash": "d27cf29ca8bb59d1d63728bb39abd2f1"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\OutputDocumentServer.js": {
+    "mtime": 1784743441.8178601,
+    "hash": "c4032b535c10e78db421c8d772dc55f4"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\PageElementWriter.js": {
+    "mtime": 1784743441.8178601,
+    "hash": "72c53e0fd8a15dd48bd08e0384b4efe9"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\PageSize.js": {
+    "mtime": 1784743441.8178601,
+    "hash": "2fb39530cfe800ea3cba2afc78fa0174"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\PDFDocument.js": {
+    "mtime": 1784743441.8178601,
+    "hash": "4049944ecaf89be7c513646c48d52662"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\Printer.js": {
+    "mtime": 1784743441.8178601,
+    "hash": "8e33b1b252ef402d2e3a4e962d46e4f9"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\qrEnc.js": {
+    "mtime": 1784743441.8448281,
+    "hash": "6c4cfa9e8016d3fbdc8056d5b1da564e"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\Renderer.js": {
+    "mtime": 1784743441.8178601,
+    "hash": "3528967c47f41b08b608ed57fd9e8a3b"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\standardPageSizes.js": {
+    "mtime": 1784743441.8448281,
+    "hash": "6f3f9d7d0189fa693bd7e50d04964eed"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\StyleContextStack.js": {
+    "mtime": 1784743441.8178601,
+    "hash": "baca321b3d190ca23c42604479051328"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\SVGMeasure.js": {
+    "mtime": 1784743441.8178601,
+    "hash": "ea2e7b6ab99185810264fd8fc522a1a8"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\tableLayouts.js": {
+    "mtime": 1784743441.8448281,
+    "hash": "421381b3df65865bebc2b9c9deab8dd6"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\TableProcessor.js": {
+    "mtime": 1784743441.8178601,
+    "hash": "0c54805c5583c3a486fea0e8617e1d1c"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\TextBreaker.js": {
+    "mtime": 1784743441.8178601,
+    "hash": "f32e000ff68e1fce58a5282980baa5b4"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\TextDecorator.js": {
+    "mtime": 1784743441.8178601,
+    "hash": "722082433f7d6dd6a05458398dcd7416"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\TextInlines.js": {
+    "mtime": 1784743441.8178601,
+    "hash": "ad2cb286957a1a08bf912a59b66eb92e"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\URLResolver.js": {
+    "mtime": 1784743441.8327868,
+    "hash": "31cb35ef745f5b61446422b996405dfd"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\virtual-fs.js": {
+    "mtime": 1784743441.8448281,
+    "hash": "a9daba9d347c814b8743401afe21a09b"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\3rd-party\\svg-to-pdfkit.js": {
+    "mtime": 1784743441.8090832,
+    "hash": "38218c90d7a03f1d559f4cec26d18c49"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\3rd-party\\svg-to-pdfkit\\source.js": {
+    "mtime": 1784743441.814595,
+    "hash": "e304fe22434a12af7d71b78a6dc54aaf"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\browser-extensions\\index.js": {
+    "mtime": 1784743441.8327868,
+    "hash": "3e0aed1ce340805b9d7ccd6f0acaeab3"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\browser-extensions\\OutputDocumentBrowser.js": {
+    "mtime": 1784743441.8327868,
+    "hash": "cf641d6b71ce7af0a79f90c2b1e6452e"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\browser-extensions\\pdfMake.js": {
+    "mtime": 1784743441.8327868,
+    "hash": "03c093fb4b4cae4fa0b49d8107c405d5"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\browser-extensions\\virtual-fs-cjs.js": {
+    "mtime": 1784743441.8327868,
+    "hash": "b295cdda98e9847545ac0aaac319cf40"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\browser-extensions\\fonts\\Roboto.js": {
+    "mtime": 1784743441.8327868,
+    "hash": "d5dd2ad8a8a5563a8e783ae3f7485d46"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\browser-extensions\\standard-fonts\\Courier.js": {
+    "mtime": 1784743441.8327868,
+    "hash": "057158a70aeaa78dc1bf1b5e95558fd4"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\browser-extensions\\standard-fonts\\Helvetica.js": {
+    "mtime": 1784743441.8327868,
+    "hash": "edb795fb246af16ea6ec91c9187b5f20"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\browser-extensions\\standard-fonts\\Symbol.js": {
+    "mtime": 1784743441.8327868,
+    "hash": "81f5c512c6e9592bd479aeb089602e44"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\browser-extensions\\standard-fonts\\Times.js": {
+    "mtime": 1784743441.8327868,
+    "hash": "a255bc2b89a3a1b03a35786a1eb14743"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\browser-extensions\\standard-fonts\\ZapfDingbats.js": {
+    "mtime": 1784743441.8327868,
+    "hash": "03af9ec6f0927fcac8be28fdf52436f9"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\helpers\\node.js": {
+    "mtime": 1784743441.8327868,
+    "hash": "84d094a8b9f1c7487e28de8aab6df781"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\helpers\\tools.js": {
+    "mtime": 1784743441.8443158,
+    "hash": "1ca56c47bd32030d88ffecc9fa70e495"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\js\\helpers\\variableType.js": {
+    "mtime": 1784743441.8448281,
+    "hash": "afe3ce7761b48f01139e75469ea24944"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\base.js": {
+    "mtime": 1784743441.8675172,
+    "hash": "34f45e8b9dcabafafc8f591c49c917cf"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\columnCalculator.js": {
+    "mtime": 1784743441.8675172,
+    "hash": "f3aa18912fcf0c010362b0303338e6c0"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\DocMeasure.js": {
+    "mtime": 1784743441.8513026,
+    "hash": "590e519bab3eee0f7c5c72b5f010119f"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\DocPreprocessor.js": {
+    "mtime": 1784743441.8513026,
+    "hash": "5c4601e08bef643c2579649516e39e9e"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\DocumentContext.js": {
+    "mtime": 1784743441.8513026,
+    "hash": "fc8516600bfc2e17f71755d14d1ef5f9"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\ElementWriter.js": {
+    "mtime": 1784743441.8513026,
+    "hash": "0a6fdcbe3e476f17c058a8892822209d"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\index.js": {
+    "mtime": 1784743441.8854864,
+    "hash": "97f46a9848e376483a0bf805535cba5b"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\LayoutBuilder.js": {
+    "mtime": 1784743441.8513026,
+    "hash": "387779eefc999d31c2f5a67a973fa250"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\Line.js": {
+    "mtime": 1784743441.8513026,
+    "hash": "bcfa167017d4fb2642109e7b68134321"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\OutputDocument.js": {
+    "mtime": 1784743441.8513026,
+    "hash": "b875427338a223cb0b92cf45d658f077"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\OutputDocumentServer.js": {
+    "mtime": 1784743441.8513026,
+    "hash": "89f8baf008cae3a788af571816742e61"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\PageElementWriter.js": {
+    "mtime": 1784743441.8610494,
+    "hash": "b0add80315a664af4fe07d9d58dca0aa"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\PageSize.js": {
+    "mtime": 1784743441.8615618,
+    "hash": "c7b1985ad26073ee9df232fc04c1618e"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\PDFDocument.js": {
+    "mtime": 1784743441.8513026,
+    "hash": "b4bf3cd8c77de364891dc626eacbbbd1"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\Printer.js": {
+    "mtime": 1784743441.8615618,
+    "hash": "c6c32192135edd85ae1afd34587638d9"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\qrEnc.js": {
+    "mtime": 1784743441.8854864,
+    "hash": "a58ebfa105d0c6234d9106b1bb245173"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\Renderer.js": {
+    "mtime": 1784743441.8615618,
+    "hash": "382796e7896001cbbecc23e300f526f5"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\standardPageSizes.js": {
+    "mtime": 1784743441.8854864,
+    "hash": "b0bd17522f1ed809461f7b3d7c4980b5"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\StyleContextStack.js": {
+    "mtime": 1784743441.8615618,
+    "hash": "333e7638ff854ac6d8b5aaa22f2862ca"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\SVGMeasure.js": {
+    "mtime": 1784743441.8615618,
+    "hash": "fee7f22f071b52e4511960d0898a78d6"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\tableLayouts.js": {
+    "mtime": 1784743441.8854864,
+    "hash": "15a2054075f255b71011c2880de59de4"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\TableProcessor.js": {
+    "mtime": 1784743441.8654134,
+    "hash": "51c44d765aa6152089147a7668f8f3e4"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\TextBreaker.js": {
+    "mtime": 1784743441.8654134,
+    "hash": "baf55ef0001eb3aceabb36fabe034aad"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\TextDecorator.js": {
+    "mtime": 1784743441.8675172,
+    "hash": "c3324a8b55ee5563259962f6f304be49"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\TextInlines.js": {
+    "mtime": 1784743441.8675172,
+    "hash": "156275b31306093dd81122e8c07425e1"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\URLResolver.js": {
+    "mtime": 1784743441.8675172,
+    "hash": "ecee613adc0db7e06099545e2017ff33"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\virtual-fs.js": {
+    "mtime": 1784743441.8854864,
+    "hash": "d447c84ca35940edfda5e460ec5f97bf"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\3rd-party\\svg-to-pdfkit.js": {
+    "mtime": 1784743441.8483415,
+    "hash": "7082b4c50937de82b6bf74942fec9138"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\3rd-party\\svg-to-pdfkit\\source.js": {
+    "mtime": 1784743441.8513026,
+    "hash": "e20126468fe38ce07ec11dece6bde0d8"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\browser-extensions\\index.js": {
+    "mtime": 1784743441.8675172,
+    "hash": "833d59b9766bee9e0e94372d3bb5e6f2"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\browser-extensions\\OutputDocumentBrowser.js": {
+    "mtime": 1784743441.8675172,
+    "hash": "b0c97523915cd4c83833d2e76275214a"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\browser-extensions\\pdfMake.js": {
+    "mtime": 1784743441.8675172,
+    "hash": "6669e24791d78151536c08b21bdc9cbf"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\browser-extensions\\virtual-fs-cjs.js": {
+    "mtime": 1784743441.8675172,
+    "hash": "30be7467ea8fa2b5d0a1ef3fbf6114c8"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\browser-extensions\\fonts\\Roboto.js": {
+    "mtime": 1784743441.8675172,
+    "hash": "855ef6995b8fb29feb5552d1c21517e0"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\browser-extensions\\standard-fonts\\Courier.js": {
+    "mtime": 1784743441.8675172,
+    "hash": "86b9968a30a44a65e9ac57d0d3ec20fa"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\browser-extensions\\standard-fonts\\Helvetica.js": {
+    "mtime": 1784743441.8675172,
+    "hash": "ea809e4d8e6abd4a31e3c1b3fcda6906"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\browser-extensions\\standard-fonts\\Symbol.js": {
+    "mtime": 1784743441.8675172,
+    "hash": "815dfb99576ae95527a7be40d37b5cd2"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\browser-extensions\\standard-fonts\\Times.js": {
+    "mtime": 1784743441.8675172,
+    "hash": "70786bea8c6c7944780f64873c0ffb45"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\browser-extensions\\standard-fonts\\ZapfDingbats.js": {
+    "mtime": 1784743441.8675172,
+    "hash": "22e1d18ebd7a53eafef38d09032dbff6"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\helpers\\node.js": {
+    "mtime": 1784743441.8675172,
+    "hash": "12dd4b9bf64a38ec7b51c93cac6c4081"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\helpers\\tools.js": {
+    "mtime": 1784743441.8854864,
+    "hash": "7bcb7b07248c2026dc1ee1c3c5097eb8"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\src\\helpers\\variableType.js": {
+    "mtime": 1784743441.8854864,
+    "hash": "0b258c9167d0918fa81687d28e2bd60b"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\standard-fonts\\Courier.js": {
+    "mtime": 1784743441.8854864,
+    "hash": "f781739276dc99df4cf5bbec19c4c044"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\standard-fonts\\Helvetica.js": {
+    "mtime": 1784743441.8854864,
+    "hash": "6d23abfd1aff574599aa585a188ce844"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\standard-fonts\\Symbol.js": {
+    "mtime": 1784743441.8854864,
+    "hash": "4e7cc1894798cb0d73243b9e7ae982d3"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\standard-fonts\\Times.js": {
+    "mtime": 1784743441.8854864,
+    "hash": "40948ceb7d187fec171dc5a01d953a78"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\standard-fonts\\ZapfDingbats.js": {
+    "mtime": 1784743441.8854864,
+    "hash": "74cdaf08ef0569f6e5fc9d33dc043601"
+  },
+  "D:\\ai-practise\\hotel-system\\AGENTS.md": {
+    "mtime": 1784743438.5909667,
+    "hash": "39486454331c29c3bce9fdf935b641d5"
+  },
+  "D:\\ai-practise\\hotel-system\\CLAUDE.md": {
+    "mtime": 1778116226.5099216,
+    "hash": "771faa62feb60b7de901a397aebb29b0"
+  },
+  "D:\\ai-practise\\hotel-system\\CLAUDE_TRANSLATION.md": {
+    "mtime": 1784743438.5909667,
+    "hash": "f27ca794da0e121ae4c62f6398c5a274"
+  },
+  "D:\\ai-practise\\hotel-system\\contact-page-response.txt": {
+    "mtime": 1779252309.9432492,
+    "hash": "de330a687cec5e870ce9e4dc84473d37"
+  },
+  "D:\\ai-practise\\hotel-system\\dev-output.txt": {
+    "mtime": 1779260153.3771746,
+    "hash": "39b4a6b8d547902a57f28b0a97af7431"
+  },
+  "D:\\ai-practise\\hotel-system\\e2e-issues-summary.md": {
+    "mtime": 1786233155.5816965,
+    "hash": "7947344d53c92e150b636edcf26bd9fc"
+  },
+  "D:\\ai-practise\\hotel-system\\e2e-qa-report.md": {
+    "mtime": 1786233134.6950066,
+    "hash": "3aa3804203f0f5d95502380dbfd55805"
+  },
+  "D:\\ai-practise\\hotel-system\\pnpm-workspace.yaml": {
+    "mtime": 1782747702.1811695,
+    "hash": "30cb628d8fcab84de5d202163cb9d2dd"
+  },
+  "D:\\ai-practise\\hotel-system\\README.md": {
+    "mtime": 1784743438.5909667,
+    "hash": "e30bd815a6d828cddf34ca7d444e7fb2"
+  },
+  "D:\\ai-practise\\hotel-system\\RENAME-REPORT.md": {
+    "mtime": 1787333548.9026346,
+    "hash": "3168f52b6bb9eb2d02a574bf12e8dd57"
+  },
+  "D:\\ai-practise\\hotel-system\\TASK_10_REPORT.md": {
+    "mtime": 1787333995.9581203,
+    "hash": "4c4e90590606ece2e400345ed2810d52"
+  },
+  "D:\\ai-practise\\hotel-system\\TASK_8_REPORT.md": {
+    "mtime": 1787333890.5304394,
+    "hash": "0653629f3fb7151a8605ce5f87d624bf"
+  },
+  "D:\\ai-practise\\hotel-system\\ts-errors.txt": {
+    "mtime": 1779253478.1425166,
+    "hash": "37e59551a43f4cc6901c7f462ddd705e"
+  },
+  "D:\\ai-practise\\hotel-system\\coverage\\index.html": {
+    "mtime": 1782690653.3461363,
+    "hash": "9c4753cc1091d7ec356a97e6694d8551"
+  },
+  "D:\\ai-practise\\hotel-system\\coverage\\reservations\\constants.ts.html": {
+    "mtime": 1782690653.3501558,
+    "hash": "2425c2e1b5ed732d28f335b2eee69624"
+  },
+  "D:\\ai-practise\\hotel-system\\coverage\\reservations\\index.html": {
+    "mtime": 1782690653.3481355,
+    "hash": "b4d5335f50a21dd93e796e54e1a4ebaa"
+  },
+  "D:\\ai-practise\\hotel-system\\coverage\\reservations\\types.ts.html": {
+    "mtime": 1782690653.3531325,
+    "hash": "5b53b13372748a9044aa8c3738dea153"
+  },
+  "D:\\ai-practise\\hotel-system\\coverage\\reservations\\validation.ts.html": {
+    "mtime": 1782690653.3588386,
+    "hash": "c882673dfced4f9e29c287e3a6fa0d12"
+  },
+  "D:\\ai-practise\\hotel-system\\coverage\\reservations\\services\\auditService.ts.html": {
+    "mtime": 1782690653.3588386,
+    "hash": "ff10106e7a48750ba1191c4f07328a0e"
+  },
+  "D:\\ai-practise\\hotel-system\\coverage\\reservations\\services\\availabilityService.ts.html": {
+    "mtime": 1782690653.3588386,
+    "hash": "135e870b95f5e1063b6df777c34c92f3"
+  },
+  "D:\\ai-practise\\hotel-system\\coverage\\reservations\\services\\billing.ts.html": {
+    "mtime": 1782690653.3588386,
+    "hash": "60ba50df1ded3e3388bccc68726fbcca"
+  },
+  "D:\\ai-practise\\hotel-system\\coverage\\reservations\\services\\index.html": {
+    "mtime": 1782690653.3588386,
+    "hash": "6b6637ae559898fa7dce990533c99c79"
+  },
+  "D:\\ai-practise\\hotel-system\\coverage\\reservations\\services\\index.ts.html": {
+    "mtime": 1782690653.3588386,
+    "hash": "cc6e9ab13ebbed64e94c43d64f10e97a"
+  },
+  "D:\\ai-practise\\hotel-system\\coverage\\reservations\\services\\pricingService.ts.html": {
+    "mtime": 1782690653.3588386,
+    "hash": "cea104d67c85628d388d0ca49a0347ac"
+  },
+  "D:\\ai-practise\\hotel-system\\coverage\\reservations\\services\\reservationService.ts.html": {
+    "mtime": 1782690653.3799722,
+    "hash": "2360ff08d63761399f1a4be6e818fc5d"
+  },
+  "D:\\ai-practise\\hotel-system\\coverage\\reservations\\services\\serviceSecurity.ts.html": {
+    "mtime": 1782690653.3809767,
+    "hash": "354f53faf5f43a80149ff839b8653f8c"
+  },
+  "D:\\ai-practise\\hotel-system\\coverage\\reservations\\services\\statusService.ts.html": {
+    "mtime": 1782690653.3819766,
+    "hash": "9922a40d6db33fbab219b4124b2919cc"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\e2e-testing.md": {
+    "mtime": 1780376892.7423754,
+    "hash": "e1705de06a1d617587a220201ae970f7"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\REFACTOR_PLAN.md": {
+    "mtime": 1788022883.5777888,
+    "hash": "818a33d987ff98b28c7144b572ec9def"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\roles-and-permissions.md": {
+    "mtime": 1783357717.711364,
+    "hash": "266e5b29ebf8da05411ce1a91fcd874f"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\SECURITY_AUDIT_ACCOUNTING.md": {
+    "mtime": 1788015367.561555,
+    "hash": "9e83d94ba5615231f60af4c7cb74dc38"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\SECURITY_AUDIT_API_ROUTES.md": {
+    "mtime": 1788017566.1999993,
+    "hash": "088983b10ee98aa9d5f7de23cf8f5ecf"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\SECURITY_AUDIT_AUTH.md": {
+    "mtime": 1788019757.3423445,
+    "hash": "baa0e1299788ba44b637cb975fce39ff"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\SECURITY_AUDIT_BOOKINGS.md": {
+    "mtime": 1788017168.2375987,
+    "hash": "e383c81d8e1eaeeee0c318f61befb723"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\SECURITY_AUDIT_CONSISTENCY.md": {
+    "mtime": 1788021353.0638354,
+    "hash": "ea5d309f39254d9458a98d47a3597835"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\SECURITY_AUDIT_CONTACTS.md": {
+    "mtime": 1788020289.8551435,
+    "hash": "23b4f318dd504e357e97da11ceb0bd5c"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\SECURITY_AUDIT_RESERVATIONS.md": {
+    "mtime": 1788018865.021721,
+    "hash": "94d0052532b9e855ebb1c11b97419c43"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\SECURITY_AUDIT_ROOMS.md": {
+    "mtime": 1788019228.192322,
+    "hash": "93f47bda77c4392815751e9108e61796"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\SECURITY_AUDIT_TEST_COVERAGE.md": {
+    "mtime": 1788020631.7058606,
+    "hash": "88bf1908ca1b648ce80a3ef484315485"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\SECURITY_AUDIT_USERS.md": {
+    "mtime": 1788016887.175192,
+    "hash": "ad00ec42d66bd0f581faec6149d4c177"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\test-data-seed.md": {
+    "mtime": 1780376903.101792,
+    "hash": "efce3b32004d906a122eb712e632369f"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\agents\\agent-review.md": {
+    "mtime": 1778116226.5099216,
+    "hash": "fc49924bbcab6a92158a647d4b584087"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\agents\\audit-report.md": {
+    "mtime": 1778818486.2444532,
+    "hash": "2bb8a055d0ef0247638d872ee287db61"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\agents\\auth-middleware-login.md": {
+    "mtime": 1778116226.5099216,
+    "hash": "0583a38d2d08cf53b0b69d19bbf39109"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\agents\\contacts-performance-plan.md": {
+    "mtime": 1778890705.1356237,
+    "hash": "1e784135ef535264dfb29fdaf02b3b13"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\agents\\contacts-testing-plan.md": {
+    "mtime": 1778888104.2703917,
+    "hash": "1afa1eb079ea9638e2b8019af9ec7534"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\agents\\CONTACTS_MODULE_STEP_BY_STEP_PLAN.md": {
+    "mtime": 1778715125.4948022,
+    "hash": "c5c9d50834f1fc6ae6e14bbb44442174"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\agents\\dashboard-performance.md": {
+    "mtime": 1778819758.6064887,
+    "hash": "4de9d36d720467f28a529e46a77ca221"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\agents\\dummy-data.md": {
+    "mtime": 1778116226.5099216,
+    "hash": "c774328f6d54caa00595465acb62f854"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\agents\\FIREBASE_TO_SUPABASE_CODEX_MASTER_PROMPT.md": {
+    "mtime": 1778557961.3839834,
+    "hash": "4af16e4cac29bbc4a9a97dd408f94840"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\agents\\layout-navigation.md": {
+    "mtime": 1778116226.5099216,
+    "hash": "8697ce2442c8769e5f6bf7079079499f"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\agents\\logs-system.md": {
+    "mtime": 1778116226.5099216,
+    "hash": "84bbb92c8c2ebc642e778071cc94f825"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\agents\\master-review.md": {
+    "mtime": 1778116226.5099216,
+    "hash": "ada2f1a6196ec639418534f2bb22c812"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\agents\\project-structure-rtk.md": {
+    "mtime": 1778116226.5099216,
+    "hash": "f07d5cd2577ee1cf6fc27bf170414891"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\agents\\pwa-mobile.md": {
+    "mtime": 1778116226.5099216,
+    "hash": "d06e52f8b688e7006deea8d0855edc0d"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\agents\\roles-rbac.md": {
+    "mtime": 1778116226.5099216,
+    "hash": "64c8559af0aaafdc0a7317a171c0e6fc"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\agents\\system-restrictions.md": {
+    "mtime": 1778116226.5255487,
+    "hash": "f819dafbd9b822db21360f73ff623bd8"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\agents\\ui-ux-tailwind.md": {
+    "mtime": 1778116226.5255487,
+    "hash": "558ce87a861b9464ffb47547d4891d35"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\agents\\user-details.md": {
+    "mtime": 1778116226.5255487,
+    "hash": "db6baf2be1b2eb3f9f2b61dd91fbfd91"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\agents\\users-module.md": {
+    "mtime": 1778116226.5255487,
+    "hash": "287dac0c7aa8c8f7cb754395f1525a73"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\plans\\accounting-finance-dashboard.md": {
+    "mtime": 1780413308.2740643,
+    "hash": "31d87e25264958521ff5aafdc72cb8e2"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\plans\\reservation_model_supabase_mcp_plan.md": {
+    "mtime": 1782613294.6524482,
+    "hash": "1d53ae77a5a78852f09555c4ace80007"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\superpowers\\plans\\2026-05-19-performance-refactor.md": {
+    "mtime": 1779154831.1122656,
+    "hash": "9b72392a0806786849a35dc0820731f5"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\superpowers\\plans\\2026-05-20-admin-settings-rooms-pricing.md": {
+    "mtime": 1779226651.1352258,
+    "hash": "b56866819e9814aee119c16d9d02a6e5"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\superpowers\\plans\\2026-06-02-security-performance-plan.md": {
+    "mtime": 1780356603.9132345,
+    "hash": "7b462da76b0ac81054c013efe9cd9843"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\superpowers\\plans\\2026-06-03-invoice-wizard.md": {
+    "mtime": 1780514500.578131,
+    "hash": "7452ec08bd804810f4a3cc995cfd2b6d"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\superpowers\\plans\\2026-06-04-invoice-wizard-implementation.md": {
+    "mtime": 1780527983.3997896,
+    "hash": "d94314ac957c69fd27e99941fcabba8c"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\superpowers\\plans\\2026-07-01-room-auto-select.md": {
+    "mtime": 1782872893.7872238,
+    "hash": "388a83276df2e30df5f294246c633738"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\superpowers\\plans\\2026-07-02-extend-booking-conflict-detection.md": {
+    "mtime": 1782961554.6833603,
+    "hash": "6399624cd0f6ca4562b7963b6e9e317b"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\superpowers\\plans\\2026-07-02-reservation-detail-route-implementation.md": {
+    "mtime": 1782977482.656152,
+    "hash": "abf537dec9f107ae36e2c1466c900504"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\superpowers\\plans\\2026-07-05-breezy-theme-implementation.md": {
+    "mtime": 1783277540.698224,
+    "hash": "d21066a5f8ed315810e9816519bca89a"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\superpowers\\plans\\2026-07-07-edit-reservation-page-redesign.md": {
+    "mtime": 1783392877.8807,
+    "hash": "e0be8076c09b993a1b1030aa2704b03b"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\superpowers\\plans\\2026-07-14-company-price-override-reservation-plan.md": {
+    "mtime": 1784044431.0085654,
+    "hash": "80848ea75a2adb4629e538a0352a5e39"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\superpowers\\plans\\2026-07-15-accounting-reports-ux-improvement.md": {
+    "mtime": 1784064520.4986682,
+    "hash": "46e436cc52b21e3863c8efac3b938765"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\superpowers\\plans\\2026-07-16-checkin-validation.md": {
+    "mtime": 1784155406.9818747,
+    "hash": "67a35772019347cdcc559e8eb3b16aee"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\superpowers\\plans\\2026-08-21-rename-debit-credit-to-income-outcome.md": {
+    "mtime": 1787331326.2505305,
+    "hash": "e2a44a0b8d491d02567b7ac165a93485"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\superpowers\\plans\\2026-08-23-reservations-year-view.md": {
+    "mtime": 1787472754.9700673,
+    "hash": "628fd78616ee0e36001250f77740471e"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\superpowers\\plans\\2026-08-23-room-price-override.md": {
+    "mtime": 1787469147.7170866,
+    "hash": "584b4d3eabd8944ce2703a299754c970"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\superpowers\\plans\\2026-08-23-year-view-wall-calendar-rev2.md": {
+    "mtime": 1787506478.8566537,
+    "hash": "3aff9ae107075603a2f53fe9449e4c67"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\superpowers\\plans\\Reservation_Module_Breakdown.md": {
+    "mtime": 1782974368.9209824,
+    "hash": "c244502c5b278ce543f6226353b642d1"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\superpowers\\specs\\2026-05-19-performance-refactor-design.md": {
+    "mtime": 1779154621.623335,
+    "hash": "ec96738e5ca9cf8941b2a19f10eb9185"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\superpowers\\specs\\2026-05-20-admin-settings-rooms-pricing-design.md": {
+    "mtime": 1779226485.3498116,
+    "hash": "e560d778c3483f5217ab7f06044f1bf5"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\superpowers\\specs\\2026-06-03-invoice-wizard-design.md": {
+    "mtime": 1780504325.087426,
+    "hash": "177ee524ba351eb13b5e3a41f116e861"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\superpowers\\specs\\2026-06-29-reservation-ui-modernization-design.md": {
+    "mtime": 1782698989.1005292,
+    "hash": "70d9f894087b35526497128f8254f4f0"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\superpowers\\specs\\2026-07-01-company-block-booking-design.md": {
+    "mtime": 1782873786.1448038,
+    "hash": "5399716b677587a61218cf6df7f33147"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\superpowers\\specs\\2026-07-01-room-auto-select-design.md": {
+    "mtime": 1782872518.4662433,
+    "hash": "a29edbbc59bd3e3bfb0078548a0b405d"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\superpowers\\specs\\2026-07-02-extend-booking-conflict-detection-design.md": {
+    "mtime": 1782961409.6737769,
+    "hash": "92bf27292036f896272143d2e3ad8928"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\superpowers\\specs\\2026-07-02-reservation-detail-route-design.md": {
+    "mtime": 1782977206.134583,
+    "hash": "996f1ef35538627c4798e26154ec9e2d"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\superpowers\\specs\\2026-07-05-breezy-theme-design.md": {
+    "mtime": 1783274355.5210376,
+    "hash": "b20f856b11939c1e8a778740bf5dce49"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\superpowers\\specs\\2026-07-06-bulk-room-creation-design.md": {
+    "mtime": 1783345136.104504,
+    "hash": "cd8cdc84b9c9c6d2c280aa2e8dab01de"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\superpowers\\specs\\2026-07-07-edit-reservation-page-redesign.md": {
+    "mtime": 1783392472.531861,
+    "hash": "a8d53c4fcc4ec1db9f7f3aef1889082b"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\superpowers\\specs\\2026-07-14-company-price-override-reservation-design.md": {
+    "mtime": 1784044337.6604798,
+    "hash": "c2109c76e51020022832926cbfc68fd1"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\superpowers\\specs\\2026-07-15-accounting-reports-ux-improvement-design.md": {
+    "mtime": 1784064430.3449545,
+    "hash": "8ad3216a440228e9e40e0bed878e6eec"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\superpowers\\specs\\2026-07-16-checkin-validation-design.md": {
+    "mtime": 1784155264.4205546,
+    "hash": "7b61417cccf20542c46d3cd0c876dd52"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\superpowers\\specs\\2026-08-23-reservations-year-view-design.md": {
+    "mtime": 1787519413.8932374,
+    "hash": "9fb985e9b5af89215b207352d198a7b2"
+  },
+  "D:\\ai-practise\\hotel-system\\docs\\superpowers\\specs\\2026-08-23-room-price-override-design.md": {
+    "mtime": 1787467772.6339262,
+    "hash": "79472f87ea5b0245cf253c9f0d7bc488"
+  },
+  "D:\\ai-practise\\hotel-system\\playwright-report\\index.html": {
+    "mtime": 1780381772.2138555,
+    "hash": "053a9d193cf6b25cd1a8e84844a334cd"
+  },
+  "D:\\ai-practise\\hotel-system\\public\\fonts\\NotoSansArabic-OFL.txt": {
+    "mtime": 1784743438.6500018,
+    "hash": "f319a2b8bcf8e25835957d7835f177b0"
+  },
+  "D:\\ai-practise\\hotel-system\\reports\\e2e-report.md": {
+    "mtime": 1780381493.6808865,
+    "hash": "b76d300cdf4537abbc4e57313bb81139"
+  },
+  "D:\\ai-practise\\hotel-system\\reports\\task-2-regenerate-types.md": {
+    "mtime": 1787333193.0887973,
+    "hash": "ca3ff9f71a33e03f4288297695c2aa24"
+  },
+  "D:\\ai-practise\\hotel-system\\scripts\\migrate-firebase-to-supabase\\README.md": {
+    "mtime": 1778557961.4362123,
+    "hash": "b35b1581efe0583ee87bab29a95122d0"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\hotel_reservation_agent_scenarios.md": {
+    "mtime": 1782775601.1091275,
+    "hash": "336137a6c589c0916834804465edeaa0"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\001-reservation-data-model\\data-model.md": {
+    "mtime": 1782743122.8411515,
+    "hash": "72f6522d1e4c12a1916bfed3566248a5"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\001-reservation-data-model\\plan.md": {
+    "mtime": 1782743122.8411515,
+    "hash": "60be4f1cf91538a89703708d6d50e092"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\001-reservation-data-model\\quickstart.md": {
+    "mtime": 1782743122.8411515,
+    "hash": "0871e0e321a0bbebd8c2568a989e4670"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\001-reservation-data-model\\research.md": {
+    "mtime": 1782743122.8506725,
+    "hash": "dbc2327885fb9c98e786d3b510dce92e"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\001-reservation-data-model\\spec.md": {
+    "mtime": 1782743122.8746681,
+    "hash": "bc2d2019bbe40eb48cd5ebca545f0a31"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\001-reservation-data-model\\tasks.md": {
+    "mtime": 1782743122.9200659,
+    "hash": "2615073f8cdfd322c3814e53f9d80f47"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\001-reservation-data-model\\checklists\\requirements.md": {
+    "mtime": 1782743122.7685676,
+    "hash": "14145c9467ad8e42b7c5d811d86966a7"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\001-reservation-data-model\\contracts\\availability.md": {
+    "mtime": 1782743122.7685676,
+    "hash": "004150feb129df09fabf9359abb333e7"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\001-reservation-data-model\\contracts\\cancel.md": {
+    "mtime": 1782743122.7685676,
+    "hash": "ff647f077871162689535079d07e9a3a"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\001-reservation-data-model\\contracts\\check-in.md": {
+    "mtime": 1782743122.7685676,
+    "hash": "499aedb92693fb12c2d0cd5117d531d4"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\001-reservation-data-model\\contracts\\check-out.md": {
+    "mtime": 1782743122.7685676,
+    "hash": "f88fee14b2917301d37735356425e126"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\001-reservation-data-model\\contracts\\confirm.md": {
+    "mtime": 1782743122.7862895,
+    "hash": "3433f915bd3006e1df2acf7b6d4ec2f6"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\001-reservation-data-model\\contracts\\history.md": {
+    "mtime": 1782743122.7862895,
+    "hash": "c7efd9e75fbf73b6ea33bb8dd9e87e90"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\001-reservation-data-model\\contracts\\holds.md": {
+    "mtime": 1782743122.7893152,
+    "hash": "b0f30262c0fbfe8c6a51856b79e7d9b3"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\001-reservation-data-model\\contracts\\index.md": {
+    "mtime": 1782743122.819389,
+    "hash": "57216082fba88a120075f9471d36cec9"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\001-reservation-data-model\\contracts\\notes.md": {
+    "mtime": 1782743122.819389,
+    "hash": "fab29986a2f304a2c66c7ecc475adf47"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\001-reservation-data-model\\contracts\\payments.md": {
+    "mtime": 1782743122.820389,
+    "hash": "a997d5f2ec17729559a5106692c33968"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\001-reservation-data-model\\contracts\\pricing-override.md": {
+    "mtime": 1782743122.8213913,
+    "hash": "983b13a7b7ce0ee63ad5d6a939641e57"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\001-reservation-data-model\\contracts\\reservations.md": {
+    "mtime": 1782743122.8283906,
+    "hash": "e1ae5d20bd106fae484d56a5fcb83a5f"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\002-reservation-rules-workflow\\data-model.md": {
+    "mtime": 1782743123.087971,
+    "hash": "bab951c748b40cb2965011ff0751d241"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\002-reservation-rules-workflow\\plan.md": {
+    "mtime": 1782743123.1030047,
+    "hash": "15c7a5da766c00a1604da2fb80b807ec"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\002-reservation-rules-workflow\\quickstart.md": {
+    "mtime": 1782743123.1045454,
+    "hash": "1f6b4f5b5f2fa7e5e4f1bc4f09e348ba"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\002-reservation-rules-workflow\\research.md": {
+    "mtime": 1782743123.112889,
+    "hash": "bafaf85870fe5366bd39988493c8c9c0"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\002-reservation-rules-workflow\\spec.md": {
+    "mtime": 1782743123.1505926,
+    "hash": "f550c752c9e192fb016c0c9b3ad1c88e"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\002-reservation-rules-workflow\\tasks.md": {
+    "mtime": 1782743123.1700163,
+    "hash": "281df2b6536c8ea10efb3cb44d5b2002"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\002-reservation-rules-workflow\\checklists\\requirements.md": {
+    "mtime": 1782743122.9702673,
+    "hash": "02c255211bb0e21ca17cdc2194c33c79"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\002-reservation-rules-workflow\\contracts\\audit-events.md": {
+    "mtime": 1782743122.9889116,
+    "hash": "51aab73fa6d6e750b353f1c884b239ee"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\002-reservation-rules-workflow\\contracts\\mcp-inspection.md": {
+    "mtime": 1782743123.0563183,
+    "hash": "b575f45a53a5a343b8115a972dd914f0"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\002-reservation-rules-workflow\\contracts\\permissions.md": {
+    "mtime": 1782743123.069946,
+    "hash": "7ea9a0ffa12a55a3c6f23ecd7aaa39fa"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\003-code-database-audit\\data-model.md": {
+    "mtime": 1782743123.2193458,
+    "hash": "d2fef5f475397d96f6310dd2586bc54a"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\003-code-database-audit\\plan.md": {
+    "mtime": 1782743123.3713467,
+    "hash": "066ad2e2e5dde8f21c1244e30a89ffa4"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\003-code-database-audit\\quickstart.md": {
+    "mtime": 1782743123.3841765,
+    "hash": "93d1426cca83df42e51e75fcba24c494"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\003-code-database-audit\\research.md": {
+    "mtime": 1782743123.4384804,
+    "hash": "3f867b440b74809e6a471e95bb038132"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\003-code-database-audit\\spec.md": {
+    "mtime": 1782743123.4534845,
+    "hash": "a6e51c6686f235c75ff5cdfbd8eb0410"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\003-code-database-audit\\tasks.md": {
+    "mtime": 1782743123.519579,
+    "hash": "e2f2466eec1c37ebfcc12f066769a097"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\003-code-database-audit\\checklists\\requirements.md": {
+    "mtime": 1782743123.198326,
+    "hash": "d12d663ba8c96ce3987f3b572c9cab81"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\003-code-database-audit\\contracts\\code-inventory-format.md": {
+    "mtime": 1782743123.1993608,
+    "hash": "bec5ba0576eebdab8462e9134b5dfad0"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\003-code-database-audit\\contracts\\db-findings-format.md": {
+    "mtime": 1782743123.2003717,
+    "hash": "5fcc507bb751c0f0357fedd53afc74ff"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\003-code-database-audit\\contracts\\reuse-extend-decision-format.md": {
+    "mtime": 1782743123.2013628,
+    "hash": "3511d38e1d0fb2c4e4bd5f7723af2825"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\003-code-database-audit\\findings\\code-inventory.md": {
+    "mtime": 1782743123.2618933,
+    "hash": "ebe7857258a737d8862d5a4074c2cf23"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\003-code-database-audit\\findings\\database-findings.md": {
+    "mtime": 1782743123.2864344,
+    "hash": "db0e23b2a3ed2dec572707ebbf73b3a9"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\003-code-database-audit\\findings\\migration-impact-list.md": {
+    "mtime": 1782743123.302055,
+    "hash": "9d06eaf35ce54a5007fc711c69beece9"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\003-code-database-audit\\findings\\reuse-extend-decisions.md": {
+    "mtime": 1782743123.3339455,
+    "hash": "87a32ed6e049b37cf4a5987838f17498"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\003-code-database-audit\\findings\\risk-assessment.md": {
+    "mtime": 1782743123.3560152,
+    "hash": "ffd5bd3b5b8fd7f98d4c92e2fe349866"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\004-supabase-schema-design\\data-model.md": {
+    "mtime": 1782743123.6683211,
+    "hash": "fd8675c59548c62d8a400337a143da55"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\004-supabase-schema-design\\plan.md": {
+    "mtime": 1782743123.6719582,
+    "hash": "b086d19848a85bf247f5d6b6300a9242"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\004-supabase-schema-design\\quickstart.md": {
+    "mtime": 1782743123.6872323,
+    "hash": "fedf9ec24a0a958d8acc4f322fb30165"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\004-supabase-schema-design\\research.md": {
+    "mtime": 1782743123.6906705,
+    "hash": "b0afb4919edb26275518dcfbd2bfedab"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\004-supabase-schema-design\\spec.md": {
+    "mtime": 1782743123.7135525,
+    "hash": "bfa068df4cd1918fef1482e36d03be83"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\004-supabase-schema-design\\tasks.md": {
+    "mtime": 1782743123.7544906,
+    "hash": "62e61eac4fbe4f83e869e6c3ce083101"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\004-supabase-schema-design\\checklists\\requirements.md": {
+    "mtime": 1782743123.5413115,
+    "hash": "8186c5c2fdc4ea22ebd34f3e5e246fb7"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\004-supabase-schema-design\\contracts\\migration-conventions.md": {
+    "mtime": 1782743123.552486,
+    "hash": "3c3b5c8960030a9036d63ab3fd71df6d"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\004-supabase-schema-design\\verification\\validation-report.md": {
+    "mtime": 1782743123.8497944,
+    "hash": "9db669403df8b1a173fecf80aebeb855"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\005-indexes-and-performance\\data-model.md": {
+    "mtime": 1782743123.9352422,
+    "hash": "fb1ebedf4800d38784d373e054a76f97"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\005-indexes-and-performance\\plan.md": {
+    "mtime": 1782743123.9412882,
+    "hash": "94320f3f768424d0eb6423f8ea768dc5"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\005-indexes-and-performance\\quickstart.md": {
+    "mtime": 1782743123.9508858,
+    "hash": "3f8b3813e372e2355662995bb1b764f1"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\005-indexes-and-performance\\research.md": {
+    "mtime": 1782743123.9749973,
+    "hash": "293e84a23d5bb8d491e196e23e170e33"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\005-indexes-and-performance\\spec.md": {
+    "mtime": 1782743124.0079775,
+    "hash": "73c52ecf581715def0edb806fe6c3641"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\005-indexes-and-performance\\tasks.md": {
+    "mtime": 1782743124.1728895,
+    "hash": "13ebdeaa36a0a3dcb2e71cf58d17a0b7"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\005-indexes-and-performance\\checklists\\requirements.md": {
+    "mtime": 1782743123.8714602,
+    "hash": "2429d8e426880a8b05e1ba3435c22083"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\005-indexes-and-performance\\contracts\\index-conventions.md": {
+    "mtime": 1782743123.9053247,
+    "hash": "5beeb31ee7981023b5a17018f4a66c48"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\006-rls-and-security\\data-model.md": {
+    "mtime": 1782743124.353663,
+    "hash": "c40d3b4cb7cb9f969566626ec4d7c9d2"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\006-rls-and-security\\plan.md": {
+    "mtime": 1782743124.4244938,
+    "hash": "79c79ef92b036854cf9fe7d03d2562ea"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\006-rls-and-security\\quickstart.md": {
+    "mtime": 1782743124.4244938,
+    "hash": "2bc8ce6ac6249dd74cd88c9727a2f1df"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\006-rls-and-security\\research.md": {
+    "mtime": 1782743124.473106,
+    "hash": "137e16687a7c04d83fc4d889084cafd5"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\006-rls-and-security\\spec.md": {
+    "mtime": 1782743124.5422447,
+    "hash": "a866d488b259dbb729ec3ec3398f9245"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\006-rls-and-security\\tasks.md": {
+    "mtime": 1782743124.6014352,
+    "hash": "3479ae906382107db2928b9b9b88b362"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\006-rls-and-security\\checklists\\requirements.md": {
+    "mtime": 1782743124.2356038,
+    "hash": "c267d3b6238f7e092c5e8d50bdd2d582"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\006-rls-and-security\\contracts\\audit-logging.md": {
+    "mtime": 1782743124.2518885,
+    "hash": "e965cc3b8f94a657ecd6bc860b9b9e49"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\006-rls-and-security\\contracts\\helper-functions.md": {
+    "mtime": 1782743124.284641,
+    "hash": "8b5619ae479102355d80370270a4de64"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\006-rls-and-security\\contracts\\rls-policy-matrix.md": {
+    "mtime": 1782743124.326182,
+    "hash": "3fe6eee7aadaed02379477a8c6e7ea54"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\007-availability-service\\data-model.md": {
+    "mtime": 1782743124.701363,
+    "hash": "2e14197661afd28753827a824bbd6989"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\007-availability-service\\plan.md": {
+    "mtime": 1782743124.701363,
+    "hash": "f2febecd49946ea584dabc4a27fb78a1"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\007-availability-service\\quickstart.md": {
+    "mtime": 1782743124.7178383,
+    "hash": "671f448c1a29afcb7f4dcc767623a6c6"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\007-availability-service\\research.md": {
+    "mtime": 1782743124.76971,
+    "hash": "c4b4de247903826acf5bebbaaa7bc428"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\007-availability-service\\spec.md": {
+    "mtime": 1782743124.7976534,
+    "hash": "3d18ef27b4bdd3ab679e28b2e5dc17e4"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\007-availability-service\\tasks.md": {
+    "mtime": 1782743124.8755567,
+    "hash": "ed090515da24b6110f601c6c88eb6bb2"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\007-availability-service\\checklists\\requirements.md": {
+    "mtime": 1782743124.6728234,
+    "hash": "257de2fc63c3b34d96043dbb99dc7dc0"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\007-availability-service\\contracts\\rpc-contract.md": {
+    "mtime": 1782743124.6859205,
+    "hash": "f0114a1cb97d5bc1096f67b9b1a9d733"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\008-reservation-creation-flow\\data-model.md": {
+    "mtime": 1782743125.1169722,
+    "hash": "2578f6d8f980a471f5bb12fb8872d112"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\008-reservation-creation-flow\\plan.md": {
+    "mtime": 1782743125.1523266,
+    "hash": "31710f32a686beee216223eddfd4c07d"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\008-reservation-creation-flow\\quickstart.md": {
+    "mtime": 1782743125.2048674,
+    "hash": "3ca99ea38e8106434354670ad9f2bee2"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\008-reservation-creation-flow\\research.md": {
+    "mtime": 1782743125.2173476,
+    "hash": "c2820abeb7d0f9e993279bcdd7c750e2"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\008-reservation-creation-flow\\spec.md": {
+    "mtime": 1782743125.2842133,
+    "hash": "36e985647c66e51e7f6aac37c4cf1123"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\008-reservation-creation-flow\\tasks.md": {
+    "mtime": 1782743125.351802,
+    "hash": "6a5b6018bfc506392b2fff5db9af312f"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\008-reservation-creation-flow\\checklists\\requirements.md": {
+    "mtime": 1782743125.0401244,
+    "hash": "98b5344a61b30180d13cee34affa7980"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\008-reservation-creation-flow\\contracts\\rpc-contracts.md": {
+    "mtime": 1782743125.089794,
+    "hash": "7e774a21a02991bda95710e9c9d12982"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\009-pricing-company-billing\\data-model.md": {
+    "mtime": 1782743125.5248113,
+    "hash": "177c83f158c2644ea7d5723638288c49"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\009-pricing-company-billing\\plan.md": {
+    "mtime": 1782743125.5412805,
+    "hash": "87e70f838517427fab69de2d36fe8ba1"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\009-pricing-company-billing\\quickstart.md": {
+    "mtime": 1782743125.568494,
+    "hash": "5d7386a9f7815b8dd68660b2af784eaa"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\009-pricing-company-billing\\research.md": {
+    "mtime": 1782743125.6422975,
+    "hash": "1eb3259d84dc7a5bb4fbd5bae6f40b42"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\009-pricing-company-billing\\spec.md": {
+    "mtime": 1782743125.6582594,
+    "hash": "301f18545a55ca6b522d7e4d5c16c596"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\009-pricing-company-billing\\tasks.md": {
+    "mtime": 1782743125.7236295,
+    "hash": "d60ad54d28c831e009623b98398a6210"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\009-pricing-company-billing\\checklists\\requirements.md": {
+    "mtime": 1782743125.374505,
+    "hash": "6758ae5ecc24fb11f92e34dfd1f81e24"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\009-pricing-company-billing\\contracts\\rpc-contracts.md": {
+    "mtime": 1782743125.512784,
+    "hash": "89e308a48752e57b72b2ece18260d537"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\010-payments-and-balance\\data-model.md": {
+    "mtime": 1782743125.764004,
+    "hash": "a88cbb3a87c3b0d3a44be10d45dcc5b5"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\010-payments-and-balance\\plan.md": {
+    "mtime": 1782743125.8678498,
+    "hash": "0a63b199ecdb2073ad2d10b9b2998c03"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\010-payments-and-balance\\quickstart.md": {
+    "mtime": 1782743125.8678498,
+    "hash": "8bdd33493649855c987a045b933c5d21"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\010-payments-and-balance\\research.md": {
+    "mtime": 1782743125.9032488,
+    "hash": "592b12b8270d6ac24a19aa97c9d4eff2"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\010-payments-and-balance\\spec.md": {
+    "mtime": 1782743125.9185822,
+    "hash": "a8fdd87e07dde1d2d5d3d8133e40ebd0"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\010-payments-and-balance\\tasks.md": {
+    "mtime": 1782743125.9656377,
+    "hash": "44f0b8120087729a147da50a21835540"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\010-payments-and-balance\\checklists\\requirements.md": {
+    "mtime": 1782743125.7256565,
+    "hash": "fc5e0608c95813d33897b1d20209f3cf"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\010-payments-and-balance\\contracts\\rpc-contracts.md": {
+    "mtime": 1782743125.7571504,
+    "hash": "820f8c92cfb0a3010c46c4a73f5b3acf"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\011-reservation-lifecycle-audit\\data-model.md": {
+    "mtime": 1782743126.0756085,
+    "hash": "cb141670552c75476f0f683431d34f70"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\011-reservation-lifecycle-audit\\plan.md": {
+    "mtime": 1782743126.0829763,
+    "hash": "7617f8ffa23aa4769a65a0987fc261ec"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\011-reservation-lifecycle-audit\\quickstart.md": {
+    "mtime": 1782743126.1164157,
+    "hash": "1a414a4378ed3c33b68bd7e901aa9556"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\011-reservation-lifecycle-audit\\research.md": {
+    "mtime": 1782743126.1224232,
+    "hash": "2ef7f0582706024672dc11ee8046a720"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\011-reservation-lifecycle-audit\\spec.md": {
+    "mtime": 1782743126.136686,
+    "hash": "b59277afe1c45e4dfb542c879c295eb3"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\011-reservation-lifecycle-audit\\tasks.md": {
+    "mtime": 1782743126.1524303,
+    "hash": "334e54ecccc381f3d2f406c352696dc0"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\011-reservation-lifecycle-audit\\checklists\\requirements.md": {
+    "mtime": 1782743125.9676366,
+    "hash": "03ebb188b71cb468071e71f60cc3490b"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\011-reservation-lifecycle-audit\\contracts\\extend.md": {
+    "mtime": 1782743125.9766624,
+    "hash": "af9f8e7893cab6aa5f0476d6e8f03b44"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\011-reservation-lifecycle-audit\\contracts\\no-show.md": {
+    "mtime": 1782743125.998626,
+    "hash": "e6534ed2b36684099d5f20fa11b457a6"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\011-reservation-lifecycle-audit\\contracts\\README.md": {
+    "mtime": 1782743125.9686384,
+    "hash": "06ec78ae48e55b8ae87425183fe6e53d"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\011-reservation-lifecycle-audit\\contracts\\room-change.md": {
+    "mtime": 1782743126.0536053,
+    "hash": "da6f9d9e73de46e1794994d8a7856c7b"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\012-api-routes-models-validation\\data-model.md": {
+    "mtime": 1782743126.271791,
+    "hash": "54813126a18d4fbb4f38c6b590b33d66"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\012-api-routes-models-validation\\plan.md": {
+    "mtime": 1782743126.2797892,
+    "hash": "e9012a2c61e20af476c701a279640388"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\012-api-routes-models-validation\\quickstart.md": {
+    "mtime": 1782743126.2829332,
+    "hash": "a660c0a16a54064a1f5a746b0c5871cf"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\012-api-routes-models-validation\\research.md": {
+    "mtime": 1782743126.3202605,
+    "hash": "8e9147dc144e284c82ee1ed9da9417c4"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\012-api-routes-models-validation\\spec.md": {
+    "mtime": 1782743126.3292572,
+    "hash": "431b25288516c1928859087504044675"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\012-api-routes-models-validation\\tasks.md": {
+    "mtime": 1782743126.356402,
+    "hash": "4f3a98f072503ecb8a9ee7593a297b2e"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\012-api-routes-models-validation\\checklists\\requirements.md": {
+    "mtime": 1782743126.1827283,
+    "hash": "edc1e05824f949f183d9f40be690250a"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\012-api-routes-models-validation\\contracts\\api-contracts.md": {
+    "mtime": 1782743126.204335,
+    "hash": "2c522946d9238bbdd33c09be75eb5ecb"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\013-testing-plans\\data-model.md": {
+    "mtime": 1782743126.410832,
+    "hash": "9cd55a67fb2c38f735de42a29d8ae9b6"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\013-testing-plans\\plan.md": {
+    "mtime": 1782743126.422354,
+    "hash": "f1ff4bc9c5244a36bad1c36b912327b2"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\013-testing-plans\\quickstart.md": {
+    "mtime": 1782743126.4344826,
+    "hash": "4d795fe995dce73cad817307ce02612f"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\013-testing-plans\\research.md": {
+    "mtime": 1782743126.45467,
+    "hash": "3c3b525a2e310c7e91a98def82a82668"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\013-testing-plans\\spec.md": {
+    "mtime": 1782743126.4728808,
+    "hash": "9aeec8f393bc9700c8a4bfda32fff84c"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\013-testing-plans\\tasks.md": {
+    "mtime": 1782743126.5380652,
+    "hash": "792f31120f78cbe22452d49ddf76a405"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\013-testing-plans\\checklists\\requirements.md": {
+    "mtime": 1782743126.3675473,
+    "hash": "a913813686712d1c39a0be24ac00b524"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\013-testing-plans\\contracts\\endpoint-coverage.md": {
+    "mtime": 1782743126.3675473,
+    "hash": "d1f469e1fd3e1d2a234c513e23c1ef71"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\014-migration-rollout-plans\\data-model.md": {
+    "mtime": 1782743126.5848148,
+    "hash": "725fb9857fb3c7e60c3c9ff709d25dfd"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\014-migration-rollout-plans\\plan.md": {
+    "mtime": 1782743126.598817,
+    "hash": "aaa64c9e74290f0b1d0e5ca81c9905b7"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\014-migration-rollout-plans\\quickstart.md": {
+    "mtime": 1782743126.6557796,
+    "hash": "43bbdcabff3fbd48a4580614365690f9"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\014-migration-rollout-plans\\research.md": {
+    "mtime": 1782743126.6879556,
+    "hash": "bc666d1fdfb490c516460805d77226e9"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\014-migration-rollout-plans\\spec.md": {
+    "mtime": 1782743126.7062185,
+    "hash": "fcf7754f728be544717ccebc781d84dd"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\014-migration-rollout-plans\\tasks.md": {
+    "mtime": 1782743126.7733266,
+    "hash": "9fd7783cf5e60f25446b9019f46c0ac3"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\014-migration-rollout-plans\\checklists\\requirements.md": {
+    "mtime": 1782743126.5450974,
+    "hash": "1805afa4833c9582de5846fac2a5585c"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\014-migration-rollout-plans\\contracts\\hold-expiry-rpc.md": {
+    "mtime": 1782743126.5494947,
+    "hash": "0c16facbc8ecbb8baaab774e70206666"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\014-migration-rollout-plans\\contracts\\verification-script.md": {
+    "mtime": 1782743126.5715535,
+    "hash": "d5f04a057e941b19b5393b5abede0bd4"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\015-mcp-verification-queries\\data-model.md": {
+    "mtime": 1782743126.8160238,
+    "hash": "660d20ef6d3cf7f758fbb92f55caf31c"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\015-mcp-verification-queries\\plan.md": {
+    "mtime": 1782743126.8503048,
+    "hash": "d48317084f4a4d8aafc2a011914ed86b"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\015-mcp-verification-queries\\quickstart.md": {
+    "mtime": 1782743126.8653052,
+    "hash": "8b7a019227cff5774ac90a448510a9a8"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\015-mcp-verification-queries\\research.md": {
+    "mtime": 1782743126.8956528,
+    "hash": "c33c90157a3d9757e069fdb8d7528bd3"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\015-mcp-verification-queries\\spec.md": {
+    "mtime": 1782743126.9026425,
+    "hash": "a1c41db28d6ca45776d3c32e287b9130"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\015-mcp-verification-queries\\tasks.md": {
+    "mtime": 1782743126.9329355,
+    "hash": "391d18bcfc119d73ea6df4dd2f5a805d"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\015-mcp-verification-queries\\checklists\\requirements.md": {
+    "mtime": 1782743126.8057024,
+    "hash": "1e3036f5bd0a197c86bd4b6ad24d8d60"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\016-room-details-modal\\data-model.md": {
+    "mtime": 1782743127.0102732,
+    "hash": "66a1c02240513200311f9579edb489be"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\016-room-details-modal\\plan.md": {
+    "mtime": 1782743127.0331166,
+    "hash": "9a73592e359cdc1cad776d853663555b"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\016-room-details-modal\\quickstart.md": {
+    "mtime": 1782743127.0401154,
+    "hash": "97e8b72601e3036435e3ed9235db461a"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\016-room-details-modal\\research.md": {
+    "mtime": 1782743127.0658946,
+    "hash": "3febb14e167ec5f1b6647ea52b256c69"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\016-room-details-modal\\spec.md": {
+    "mtime": 1782743127.1032593,
+    "hash": "9c7ad6c410fab5a691e08c394bbea30c"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\016-room-details-modal\\tasks.md": {
+    "mtime": 1782743127.1209314,
+    "hash": "60d6f1f0c67f3834905d23f7561cbf08"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\016-room-details-modal\\checklists\\acceptance.md": {
+    "mtime": 1782743126.9511802,
+    "hash": "802a8f4cdb137b7df9951384823ef3a2"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\016-room-details-modal\\checklists\\requirements.md": {
+    "mtime": 1782743126.9744189,
+    "hash": "3fd14da8be0a99b7193624d4d8e99e6c"
+  },
+  "D:\\ai-practise\\hotel-system\\specs\\016-room-details-modal\\contracts\\api-contract.md": {
+    "mtime": 1782743126.9853303,
+    "hash": "01c415aaf55efcd0f2a78da621b7b11b"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\[locale]\\(auth)\\README.md": {
+    "mtime": 1778116226.7261827,
+    "hash": "1b7e344b82eadd56efd6be8a55c2d7bd"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\[locale]\\(dashboard)\\README.md": {
+    "mtime": 1778116226.7261827,
+    "hash": "e31d7fd101db25ee99b940b735db82be"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\config\\RBAC.md": {
+    "mtime": 1778116226.8411677,
+    "hash": "7b62d0de756f5d4ddcd009e0ab3b3b4f"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\data\\README.md": {
+    "mtime": 1778116226.8411677,
+    "hash": "eb97a9dc638a2c335070d6a98e59979c"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\hooks\\README.md": {
+    "mtime": 1778116226.8411677,
+    "hash": "f574ac7b054c605dfa15f794c041ac29"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\README.md": {
+    "mtime": 1778116226.856792,
+    "hash": "41e3050a7e763a8119cd89832ddf2e2b"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\components\\README.md": {
+    "mtime": 1778116226.91929,
+    "hash": "6479417df7fa54797dad9cf0a5e96588"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\services\\README.md": {
+    "mtime": 1778116226.91929,
+    "hash": "b816cc52d1ae7a2dd14d7bdad649dfe4"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\bookings\\store\\README.md": {
+    "mtime": 1778116226.91929,
+    "hash": "00a69dd7dc8b6d75c129dc1741cc6f80"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\dashboard\\components\\README.md": {
+    "mtime": 1778116226.9349184,
+    "hash": "3cd15a9a39b3d9ab2661d79642c1e89d"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\dashboard\\services\\README.md": {
+    "mtime": 1778116226.9349184,
+    "hash": "7b7289fb839dd7a9bc8adc0b1804b120"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\dashboard\\store\\README.md": {
+    "mtime": 1778116226.950541,
+    "hash": "627c87319dfe869a0af93f3998c31d0a"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\guests\\components\\README.md": {
+    "mtime": 1778116226.950541,
+    "hash": "450ecc13ac715f223fdf7be1dbb33d61"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\guests\\services\\README.md": {
+    "mtime": 1778116226.950541,
+    "hash": "808dc69b603a443b732fe43021cd42c4"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\guests\\store\\README.md": {
+    "mtime": 1778116226.950541,
+    "hash": "51bd17529a66e16f999752b3370f2df9"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\rooms\\components\\README.md": {
+    "mtime": 1778116226.950541,
+    "hash": "6c4916100f2019c3b9683f31bf0a22f6"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\rooms\\services\\README.md": {
+    "mtime": 1778116226.950541,
+    "hash": "8045acfaca22c8e1cd679c52d57d291c"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\modules\\rooms\\store\\README.md": {
+    "mtime": 1778116226.950541,
+    "hash": "16f1be60d8f1fc53fe56530e1eee1098"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\services\\README.md": {
+    "mtime": 1778557961.5126116,
+    "hash": "e82e877aafbf2c036ff5348b72c06853"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\shared\\README.md": {
+    "mtime": 1778116227.0599144,
+    "hash": "57b99f443a4eac783cf76e8408ced44c"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\store\\README.md": {
+    "mtime": 1778116227.1224132,
+    "hash": "6ece6b5b908e74cfcbae899a35c9b1ff"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\styles\\README.md": {
+    "mtime": 1778116227.13804,
+    "hash": "5289abe88fcdd248d2c1414ac1930fa2"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\types\\README.md": {
+    "mtime": 1778116227.13804,
+    "hash": "aaaad7546bca29d88ae724c527f361fa"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\CHANGELOG.md": {
+    "mtime": 1784743441.5766733,
+    "hash": "b8ad9fac4ef0d23a5b4ffc2ffcb14622"
+  },
+  "D:\\ai-practise\\hotel-system\\temp_check\\package\\README.md": {
+    "mtime": 1784743441.5766733,
+    "hash": "578579740b9f2836a562bf9a7f6c3419"
+  },
+  "D:\\ai-practise\\hotel-system\\public\\users-2026-07-27 (4).pdf": {
+    "mtime": 1785121843.6099465,
+    "hash": "a56e3c9d679f339147a0e1026717fd4b"
+  },
+  "D:\\ai-practise\\hotel-system\\ar-price-1500.png": {
+    "mtime": 1785793217.6097083,
+    "hash": "477afcd10c5e8864b151d8dde6d41ac1"
+  },
+  "D:\\ai-practise\\hotel-system\\ar-price-input.png": {
+    "mtime": 1785792537.9829543,
+    "hash": "477afcd10c5e8864b151d8dde6d41ac1"
+  },
+  "D:\\ai-practise\\hotel-system\\coverage\\favicon.png": {
+    "mtime": 1782690653.3361833,
+    "hash": "8c814a46f24208d0bc459bb2cf8b7b88"
+  },
+  "D:\\ai-practise\\hotel-system\\coverage\\sort-arrow-sprite.png": {
+    "mtime": 1782690653.3381827,
+    "hash": "fd08a5625d21e34b1d6d9c026f2728a9"
+  },
+  "D:\\ai-practise\\hotel-system\\public\\favicon-16x16.png": {
+    "mtime": 1784765020.339,
+    "hash": "c16b3c3c5768bed62d4257f6c8189fab"
+  },
+  "D:\\ai-practise\\hotel-system\\public\\Full Logo Green.png": {
+    "mtime": 1779526806.0,
+    "hash": "c39f03945ed82565748ae851a3fa42e7"
+  },
+  "D:\\ai-practise\\hotel-system\\public\\icon-192x192.png": {
+    "mtime": 1784764661.328,
+    "hash": "414ae3b94aec59088fa94dfdeae12567"
+  },
+  "D:\\ai-practise\\hotel-system\\public\\icon-512x512.png": {
+    "mtime": 1784764661.35,
+    "hash": "fa4ff9b0149f96d9536c05ca92fdaf8a"
+  },
+  "D:\\ai-practise\\hotel-system\\public\\logo Green.svg": {
+    "mtime": 1780750370.0,
+    "hash": "dda011be3e06f8406f154237ca93d832"
+  },
+  "D:\\ai-practise\\hotel-system\\public\\logo-without-text-removebg-preview.png": {
+    "mtime": 1776865031.6903234,
+    "hash": "69b76bfacb2259087cc7d633f3e4f398"
+  },
+  "D:\\ai-practise\\hotel-system\\public\\Profile Picture Green.jpg": {
+    "mtime": 1780749868.0,
+    "hash": "aa5466d80a9cbf8f7afeebf27f30c9cd"
+  },
+  "D:\\ai-practise\\hotel-system\\public\\Profile Picture White.jpg": {
+    "mtime": 1780749850.0,
+    "hash": "fc7a1fc979a90fd5ada9ab1b78efbfae"
+  },
+  "D:\\ai-practise\\hotel-system\\public\\Profile_Picture_White.png": {
+    "mtime": 1783379486.3384962,
+    "hash": "2d7f738b529251fc7c2f851e304ffe3a"
+  },
+  "D:\\ai-practise\\hotel-system\\public\\qr-code.jpeg": {
+    "mtime": 1787948808.3340113,
+    "hash": "0c3d9cabb271c3cf1647b62d39a67d68"
+  },
+  "D:\\ai-practise\\hotel-system\\qa-screenshots\\02-dev-issues-overlay.png": {
+    "mtime": 1786174652.8491955,
+    "hash": "76d24c3bfe8678ed4476434611dcd38c"
+  },
+  "D:\\ai-practise\\hotel-system\\qa-screenshots\\05-contacts-actions-menu.png": {
+    "mtime": 1786181615.543134,
+    "hash": "fee56d12653875ad573f90046d75a637"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\apple-icon.png": {
+    "mtime": 1784764661.328,
+    "hash": "414ae3b94aec59088fa94dfdeae12567"
+  },
+  "D:\\ai-practise\\hotel-system\\src\\app\\icon.png": {
+    "mtime": 1784765020.339,
+    "hash": "c16b3c3c5768bed62d4257f6c8189fab"
+  }
+}

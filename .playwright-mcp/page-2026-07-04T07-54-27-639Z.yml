@@ -1,0 +1,23 @@
+- generic [active] [ref=e1]:
+  - main [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e7]:
+        - generic [ref=e8]:
+          - generic [ref=e9]: F.
+          - heading "Sign in" [level=1] [ref=e10]
+          - paragraph [ref=e11]: Use your staff account to continue.
+        - generic [ref=e12]:
+          - generic [ref=e14]:
+            - textbox "Email" [ref=e15]:
+              - /placeholder: ""
+            - generic: Email
+          - generic [ref=e17]:
+            - textbox "Password" [ref=e18]:
+              - /placeholder: ""
+            - generic: Password
+          - button "Sign in" [ref=e19]
+      - complementary [ref=e20]:
+        - img "STEP logo" [ref=e21]
+  - button "Open Next.js Dev Tools" [ref=e27] [cursor=pointer]:
+    - img [ref=e28]
+  - alert [ref=e31]

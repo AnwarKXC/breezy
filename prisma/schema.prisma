@@ -1,0 +1,1037 @@
+generator client {
+  provider        = "prisma-client"
+  output          = "../src/generated/prisma"
+  previewFeatures = ["partialIndexes"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model accounting_ledger_entries {
+  id                              String                      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  transaction_number              String                      @unique
+  type                            String
+  source_type                     String
+  source_id                       String?                     @db.Uuid
+  income_amount                   Decimal                     @default(0) @db.Decimal(12, 2)
+  outcome_amount                  Decimal                     @default(0) @db.Decimal(12, 2)
+  currency                        String                      @default("EGP")
+  account_category                String?
+  description                     String                      @default("")
+  transaction_date                DateTime                    @default(dbgenerated("CURRENT_DATE")) @db.Date
+  created_by                      String?                     @db.Uuid
+  metadata                        Json?                       @default("{}")
+  reversal_of_transaction_id      String?                     @db.Uuid
+  created_at                      DateTime                    @default(now()) @db.Timestamptz(6)
+  invoice_id                      String?                     @db.Uuid
+  contact_id                      String?                     @db.Uuid
+  contacts                        contacts?                   @relation(fields: [contact_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users                           users?                      @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  invoices                        invoices?                   @relation(fields: [invoice_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  accounting_ledger_entries       accounting_ledger_entries?  @relation("accounting_ledger_entriesToaccounting_ledger_entries", fields: [reversal_of_transaction_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  other_accounting_ledger_entries accounting_ledger_entries[] @relation("accounting_ledger_entriesToaccounting_ledger_entries")
+
+  @@index([contact_id])
+  @@index([invoice_id])
+  @@index([reversal_of_transaction_id])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model accounting_settings {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  key         String   @unique
+  value       Json     @default("{}")
+  description String?
+  updated_by  String?  @db.Uuid
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @default(now()) @db.Timestamptz(6)
+  users       users?   @relation(fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model audit_logs {
+  id                   String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  external_firebase_id String?    @unique
+  action               log_action
+  module               log_module
+  description          String
+  actor                Json
+  target               Json?
+  metadata             Json?
+  created_at           DateTime   @default(now()) @db.Timestamptz(6)
+
+  @@index([action, created_at(sort: Desc), id(sort: Desc)])
+  @@index([created_at(sort: Desc), id(sort: Desc)])
+  @@index([module, created_at(sort: Desc), id(sort: Desc)])
+  @@index([created_at(sort: Desc)], map: "idx_audit_logs_created_at_desc")
+  @@index([module, action], map: "idx_audit_logs_module_action")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model audit_logs_archive {
+  id                   String     @id @db.Uuid
+  external_firebase_id String?
+  action               log_action
+  module               log_module
+  description          String
+  actor                Json
+  target               Json?
+  metadata             Json?
+  created_at           DateTime   @db.Timestamptz(6)
+  archived_at          DateTime   @default(now()) @db.Timestamptz(6)
+
+  @@index([created_at(sort: Desc)], map: "idx_audit_logs_archive_created_at")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model company_price_overrides {
+  id             String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  contact_id     String         @db.Uuid
+  room_category  String
+  occupancy_code occupancy_code
+  price          Decimal        @db.Decimal(10, 2)
+  currency       String         @default("USD")
+  created_at     DateTime       @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime       @default(now()) @db.Timestamptz(6)
+  deleted_at     DateTime?      @db.Timestamptz(6)
+  contacts       contacts       @relation(fields: [contact_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([contact_id, room_category, occupancy_code], map: "company_price_overrides_unique_override")
+  @@index([contact_id])
+  @@index([deleted_at])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model contacts {
+  id                        String                      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  type                      contact_type
+  name                      String
+  phone                     String?                     @unique(map: "contacts_phone_unique_idx", where: raw("((deleted_at IS NULL) AND (phone IS NOT NULL) AND (phone <> ''::text))"))
+  email                     String?
+  logo                      String?
+  country                   String?
+  city                      String?
+  responsible_person        String?
+  id_passport               String?
+  created_at                DateTime                    @default(now()) @db.Timestamptz(6)
+  updated_at                DateTime                    @default(now()) @db.Timestamptz(6)
+  deleted_at                DateTime?                   @db.Timestamptz(6)
+  accounting_ledger_entries accounting_ledger_entries[]
+  company_price_overrides   company_price_overrides[]
+  invoices                  invoices[]
+  reservation_company_info  reservation_company_info[]
+  reservation_guests        reservation_guests[]
+  reservations              reservations[]
+
+  @@index([country, city])
+  @@index([created_at(sort: Desc), id(sort: Desc)])
+  @@index([deleted_at])
+  @@index([type, created_at(sort: Desc), id(sort: Desc)])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model expense_categories {
+  id          String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String
+  description String?
+  created_at  DateTime?  @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime?  @default(now()) @db.Timestamptz(6)
+  deleted_at  DateTime?  @db.Timestamptz(6)
+  name_ar     String?
+  expenses    expenses[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model expenses {
+  id                                String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  category_id                       String             @db.Uuid
+  amount                            Decimal            @db.Decimal
+  description                       String
+  date                              DateTime           @default(dbgenerated("CURRENT_DATE")) @db.Date
+  created_by                        String?            @db.Uuid
+  created_at                        DateTime?          @default(now()) @db.Timestamptz(6)
+  updated_at                        DateTime?          @default(now()) @db.Timestamptz(6)
+  deleted_at                        DateTime?          @db.Timestamptz(6)
+  vendor                            String?
+  tax_amount                        Decimal            @default(0) @db.Decimal(10, 2)
+  total_amount                      Decimal            @default(0) @db.Decimal(10, 2)
+  payment_method                    String?
+  receipt_url                       String?
+  cost_center                       String?
+  approved_by                       String?            @db.Uuid
+  approved_at                       DateTime?          @db.Timestamptz(6)
+  status                            String             @default("draft")
+  users_expenses_approved_byTousers users?             @relation("expenses_approved_byTousers", fields: [approved_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  expense_categories                expense_categories @relation(fields: [category_id], references: [id], onUpdate: NoAction)
+  users_expenses_created_byTousers  users?             @relation("expenses_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([category_id], map: "idx_expenses_category_id")
+  @@index([cost_center], map: "idx_expenses_cost_center")
+  @@index([date], map: "idx_expenses_date")
+  @@index([deleted_at], map: "idx_expenses_deleted_at")
+  @@index([status], map: "idx_expenses_status")
+  @@index([vendor], map: "idx_expenses_vendor")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model files {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  content_type String
+  size_bytes   Int
+  data         Bytes
+  created_by   String?  @db.Uuid
+  created_at   DateTime @default(now()) @db.Timestamptz(6)
+  users        users?   @relation(fields: [created_by], references: [id], onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model guests {
+  id                 String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  first_name         String
+  last_name          String
+  email              String               @unique(map: "guests_email_active_unique", where: raw("(deleted_at IS NULL)"))
+  phone              String?
+  country            String?
+  passport_number    String?
+  status             guest_status         @default(active)
+  total_bookings     Int                  @default(0)
+  total_spent        Decimal              @default(0) @db.Decimal(12, 2)
+  last_visit         DateTime?            @db.Timestamptz(6)
+  created_at         DateTime             @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime             @default(now()) @db.Timestamptz(6)
+  deleted_at         DateTime?            @db.Timestamptz(6)
+  reservation_guests reservation_guests[]
+  reservation_rooms  reservation_rooms[]
+  reservations       reservations[]
+
+  @@index([created_at(sort: Desc), id(sort: Desc)])
+  @@index([deleted_at])
+  @@index([status])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model invoice_events {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  invoice_id     String   @db.Uuid
+  event_type     String
+  actor_id       String?  @db.Uuid
+  old_status     String?
+  new_status     String?
+  amount_changed Decimal? @db.Decimal(10, 2)
+  reason         String?
+  metadata       Json?    @default("{}")
+  created_at     DateTime @default(now()) @db.Timestamptz(6)
+  users          users?   @relation(fields: [actor_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  invoices       invoices @relation(fields: [invoice_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([created_at(sort: Desc)], map: "idx_invoice_events_created")
+  @@index([invoice_id], map: "idx_invoice_events_invoice")
+  @@index([event_type], map: "idx_invoice_events_type")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model invoice_items {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  invoice_id      String   @db.Uuid
+  type            String
+  description     String   @default("")
+  quantity        Decimal  @default(1) @db.Decimal(10, 2)
+  unit_price      Decimal  @default(0) @db.Decimal(10, 2)
+  total_price     Decimal  @default(0) @db.Decimal(10, 2)
+  created_at      DateTime @default(now()) @db.Timestamptz(6)
+  sort_order      Int      @default(0)
+  discount_amount Decimal  @default(0) @db.Decimal(10, 2)
+  tax_amount      Decimal  @default(0) @db.Decimal(10, 2)
+  updated_at      DateTime @default(now()) @db.Timestamptz(6)
+  invoices        invoices @relation(fields: [invoice_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([invoice_id], map: "idx_invoice_items_invoice_id")
+  @@index([type], map: "idx_invoice_items_type")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model invoices {
+  id                               String                      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  contact_id                       String                      @db.Uuid
+  invoice_number                   String                      @unique(map: "invoices_invoice_number_active_unique", where: raw("(deleted_at IS NULL)"))
+  amount                           Decimal                     @db.Decimal(10, 2)
+  status                           String                      @default("pending")
+  issue_date                       DateTime                    @default(dbgenerated("CURRENT_DATE")) @db.Date
+  due_date                         DateTime                    @db.Date
+  paid_at                          DateTime?                   @db.Timestamptz(6)
+  notes                            String?
+  created_at                       DateTime                    @default(now()) @db.Timestamptz(6)
+  updated_at                       DateTime                    @default(now()) @db.Timestamptz(6)
+  deleted_at                       DateTime?                   @db.Timestamptz(6)
+  payment_method                   String?
+  room_id                          String?
+  room_number                      String?
+  subtotal                         Decimal                     @default(0) @db.Decimal(10, 2)
+  discount                         Decimal                     @default(0) @db.Decimal(10, 2)
+  tax_amount                       Decimal                     @default(0) @db.Decimal(10, 2)
+  service_charge                   Decimal                     @default(0) @db.Decimal(10, 2)
+  paid_amount                      Decimal                     @default(0) @db.Decimal(10, 2)
+  remaining_balance                Decimal                     @default(0) @db.Decimal(10, 2)
+  stay_check_in                    DateTime?                   @db.Date
+  stay_check_out                   DateTime?                   @db.Date
+  created_by                       String?                     @db.Uuid
+  updated_by                       String?                     @db.Uuid
+  void_reason                      String?
+  voided_at                        DateTime?                   @db.Timestamptz(6)
+  voided_by                        String?                     @db.Uuid
+  guest_name                       String?
+  company_name                     String?
+  public_notes                     String?
+  internal_notes                   String?
+  issued_at                        DateTime?                   @db.Timestamptz(6)
+  issued_by                        String?                     @db.Uuid
+  refunded_amount                  Decimal                     @default(0) @db.Decimal(10, 2)
+  currency                         String                      @default("EGP")
+  billing_address                  String?
+  /// Partial unique index invoices_reservation_id_active_unique (one active (non-void) invoice per reservation) lives in the migration SQL.
+  /// Not declared here: Prisma would treat the relation as one-to-one.
+  reservation_id                   String?                     @db.Uuid
+  discount_reason                  String?
+  accounting_ledger_entries        accounting_ledger_entries[]
+  invoice_events                   invoice_events[]
+  invoice_items                    invoice_items[]
+  contacts                         contacts                    @relation(fields: [contact_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users_invoices_created_byTousers users?                      @relation("invoices_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users_invoices_issued_byTousers  users?                      @relation("invoices_issued_byTousers", fields: [issued_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  reservations                     reservations?               @relation(fields: [reservation_id], references: [id], onUpdate: NoAction)
+  users_invoices_updated_byTousers users?                      @relation("invoices_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users_invoices_voided_byTousers  users?                      @relation("invoices_voided_byTousers", fields: [voided_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  payments                         payments[]
+
+  @@index([payment_method], map: "idx_invoices_payment_method")
+  @@index([reservation_id], map: "idx_invoices_reservation_id", where: raw("(reservation_id IS NOT NULL)"))
+  @@index([contact_id])
+  @@index([deleted_at])
+  @@index([due_date])
+  @@index([issue_date(sort: Desc)])
+  @@index([status])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model payments {
+  id                                String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  invoice_id                        String       @db.Uuid
+  type                              payment_type
+  amount                            Decimal      @db.Decimal
+  description                       String?
+  created_by                        String?      @db.Uuid
+  created_at                        DateTime?    @default(now()) @db.Timestamptz(6)
+  updated_at                        DateTime?    @default(now()) @db.Timestamptz(6)
+  deleted_at                        DateTime?    @db.Timestamptz(6)
+  transaction_date                  DateTime     @default(dbgenerated("CURRENT_DATE")) @db.Date
+  payment_number                    String?
+  refunded_amount                   Decimal      @default(0) @db.Decimal(10, 2)
+  void_reason                       String?
+  received_by                       String?      @db.Uuid
+  idempotency_key                   String?      @unique(map: "payments_idempotency_key_active_unique", where: raw("((idempotency_key IS NOT NULL) AND (deleted_at IS NULL))"))
+  users_payments_created_byTousers  users?       @relation("payments_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  invoices                          invoices     @relation(fields: [invoice_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users_payments_received_byTousers users?       @relation("payments_received_byTousers", fields: [received_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([created_at], map: "idx_payments_created_at")
+  @@index([invoice_id], map: "idx_payments_invoice_id")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model price_override_audit_log {
+  id                String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  reservation_id    String       @db.Uuid
+  room_id           String       @db.Uuid
+  night_date        DateTime     @db.Date
+  old_rate          Decimal      @db.Decimal(10, 2)
+  new_rate          Decimal      @db.Decimal(10, 2)
+  reason            String
+  actor_id          String       @db.Uuid
+  permission_level  String
+  threshold_checked Boolean      @default(false)
+  created_at        DateTime     @default(now()) @db.Timestamptz(6)
+  needs_review      Boolean      @default(false)
+  users             users        @relation(fields: [actor_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  reservations      reservations @relation(fields: [reservation_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  rooms             rooms        @relation(fields: [room_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([actor_id], map: "idx_price_override_audit_actor")
+  @@index([reservation_id], map: "idx_price_override_audit_reservation")
+  @@index([needs_review], map: "idx_price_override_needs_review")
+  @@index([room_id])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model profiles {
+  id                                             String                       @id @db.Uuid
+  external_firebase_id                           String?                      @unique
+  name                                           String
+  email                                          String                       @unique(map: "profiles_email_active_unique", where: raw("(deleted_at IS NULL)"))
+  phone                                          String?
+  role                                           app_role
+  created_at                                     DateTime                     @default(now()) @db.Timestamptz(6)
+  updated_at                                     DateTime                     @default(now()) @db.Timestamptz(6)
+  deleted_at                                     DateTime?                    @db.Timestamptz(6)
+  users                                          users                        @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  reservation_holds                              reservation_holds[]
+  reservation_notes                              reservation_notes[]
+  reservation_pricing_items                      reservation_pricing_items[]
+  reservation_status_history                     reservation_status_history[]
+  reservations_reservations_created_byToprofiles reservations[]               @relation("reservations_created_byToprofiles")
+  reservations_reservations_updated_byToprofiles reservations[]               @relation("reservations_updated_byToprofiles")
+  room_status_history                            room_status_history[]
+
+  @@index([created_at(sort: Desc), id(sort: Desc)])
+  @@index([deleted_at])
+  @@index([phone])
+  @@index([role, created_at(sort: Desc), id(sort: Desc)])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model rate_change_audit_log {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  table_name String
+  record_id  String   @db.Uuid
+  action     String
+  old_data   Json?
+  new_data   Json?
+  actor_id   String   @db.Uuid
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  users      users    @relation(fields: [actor_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([actor_id], map: "idx_rate_change_audit_actor")
+  @@index([table_name, record_id], map: "idx_rate_change_audit_table_record")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model reservation_company_info {
+  id                             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  reservation_id                 String       @unique @db.Uuid
+  company_id                     String       @db.Uuid
+  company_name                   String
+  contact_person_name            String?
+  contact_person_phone           String?
+  contact_person_email           String?
+  tax_number                     String?
+  billing_address                String?
+  payment_terms                  String       @default("pay_on_arrival")
+  credit_limit                   Decimal?     @db.Decimal(12, 2)
+  credit_approved                Boolean      @default(false)
+  company_rate_plan_id           String?      @db.Uuid
+  company_price_override_applied Boolean      @default(false)
+  company_pays                   String       @default("room_only")
+  created_at                     DateTime     @default(now()) @db.Timestamptz(6)
+  updated_at                     DateTime     @default(now()) @db.Timestamptz(6)
+  contacts                       contacts     @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  reservations                   reservations @relation(fields: [reservation_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([company_id])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model reservation_guests {
+  id                  String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  /// Partial unique index reservation_guests_single_primary (one primary guest per reservation) lives in the migration SQL.
+  /// Not declared here: Prisma would treat the relation as one-to-one.
+  reservation_id      String                 @db.Uuid
+  guest_id            String?                @db.Uuid
+  role                reservation_guest_role @default(additional_guest)
+  full_name           String
+  phone               String?
+  email               String?
+  nationality         String?
+  document_type       String?
+  document_number     String?
+  assigned_room_id    String?                @db.Uuid
+  reservation_room_id String?                @db.Uuid
+  is_primary          Boolean                @default(false)
+  is_vip              Boolean                @default(false)
+  created_at          DateTime               @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime               @default(now()) @db.Timestamptz(6)
+  deleted_at          DateTime?              @db.Timestamptz(6)
+  contact_id          String?                @db.Uuid
+  rooms               rooms?                 @relation(fields: [assigned_room_id], references: [id], onUpdate: NoAction)
+  contacts            contacts?              @relation(fields: [contact_id], references: [id], onUpdate: NoAction)
+  guests              guests?                @relation(fields: [guest_id], references: [id], onUpdate: NoAction)
+  reservations        reservations           @relation(fields: [reservation_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  reservation_rooms   reservation_rooms?     @relation(fields: [reservation_room_id], references: [id], onUpdate: NoAction)
+
+  @@index([contact_id], map: "idx_reservation_guests_contact_id")
+  @@index([guest_id], map: "idx_reservation_guests_guest", where: raw("(guest_id IS NOT NULL)"))
+  @@index([reservation_id], map: "idx_reservation_guests_reservation")
+  @@index([assigned_room_id])
+  @@index([reservation_room_id])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model reservation_holds {
+  id              String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  reservation_id  String?       @db.Uuid
+  room_id         String        @db.Uuid
+  held_by_user_id String        @db.Uuid
+  check_in_date   DateTime      @db.Date
+  check_out_date  DateTime      @db.Date
+  status          String        @default("active")
+  expires_at      DateTime      @db.Timestamptz(6)
+  created_at      DateTime      @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime      @default(now()) @db.Timestamptz(6)
+  profiles        profiles      @relation(fields: [held_by_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  reservations    reservations? @relation(fields: [reservation_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  rooms           rooms         @relation(fields: [room_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([room_id, check_in_date, check_out_date, expires_at], map: "idx_reservation_holds_active", where: raw("(status = 'active'::text)"))
+  @@index([expires_at, status], map: "idx_reservation_holds_expiry_cleanup", where: raw("(status = 'active'::text)"))
+  @@index([reservation_id], map: "idx_reservation_holds_reservation")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model reservation_notes {
+  id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  reservation_id String       @db.Uuid
+  type           String       @default("front_desk")
+  visibility     String       @default("internal")
+  message        String
+  created_by     String       @db.Uuid
+  created_at     DateTime     @default(now()) @db.Timestamptz(6)
+  profiles       profiles     @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  reservations   reservations @relation(fields: [reservation_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([reservation_id, created_at(sort: Desc)], map: "idx_reservation_notes_reservation")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model reservation_pricing_items {
+  id                        String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  reservation_id            String             @db.Uuid
+  reservation_room_id       String?            @db.Uuid
+  pricing_level             String             @default("room")
+  price_date                DateTime?          @db.Date
+  room_id                   String?            @db.Uuid
+  room_type_id              String?            @db.Uuid
+  base_rate                 Decimal            @default(0) @db.Decimal(12, 2)
+  applied_rate              Decimal            @default(0) @db.Decimal(12, 2)
+  nights                    Int                @default(1)
+  quantity                  Int                @default(1)
+  discount_type             String?
+  discount_value            Decimal?           @db.Decimal(12, 2)
+  discount_amount           Decimal            @default(0) @db.Decimal(12, 2)
+  tax_amount                Decimal            @default(0) @db.Decimal(12, 2)
+  service_amount            Decimal            @default(0) @db.Decimal(12, 2)
+  total_amount              Decimal            @default(0) @db.Decimal(12, 2)
+  currency                  String             @default("USD")
+  price_source              price_source
+  manual_override_reason    String?
+  manual_override_by        String?            @db.Uuid
+  created_at                DateTime           @default(now()) @db.Timestamptz(6)
+  updated_at                DateTime           @default(now()) @db.Timestamptz(6)
+  source_type               String?
+  source_ref                String?            @db.Uuid
+  rate_per_night_at_booking Decimal?           @db.Decimal(10, 2)
+  profiles                  profiles?          @relation(fields: [manual_override_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  reservations              reservations       @relation(fields: [reservation_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  reservation_rooms         reservation_rooms? @relation(fields: [reservation_room_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([reservation_id], map: "idx_reservation_pricing_items_reservation")
+  @@index([reservation_room_id], map: "idx_reservation_pricing_items_room", where: raw("(reservation_room_id IS NOT NULL)"))
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/exclusion-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model reservation_rooms {
+  id                        String                      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  reservation_id            String                      @db.Uuid
+  room_id                   String                      @db.Uuid
+  room_type_id              String                      @db.Uuid
+  stay_segment_type         String                      @default("full_stay")
+  check_in_date             DateTime                    @db.Date
+  check_out_date            DateTime                    @db.Date
+  status                    reservation_room_status     @default(selected)
+  adults                    Int                         @default(1)
+  children                  Int                         @default(0)
+  infants                   Int                         @default(0)
+  assigned_guest_id         String?                     @db.Uuid
+  rate_per_night            Decimal                     @default(0) @db.Decimal(12, 2)
+  nights                    Int
+  subtotal_amount           Decimal                     @default(0) @db.Decimal(12, 2)
+  discount_amount           Decimal                     @default(0) @db.Decimal(12, 2)
+  tax_amount                Decimal                     @default(0) @db.Decimal(12, 2)
+  total_amount              Decimal                     @default(0) @db.Decimal(12, 2)
+  price_source              price_source                @default(default_room_type_rate)
+  housekeeping_requirement  String                      @default("clean_required")
+  created_at                DateTime                    @default(now()) @db.Timestamptz(6)
+  updated_at                DateTime                    @default(now()) @db.Timestamptz(6)
+  deleted_at                DateTime?                   @db.Timestamptz(6)
+  occupancy_code            occupancy_code?
+  reservation_guests        reservation_guests[]
+  reservation_pricing_items reservation_pricing_items[]
+  guests                    guests?                     @relation(fields: [assigned_guest_id], references: [id], onUpdate: NoAction)
+  reservations              reservations                @relation(fields: [reservation_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  rooms                     rooms                       @relation(fields: [room_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  room_types                room_types                  @relation(fields: [room_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([reservation_id], map: "idx_reservation_rooms_reservation", where: raw("(deleted_at IS NULL)"))
+  @@index([room_id, check_in_date, check_out_date], map: "idx_reservation_rooms_room_dates", where: raw("(deleted_at IS NULL)"))
+  @@index([status], map: "idx_reservation_rooms_status", where: raw("(deleted_at IS NULL)"))
+  @@index([assigned_guest_id])
+  @@index([room_type_id])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model reservation_status_history {
+  id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  reservation_id String       @db.Uuid
+  from_status    String?
+  to_status      String
+  reason         String?
+  changed_by     String       @db.Uuid
+  changed_at     DateTime     @default(now()) @db.Timestamptz(6)
+  profiles       profiles     @relation(fields: [changed_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  reservations   reservations @relation(fields: [reservation_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([reservation_id, changed_at(sort: Desc)], map: "idx_reservation_status_history_reservation")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model reservations {
+  id                                         String                       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  reservation_number                         String                       @unique @default(dbgenerated("generate_reservation_number()"))
+  booking_type                               reservation_booking_type
+  status                                     reservation_status           @default(draft)
+  source                                     reservation_source           @default(manual)
+  check_in_date                              DateTime                     @db.Date
+  check_out_date                             DateTime                     @db.Date
+  check_in_time                              DateTime?                    @db.Time(6)
+  check_out_time                             DateTime?                    @db.Time(6)
+  nights                                     Int
+  adults                                     Int                          @default(1)
+  children                                   Int                          @default(0)
+  infants                                    Int                          @default(0)
+  room_count                                 Int                          @default(1)
+  primary_guest_id                           String?                      @db.Uuid
+  company_id                                 String?                      @db.Uuid
+  booker_name                                String?
+  booker_phone                               String?
+  booker_email                               String?
+  billing_party                              billing_party                @default(guest)
+  currency                                   String                       @default("USD")
+  subtotal_amount                            Decimal                      @default(0) @db.Decimal(12, 2)
+  discount_amount                            Decimal                      @default(0) @db.Decimal(12, 2)
+  tax_amount                                 Decimal                      @default(0) @db.Decimal(12, 2)
+  service_amount                             Decimal                      @default(0) @db.Decimal(12, 2)
+  total_amount                               Decimal                      @default(0) @db.Decimal(12, 2)
+  paid_amount                                Decimal                      @default(0) @db.Decimal(12, 2)
+  balance_amount                             Decimal                      @default(0) @db.Decimal(12, 2)
+  guarantee_type                             String                       @default("none")
+  special_requests                           String?
+  internal_notes                             String?
+  created_by                                 String                       @db.Uuid
+  updated_by                                 String?                      @db.Uuid
+  created_at                                 DateTime                     @default(now()) @db.Timestamptz(6)
+  updated_at                                 DateTime                     @default(now()) @db.Timestamptz(6)
+  cancelled_at                               DateTime?                    @db.Timestamptz(6)
+  checked_in_at                              DateTime?                    @db.Timestamptz(6)
+  checked_out_at                             DateTime?                    @db.Timestamptz(6)
+  deleted_at                                 DateTime?                    @db.Timestamptz(6)
+  billing_type                               billing_type                 @default(guest_pays)
+  split_percentage                           Decimal?                     @db.Decimal(5, 2)
+  invoices                                   invoices[]
+  price_override_audit_log                   price_override_audit_log[]
+  reservation_company_info                   reservation_company_info?
+  reservation_guests                         reservation_guests[]
+  reservation_holds                          reservation_holds[]
+  reservation_notes                          reservation_notes[]
+  reservation_pricing_items                  reservation_pricing_items[]
+  reservation_rooms                          reservation_rooms[]
+  reservation_status_history                 reservation_status_history[]
+  contacts                                   contacts?                    @relation(fields: [company_id], references: [id], onUpdate: NoAction)
+  profiles_reservations_created_byToprofiles profiles                     @relation("reservations_created_byToprofiles", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  guests                                     guests?                      @relation(fields: [primary_guest_id], references: [id], onUpdate: NoAction)
+  profiles_reservations_updated_byToprofiles profiles?                    @relation("reservations_updated_byToprofiles", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  room_status_history                        room_status_history[]
+
+  @@index([company_id], map: "idx_reservations_company", where: raw("((company_id IS NOT NULL) AND (deleted_at IS NULL))"))
+  @@index([created_at(sort: Desc)], map: "idx_reservations_created_at", where: raw("(deleted_at IS NULL)"))
+  @@index([created_by], map: "idx_reservations_created_by", where: raw("(deleted_at IS NULL)"))
+  @@index([check_in_date, check_out_date], map: "idx_reservations_dates", where: raw("(deleted_at IS NULL)"))
+  @@index([primary_guest_id], map: "idx_reservations_primary_guest", where: raw("((primary_guest_id IS NOT NULL) AND (deleted_at IS NULL))"))
+  @@index([status], map: "idx_reservations_status", where: raw("(deleted_at IS NULL)"))
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model room_specific_rates {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  room_id       String   @db.Uuid
+  start_date    DateTime @db.Date
+  end_date      DateTime @db.Date
+  override_rate Decimal  @db.Decimal(10, 2)
+  reason        String?
+  created_by    String   @db.Uuid
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime @default(now()) @db.Timestamptz(6)
+  users         users    @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  rooms         rooms    @relation(fields: [room_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([room_id, start_date, end_date], map: "idx_room_specific_rates_room_dates")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model room_status_history {
+  id             String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  room_id        String        @db.Uuid
+  from_status    String?
+  to_status      String
+  reason         String?
+  reservation_id String?       @db.Uuid
+  changed_by     String        @db.Uuid
+  changed_at     DateTime      @default(now()) @db.Timestamptz(6)
+  metadata       Json          @default("{}")
+  profiles       profiles      @relation(fields: [changed_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  reservations   reservations? @relation(fields: [reservation_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  rooms          rooms         @relation(fields: [room_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([room_id, changed_at(sort: Desc)], map: "idx_room_status_history_room_time")
+  @@index([reservation_id])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model room_type_pricing {
+  id              String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  /// Partial unique index room_type_pricing_current_active_unique (one open-ended pricing row per room type) lives in the migration SQL.
+  /// Not declared here: Prisma would treat the relation as one-to-one.
+  room_type_id    String     @db.Uuid
+  price           Decimal    @db.Decimal(10, 2)
+  currency        String     @default("USD")
+  effective_from  DateTime?  @db.Timestamptz(6)
+  effective_until DateTime?  @db.Timestamptz(6)
+  created_at      DateTime   @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime   @default(now()) @db.Timestamptz(6)
+  deleted_at      DateTime?  @db.Timestamptz(6)
+  price_single    Decimal?   @db.Decimal
+  price_double    Decimal?   @db.Decimal
+  price_triple    Decimal?   @db.Decimal
+  room_types      room_types @relation(fields: [room_type_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([deleted_at])
+  @@index([effective_from])
+  @@index([room_type_id])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model room_types {
+  id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name              String              @unique(map: "room_types_name_active_unique", where: raw("(deleted_at IS NULL)"))
+  slug              String              @unique(map: "room_types_slug_active_unique", where: raw("(deleted_at IS NULL)"))
+  description       String?
+  base_price        Decimal             @db.Decimal(10, 2)
+  default_capacity  Int
+  amenities         Json                @default("[]")
+  created_at        DateTime            @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime            @default(now()) @db.Timestamptz(6)
+  deleted_at        DateTime?           @db.Timestamptz(6)
+  reservation_rooms reservation_rooms[]
+  room_type_pricing room_type_pricing[]
+  rooms             rooms[]
+  seasonal_rates    seasonal_rates[]
+
+  @@index([deleted_at])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model rooms {
+  id                       String                     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  number                   String                     @unique(map: "rooms_number_active_unique", where: raw("(deleted_at IS NULL)"))
+  floor                    Int
+  status                   room_status                @default(available)
+  price                    Decimal                    @db.Decimal(10, 2)
+  capacity                 Int
+  amenities                Json                       @default("[]")
+  created_at               DateTime                   @default(now()) @db.Timestamptz(6)
+  updated_at               DateTime                   @default(now()) @db.Timestamptz(6)
+  room_type_id             String                     @db.Uuid
+  deleted_at               DateTime?                  @db.Timestamptz(6)
+  price_override_audit_log price_override_audit_log[]
+  reservation_guests       reservation_guests[]
+  reservation_holds        reservation_holds[]
+  reservation_rooms        reservation_rooms[]
+  room_specific_rates      room_specific_rates[]
+  room_status_history      room_status_history[]
+  room_types               room_types                 @relation(fields: [room_type_id], references: [id], onUpdate: NoAction)
+
+  @@index([deleted_at])
+  @@index([floor])
+  @@index([number])
+  @@index([room_type_id])
+  @@index([status, room_type_id])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model seasonal_rates {
+  id            String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String
+  start_date    DateTime   @db.Date
+  end_date      DateTime   @db.Date
+  room_type_id  String     @db.Uuid
+  override_rate Decimal    @db.Decimal(10, 2)
+  currency      String     @default("USD")
+  status        String     @default("active")
+  created_by    String     @db.Uuid
+  created_at    DateTime   @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime   @default(now()) @db.Timestamptz(6)
+  users         users      @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  room_types    room_types @relation(fields: [room_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([room_type_id, start_date, end_date], map: "idx_seasonal_rates_room_type_dates")
+  @@index([status], map: "idx_seasonal_rates_status")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model sessions {
+  id           String   @id
+  user_id      String   @db.Uuid
+  expires_at   DateTime @db.Timestamptz(6)
+  created_at   DateTime @default(now()) @db.Timestamptz(6)
+  last_seen_at DateTime @default(now()) @db.Timestamptz(6)
+  ip_address   String?
+  user_agent   String?
+  users        users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([expires_at])
+  @@index([user_id])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model users {
+  id                                   String                      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email                                String                      @unique
+  password_hash                        String
+  is_active                            Boolean                     @default(true)
+  last_login_at                        DateTime?                   @db.Timestamptz(6)
+  created_at                           DateTime                    @default(now()) @db.Timestamptz(6)
+  updated_at                           DateTime                    @default(now()) @db.Timestamptz(6)
+  accounting_ledger_entries            accounting_ledger_entries[]
+  accounting_settings                  accounting_settings[]
+  expenses_expenses_approved_byTousers expenses[]                  @relation("expenses_approved_byTousers")
+  expenses_expenses_created_byTousers  expenses[]                  @relation("expenses_created_byTousers")
+  files                                files[]
+  invoice_events                       invoice_events[]
+  invoices_invoices_created_byTousers  invoices[]                  @relation("invoices_created_byTousers")
+  invoices_invoices_issued_byTousers   invoices[]                  @relation("invoices_issued_byTousers")
+  invoices_invoices_updated_byTousers  invoices[]                  @relation("invoices_updated_byTousers")
+  invoices_invoices_voided_byTousers   invoices[]                  @relation("invoices_voided_byTousers")
+  payments_payments_created_byTousers  payments[]                  @relation("payments_created_byTousers")
+  payments_payments_received_byTousers payments[]                  @relation("payments_received_byTousers")
+  price_override_audit_log             price_override_audit_log[]
+  profiles                             profiles?
+  rate_change_audit_log                rate_change_audit_log[]
+  room_specific_rates                  room_specific_rates[]
+  seasonal_rates                       seasonal_rates[]
+  sessions                             sessions[]
+}
+
+enum app_role {
+  admin
+  accountant
+  front_desk
+}
+
+enum billing_party {
+  guest
+  company
+  split
+  complimentary
+}
+
+enum billing_type {
+  guest_pays
+  company_room_only
+  company_all_charges
+  split
+}
+
+enum booking_status {
+  pending
+  booked
+  confirmed
+  checked_in  @map("checked-in")
+  checked_out @map("checked-out")
+  cancelled
+}
+
+enum contact_type {
+  company
+  individual
+}
+
+enum guest_status {
+  active
+  inactive
+  vip
+  blacklist
+}
+
+enum log_action {
+  accounting_created
+  accounting_deleted
+  accounting_updated
+  contact_created
+  contact_deleted
+  contact_updated
+  login
+  logout
+  reservation_created
+  reservation_deleted
+  reservation_updated
+  user_created
+  user_deleted
+  user_updated
+  user_viewed
+  reservation_cancelled
+  reservation_checked_in
+  reservation_checked_out
+  reservation_confirmed
+  reservation_extended
+  reservation_held
+  reservation_no_show
+  reservation_note_added
+  reservation_payment_recorded
+  reservation_price_override
+  reservation_refund_recorded
+  reservation_room_changed
+}
+
+enum log_module {
+  accounting
+  auth
+  contacts
+  reservations
+  users
+}
+
+enum occupancy_code {
+  S
+  D
+  T
+}
+
+enum payment_type {
+  instapay
+  vodafone_cash
+  cash
+  bank_transfer
+  visa
+  card
+  online
+  ota
+  company_credit
+  other
+}
+
+enum price_source {
+  default_room_type_rate
+  room_specific_rate
+  company_override
+  seasonal_rate
+  manual_override
+}
+
+enum reservation_booking_type {
+  individual
+  company
+  group
+  travel_agent
+  internal
+}
+
+enum reservation_guest_role {
+  primary_guest
+  additional_guest
+  company_guest
+  child
+}
+
+enum reservation_payment_method {
+  cash
+  card
+  bank_transfer
+  company_credit
+  voucher
+  other
+}
+
+enum reservation_payment_type {
+  deposit
+  partial_payment
+  full_payment
+  refund
+  company_invoice
+  guarantee_only
+}
+
+enum reservation_room_status {
+  selected
+  held
+  reserved
+  occupied
+  checked_out
+  cancelled
+  released
+}
+
+enum reservation_source {
+  walk_in
+  phone
+  website
+  whatsapp
+  email
+  company
+  travel_agent
+  ota
+  manual
+}
+
+enum reservation_status {
+  draft
+  held
+  confirmed
+  checked_in
+  checked_out
+  cancelled
+  no_show
+  expired
+}
+
+enum room_status {
+  available
+  occupied
+  maintenance
+  cleaning
+  dirty
+}

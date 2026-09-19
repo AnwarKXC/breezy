@@ -1,0 +1,429 @@
+﻿'use client'
+
+import { useState, useCallback, useEffect, useMemo } from 'react'
+import { Skeleton } from '@/shared/components/Skeleton'
+import { ToolbarExportGroup } from '@/shared/components/toolbar'
+import { useCurrency } from '@/shared/contexts/CurrencyContext'
+import { useLocale } from '@/i18n/components/LocaleContext'
+import { formatDate } from '@/shared/utils/date'
+import type { DailyRevenueReport, MonthlyRevenueReport, ReportInvoiceDetail, ReportExpenseDetail } from '../types'
+import { exportDailyRevenueCsv, exportMonthlyRevenueCsv } from '../utils/reportCsvExport'
+import { exportDailyRevenuePdf, exportMonthlyRevenuePdf } from '../utils/reportPdfExport'
+import { INVOICE_STATUS_LABELS, PAYMENT_TYPE_LABELS, COST_CENTER_LABELS } from '../types'
+
+interface Props {
+  t: (key: string) => string
+}
+
+type RecordType = 'invoice' | 'expense'
+
+interface CombinedRow {
+  id: string
+  type: RecordType
+  invoiceNumber?: string
+  description: string
+  secondary: string
+  amount: number
+  paidAmount: number
+  refundedAmount: number
+  remainingBalance: number
+  totalAmount: number
+  taxAmount: number
+  vendor: string | null
+  category: string | null
+  costCenter: string | null
+  room: string | null
+  method: string | null
+  status: string
+  date: string
+}
+
+const PAGE_SIZE = 20
+
+const cardClass = 'rounded-xl border border-[#EAEAEA] bg-white p-5 space-y-1'
+const tableHeadClass = 'text-left text-xs font-medium text-[#787774] uppercase tracking-wider px-3 py-2 bg-[#F9F9F9] border-b border-[#EAEAEA]'
+const tableCellClass = 'px-3 py-2 text-sm text-[#333333] border-b border-[#EAEAEA]'
+
+function MetricCard({ label, value, context, positive }: {
+  label: string; value: string; context?: string; positive?: boolean
+}) {
+  return (
+    <div className={cardClass}>
+      <p className="text-sm text-[#787774]">{label}</p>
+      <p className={`text-2xl font-bold ${positive === true ? 'text-green-600' : positive === false ? 'text-[#9F2F2D]' : 'text-[#1A1A1A]'}`}>{value}</p>
+      {context && <p className="text-xs text-[#BBBBBB]">{context}</p>}
+    </div>
+  )
+}
+
+function TypeBadge({ type, t }: { type: RecordType; t: (key: string) => string }) {
+  return (
+    <span className={`inline-block px-2 py-0.5 text-xs font-medium rounded-full border ${
+      type === 'invoice'
+        ? 'bg-blue-50 text-blue-700 border-blue-200'
+        : 'bg-orange-50 text-orange-700 border-orange-200'
+    }`}>
+      {type === 'invoice' ? t('accounting.reports.invoiceBadge') : t('accounting.reports.expenseBadge')}
+    </span>
+  )
+}
+
+function StatusBadge({ status, type }: { status: string; type: RecordType }) {
+  if (type === 'expense') {
+    const colors: Record<string, string> = {
+      paid: 'bg-green-50 text-green-700 border-green-200',
+      approved: 'bg-blue-50 text-blue-700 border-blue-200',
+      draft: 'bg-gray-50 text-gray-500 border-gray-200',
+      void: 'bg-gray-50 text-gray-400 border-gray-200',
+    }
+    return (
+      <span className={`inline-block px-2 py-0.5 text-xs font-medium rounded-full border ${colors[status] ?? 'bg-gray-50 text-gray-500 border-gray-200'}`}>
+        {status.charAt(0).toUpperCase() + status.slice(1)}
+      </span>
+    )
+  }
+  const colors: Record<string, string> = {
+    paid: 'bg-green-50 text-green-700 border-green-200',
+    partially_paid: 'bg-yellow-50 text-yellow-700 border-yellow-200',
+    issued: 'bg-blue-50 text-blue-700 border-blue-200',
+    overdue: 'bg-red-50 text-red-700 border-red-200',
+    draft: 'bg-gray-50 text-gray-500 border-gray-200',
+    void: 'bg-gray-50 text-gray-400 border-gray-200',
+    refunded: 'bg-purple-50 text-purple-700 border-purple-200',
+  }
+  return (
+    <span className={`inline-block px-2 py-0.5 text-xs font-medium rounded-full border ${colors[status] ?? 'bg-gray-50 text-gray-500 border-gray-200'}`}>
+      {INVOICE_STATUS_LABELS[status] ?? status}
+    </span>
+  )
+}
+
+function Pagination({ page, totalPages, onPrev, onNext, from, to, total, t }: {
+  page: number; totalPages: number; onPrev: () => void; onNext: () => void; from: number; to: number; total: number; t: (key: string) => string
+}) {
+  if (totalPages <= 1) return null
+  return (
+    <div className="flex items-center justify-between pt-3 text-sm text-[#787774]">
+      <span>{from + 1}–{Math.min(to, total)} of {total}</span>
+      <div className="flex gap-1">
+        <button onClick={onPrev} disabled={page <= 0}
+          className="px-3 py-1 rounded border border-[#D4D4D4] disabled:opacity-30 hover:bg-[#F5F5F5]"
+        >{t('common.previous')}</button>
+        <button onClick={onNext} disabled={page >= totalPages - 1}
+          className="px-3 py-1 rounded border border-[#D4D4D4] disabled:opacity-30 hover:bg-[#F5F5F5]"
+        >{t('common.next')}</button>
+      </div>
+    </div>
+  )
+}
+
+function CombinedTable({ rows, page, totalPages, onPrev, onNext, formatCurrency, onDownloadInvoice, printingId, t }: {
+  rows: CombinedRow[]; page: number; totalPages: number; onPrev: () => void; onNext: () => void; formatCurrency: (n: number) => string; onDownloadInvoice?: (id: string) => void; printingId?: string | null; t: (key: string) => string
+}) {
+  if (rows.length === 0) return <p className="text-sm text-[#787774] py-4">{t('accounting.reports.noRecords')}</p>
+  return (
+    <div>
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[900px]">
+          <thead>
+            <tr>
+              <th className={tableHeadClass}>{t('accounting.ledger.type')}</th>
+              <th className={tableHeadClass}>{t('accounting.reports.idDescription')}</th>
+              <th className={tableHeadClass}>{t('accounting.reports.details')}</th>
+              <th className={tableHeadClass}>{t('accounting.invoices.amount')}</th>
+              <th className={tableHeadClass}>{t('accounting.reports.paid')}</th>
+              <th className={tableHeadClass}>{t('accounting.reports.refunded')}</th>
+              <th className={tableHeadClass}>{t('accounting.reports.remaining')}</th>
+              <th className={tableHeadClass}>{t('accounting.reports.method')}</th>
+              <th className={tableHeadClass}>{t('accounting.invoices.status')}</th>
+              <th className={tableHeadClass}>{t('common.date')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={`${r.type}-${r.id}`} className="hover:bg-[#F9F9F9]">
+                <td className={tableCellClass}><TypeBadge type={r.type} t={t} /></td>
+                <td className={tableCellClass}>
+                  {r.type === 'invoice' ? (
+                    <button onClick={() => onDownloadInvoice?.(r.id)} disabled={printingId === r.id}
+                      className="font-medium text-blue-600 hover:text-blue-800 hover:underline disabled:text-[#787774] disabled:no-underline disabled:cursor-not-allowed text-left"
+                    >
+                      {printingId === r.id ? '...' : r.invoiceNumber}
+                    </button>
+                  ) : (
+                    <span className="font-medium">{r.description}</span>
+                  )}
+                </td>
+                <td className={`${tableCellClass} text-[#787774]`}>
+                  {r.type === 'invoice' ? (r.secondary || '—') : (r.category || '—')}
+                </td>
+                <td className={tableCellClass}>{formatCurrency(r.amount)}</td>
+                <td className={tableCellClass}>{formatCurrency(r.paidAmount)}</td>
+                <td className={tableCellClass}>{r.refundedAmount > 0 ? formatCurrency(r.refundedAmount) : '—'}</td>
+                <td className={`${tableCellClass} font-medium ${r.remainingBalance > 0 ? 'text-[#9F2F2D]' : 'text-green-600'}`}>
+                  {r.remainingBalance > 0 ? formatCurrency(r.remainingBalance) : '0'}
+                </td>
+                <td className={`${tableCellClass} text-[#787774]`}>
+                  {r.method ? (PAYMENT_TYPE_LABELS[r.method as keyof typeof PAYMENT_TYPE_LABELS] ?? r.method) : '—'}
+                </td>
+                <td className={tableCellClass}><StatusBadge status={r.status} type={r.type} /></td>
+                <td className={`${tableCellClass} text-[#787774]`}>{r.date?.slice(0, 10) ?? '—'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <Pagination page={page} totalPages={totalPages} onPrev={onPrev} onNext={onNext}
+        from={page * PAGE_SIZE} to={page * PAGE_SIZE + rows.length} total={rows.length + (page * PAGE_SIZE)} t={t} />
+    </div>
+  )
+}
+
+function mergeRows(invoices: ReportInvoiceDetail[], expenses: ReportExpenseDetail[]): CombinedRow[] {
+  const inv: CombinedRow[] = invoices.map((i) => ({
+    id: i.id, type: 'invoice' as RecordType,
+    invoiceNumber: i.invoiceNumber,
+    description: `${i.invoiceNumber} - ${i.guestName ?? i.companyName ?? ''}`,
+    secondary: i.guestName ?? i.companyName ?? '—',
+    amount: i.amount, paidAmount: i.paidAmount, refundedAmount: i.refundedAmount,
+    remainingBalance: i.remainingBalance, totalAmount: i.amount, taxAmount: 0,
+    vendor: null, category: null, costCenter: null, room: i.roomNumber,
+    method: i.paymentMethod, status: i.status, date: i.issueDate,
+  }))
+  const exp: CombinedRow[] = expenses.map((e) => ({
+    id: e.id, type: 'expense' as RecordType,
+    description: e.description,
+    secondary: e.categoryName ?? '—',
+    amount: e.amount, paidAmount: e.totalAmount, refundedAmount: 0,
+    remainingBalance: 0, totalAmount: e.totalAmount, taxAmount: e.taxAmount,
+    vendor: e.vendor, category: e.categoryName, costCenter: e.costCenter, room: null,
+    method: e.paymentMethod, status: e.status, date: e.date,
+    invoiceNumber: undefined,
+  }))
+  return [...inv, ...exp].sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''))
+}
+
+export function ReportsTab({ t }: Props) {
+  const { formatCurrency, currencyCode } = useCurrency()
+  const locale = useLocale()
+  const [reportType, setReportType] = useState<'daily' | 'monthly'>('daily')
+  const [date, setDate] = useState(new Date().toISOString().slice(0, 10))
+  const [month, setMonth] = useState(new Date().toISOString().slice(0, 7))
+  const [dailyReport, setDailyReport] = useState<DailyRevenueReport | null>(null)
+  const [monthlyReport, setMonthlyReport] = useState<MonthlyRevenueReport | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
+  const [exportingCsv, setExportingCsv] = useState(false)
+  const [exportingPdf, setExportingPdf] = useState(false)
+  const [printingId, setPrintingId] = useState<string | null>(null)
+  const [page, setPage] = useState(0)
+
+  const loadReport = useCallback(async () => {
+    setLoading(true)
+    setPage(0)
+    try {
+      if (reportType === 'daily') {
+        const res = await fetch(`/api/accounting/reports/daily-revenue?date=${date}`)
+        if (res.ok) {
+          const json = await res.json()
+          setDailyReport(json.data)
+        }
+      } else if (reportType === 'monthly') {
+        const res = await fetch(`/api/accounting/reports/monthly-revenue?month=${month}`)
+        if (res.ok) {
+          const json = await res.json()
+          setMonthlyReport(json.data)
+        }
+      }
+      setLastUpdated(new Date())
+    } catch { /* handled */ }
+    finally { setLoading(false) }
+  }, [reportType, date, month])
+
+  useEffect(() => { loadReport() }, [loadReport])
+
+  const invoices = (reportType === 'daily' ? dailyReport?.invoices : monthlyReport?.invoices) ?? []
+  const expenseDetails = (reportType === 'daily' ? dailyReport?.expenseDetails : monthlyReport?.expenseDetails) ?? []
+
+  const allRows = useMemo(() => mergeRows(invoices, expenseDetails), [invoices, expenseDetails])
+  const totalPages = Math.max(1, Math.ceil(allRows.length / PAGE_SIZE))
+  const pageRows = allRows.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE)
+
+  const totalPaid = invoices.reduce((s, i) => s + i.paidAmount, 0)
+  const totalRefunded = invoices.reduce((s, i) => s + i.refundedAmount, 0)
+  const totalRemaining = invoices.reduce((s, i) => s + i.remainingBalance, 0)
+  const totalAmount = (reportType === 'daily' ? dailyReport?.totalRevenue : monthlyReport?.totalRevenue) ?? 0
+  const totalExpenses = (reportType === 'daily' ? dailyReport?.expenses : monthlyReport?.expenses) ?? 0
+
+  const handleExportCsv = useCallback(async () => {
+    setExportingCsv(true)
+    await new Promise<void>(r => setTimeout(r, 0))
+    try {
+      if (reportType === 'daily' && dailyReport) {
+        exportDailyRevenueCsv(dailyReport, `daily-revenue-${date}.csv`)
+      } else if (reportType === 'monthly' && monthlyReport) {
+        exportMonthlyRevenueCsv(monthlyReport, `monthly-revenue-${month}.csv`)
+      }
+    } finally {
+      setExportingCsv(false)
+    }
+  }, [reportType, dailyReport, monthlyReport, date, month])
+
+  const handleExportPdf = useCallback(async () => {
+    setExportingPdf(true)
+    try {
+      if (reportType === 'daily' && dailyReport) {
+        await exportDailyRevenuePdf(dailyReport, locale as 'en' | 'ar', `daily-revenue-${date}.pdf`, currencyCode)
+      } else if (reportType === 'monthly' && monthlyReport) {
+        await exportMonthlyRevenuePdf(monthlyReport, locale as 'en' | 'ar', `monthly-revenue-${month}.pdf`, currencyCode)
+      }
+    } finally {
+      setExportingPdf(false)
+    }
+  }, [reportType, dailyReport, monthlyReport, locale, date, month, currencyCode])
+
+  const handleDownloadInvoice = useCallback(async (id: string) => {
+    setPrintingId(id)
+    try {
+      const res = await fetch(`/api/accounting/invoices/${id}`)
+      if (!res.ok) {
+        console.error('[ReportsTab] fetch invoice FAILED', res.status)
+        const { toast } = await import('@/shared/toast/toastEvents')
+        toast.error('Failed to load invoice')
+        return
+      }
+      const json = await res.json()
+      const full = json.data ?? json
+      const { downloadInvoicePdf } = await import('@/modules/accounting/utils/invoicePdfExport')
+      await downloadInvoicePdf(full, locale)
+    } catch (err) {
+      console.error('[ReportsTab] handleDownloadInvoice FAILED', err)
+    }
+    finally { setPrintingId(null) }
+  }, [locale])
+
+  return (
+    <div className="space-y-6">
+      <div className="flex gap-1 bg-[#F5F5F5] rounded-lg p-1 w-full overflow-x-auto">
+        {(['daily', 'monthly'] as const).map((type) => (
+          <button key={type} onClick={() => setReportType(type)}
+            className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+              reportType === type ? 'bg-white text-[#1A1A1A]' : 'text-[#787774] hover:text-[#333333]'
+            }`}>
+            {t(`accounting.reports.${type}`)}
+          </button>
+        ))}
+      </div>
+
+      <div className="flex items-center gap-3 flex-wrap">
+        {reportType === 'daily' && (
+          <input type="date" className="h-9 rounded-lg border border-[#D4D4D4] px-3 text-sm"
+            value={date} onChange={(e) => setDate(e.target.value)} />
+        )}
+        {reportType === 'monthly' && (
+          <input type="month" className="h-9 rounded-lg border border-[#D4D4D4] px-3 text-sm"
+            value={month} onChange={(e) => setMonth(e.target.value)} />
+        )}
+        <button onClick={loadReport}
+          className="h-9 rounded-lg bg-[#1A1A1A] px-4 text-sm font-medium text-white hover:bg-[#333333]">
+          {t('common.search')}
+        </button>
+        <ToolbarExportGroup onExportCsv={handleExportCsv} onExportPdf={handleExportPdf} csvLabel="CSV" pdfLabel="PDF" csvExporting={exportingCsv} pdfExporting={exportingPdf} />
+      </div>
+
+      {lastUpdated && (
+        <p className="text-xs text-[#787774]">
+          {t('accounting.reports.lastUpdated')}: {formatDate(lastUpdated.toISOString(), locale)}
+        </p>
+      )}
+
+      {loading && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-24 rounded-xl" />)}
+        </div>
+      )}
+
+      {!loading && reportType === 'daily' && dailyReport && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <MetricCard label={t('accounting.reports.roomRevenue')} value={formatCurrency(dailyReport.roomRevenue)} />
+            <MetricCard label={t('accounting.reports.extraServices')} value={formatCurrency(dailyReport.extraServices)} />
+            <MetricCard label={t('accounting.reports.taxCollected')} value={formatCurrency(dailyReport.taxCollected)} />
+            <MetricCard label={t('accounting.reports.netRevenue')} value={formatCurrency(dailyReport.netRevenue)} positive={dailyReport.netRevenue >= 0} />
+          </div>
+
+          <div className={cardClass}>
+            <h4 className="text-sm font-medium text-[#333333] mb-3">{t('accounting.reports.paymentMethods')}</h4>
+            {dailyReport.payments.length === 0 && <p className="text-sm text-[#787774]">{t('accounting.reports.noData')}</p>}
+            {dailyReport.payments.map((p, i) => (
+              <div key={i} className="flex justify-between py-1 text-sm border-b border-gray-50 last:border-0">
+                <span className="text-[#555555]">{PAYMENT_TYPE_LABELS[p.method as keyof typeof PAYMENT_TYPE_LABELS] ?? p.method}</span>
+                <span className="font-medium">{formatCurrency(p.amount)}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className={cardClass}>
+            <h4 className="text-sm font-medium text-[#333333] mb-3">{t('accounting.reports.allRecords').replace('{count}', String(allRows.length))}</h4>
+            <CombinedTable rows={pageRows} page={page} totalPages={totalPages}
+              onPrev={() => setPage(p => Math.max(0, p - 1))}
+              onNext={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+              formatCurrency={formatCurrency} onDownloadInvoice={handleDownloadInvoice} printingId={printingId} t={t} />
+            <div className="mt-3 pt-3 border-t border-[#EAEAEA] space-y-1">
+              <SummaryRow label={t('accounting.reports.totalRevenue')} value={formatCurrency(totalAmount)} />
+              <SummaryRow label={t('accounting.finance.paid')} value={formatCurrency(totalPaid)} positive />
+              <SummaryRow label={t('accounting.invoices.refunded')} value={formatCurrency(totalRefunded)} positive={false} />
+              <SummaryRow label={t('accounting.overview.outstanding')} value={formatCurrency(totalRemaining)}
+                positive={totalRemaining <= 0} />
+              <SummaryRow label={t('accounting.overview.totalExpenses')} value={formatCurrency(totalExpenses)} positive={false} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {!loading && reportType === 'monthly' && monthlyReport && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <MetricCard label={t('accounting.reports.roomRevenue')} value={formatCurrency(monthlyReport.roomRevenue)} />
+            <MetricCard label={t('accounting.reports.otherRevenue')} value={formatCurrency(monthlyReport.otherRevenue)} />
+            <MetricCard label={t('accounting.reports.totalRevenue')} value={formatCurrency(monthlyReport.totalRevenue)} positive />
+            <MetricCard label={t('accounting.reports.expenses')} value={formatCurrency(monthlyReport.expenses)} positive={false} />
+            <MetricCard label={t('accounting.reports.netProfit')} value={formatCurrency(monthlyReport.netProfit)} positive={monthlyReport.netProfit >= 0} />
+            <MetricCard label={t('accounting.reports.occupancyRate')} value={monthlyReport.occupancyRate > 0 ? `${monthlyReport.occupancyRate.toFixed(1)}%` : '—'} />
+          </div>
+
+          <div className={cardClass}>
+            <h4 className="text-sm font-medium text-[#333333] mb-3">{t('accounting.reports.allRecords').replace('{count}', String(allRows.length))}</h4>
+            <CombinedTable rows={pageRows} page={page} totalPages={totalPages}
+              onPrev={() => setPage(p => Math.max(0, p - 1))}
+              onNext={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+              formatCurrency={formatCurrency} onDownloadInvoice={handleDownloadInvoice} printingId={printingId} t={t} />
+            <div className="mt-3 pt-3 border-t border-[#EAEAEA] space-y-1">
+              <SummaryRow label={t('accounting.reports.totalRevenue')} value={formatCurrency(totalAmount)} />
+              <SummaryRow label={t('accounting.finance.paid')} value={formatCurrency(totalPaid)} positive />
+              <SummaryRow label={t('accounting.invoices.refunded')} value={formatCurrency(totalRefunded)} positive={false} />
+              <SummaryRow label={t('accounting.overview.outstanding')} value={formatCurrency(totalRemaining)}
+                positive={totalRemaining <= 0} />
+              <SummaryRow label={t('accounting.overview.totalExpenses')} value={formatCurrency(totalExpenses)} positive={false} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {!loading && !dailyReport && !monthlyReport && (
+        <div className="rounded-xl border border-[#EAEAEA] bg-white p-10 text-center space-y-1">
+          <p className="text-sm text-[#787774]">{t('accounting.reports.selectAndSearch')}</p>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function SummaryRow({ label, value, positive }: { label: string; value: string; positive?: boolean }) {
+  return (
+    <div className="flex justify-between py-1.5 text-sm border-b border-gray-50 last:border-0">
+      <span className="text-[#555555]">{label}</span>
+      <span className={`font-semibold ${positive === true ? 'text-green-600' : positive === false ? 'text-[#9F2F2D]' : 'text-[#1A1A1A]'}`}>{value}</span>
+    </div>
+  )
+}

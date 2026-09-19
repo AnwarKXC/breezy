@@ -1,0 +1,1 @@
+export { useAdminRooms } from './useAdminRooms'

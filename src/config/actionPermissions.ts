@@ -1,0 +1,108 @@
+import { ROLES, type UserRole } from './roles'
+
+export const ACTIONS = {
+  DASHBOARD_READ: 'dashboard:read',
+  BOOKINGS_READ: 'bookings:read',
+  BOOKINGS_WRITE: 'bookings:write',
+  GUESTS_READ: 'guests:read',
+  GUESTS_WRITE: 'guests:write',
+  ROOMS_READ: 'rooms:read',
+  ROOMS_STATUS_UPDATE: 'rooms:status_update',
+  ACCOUNTING_READ: 'accounting:read',
+  ACCOUNTING_WRITE: 'accounting:write',
+  ACCOUNTING_REPORTS: 'accounting:reports',
+  ACCOUNTING_EXPORT: 'accounting:export',
+  INVOICES_CREATE: 'invoices:create',
+  INVOICES_UPDATE: 'invoices:update',
+  INVOICES_ISSUE: 'invoices:issue',
+  INVOICES_VOID: 'invoices:void',
+  INVOICES_REFUND: 'invoices:refund',
+  INVOICES_ADJUST: 'invoices:adjust',
+  INVOICES_DELETE: 'invoices:delete',
+  PAYMENTS_CREATE: 'payments:create',
+  PAYMENTS_REFUND: 'payments:refund',
+  EXPENSES_CREATE: 'expenses:create',
+  EXPENSES_UPDATE: 'expenses:update',
+  EXPENSES_APPROVE: 'expenses:approve',
+  EXPENSES_VOID: 'expenses:void',
+  LEDGER_READ: 'ledger:read',
+  USERS_CREATE: 'users:create',
+  USERS_READ: 'users:read',
+  USERS_UPDATE: 'users:update',
+  USERS_DELETE: 'users:delete',
+  LOGS_READ: 'logs:read',
+  CONTACTS_CREATE: 'contacts:create',
+  CONTACTS_READ: 'contacts:read',
+  CONTACTS_UPDATE: 'contacts:update',
+  CONTACTS_DELETE: 'contacts:delete',
+  CONTACTS_PRICE_OVERRIDES_UPDATE: 'contacts:priceOverrides:update',
+  SETTINGS_READ: 'settings:read',
+  SETTINGS_WRITE: 'settings:write',
+  ACCOUNTING_SETTINGS: 'accounting:settings',
+  RESERVATIONS_READ: 'reservations:read',
+  RESERVATIONS_CREATE: 'reservations:create',
+  RESERVATIONS_UPDATE_DRAFT: 'reservations:update_draft',
+  RESERVATIONS_CONFIRM: 'reservations:confirm',
+  RESERVATIONS_CANCEL: 'reservations:cancel',
+  RESERVATIONS_CHECK_IN: 'reservations:check_in',
+  RESERVATIONS_CHECK_OUT: 'reservations:check_out',
+  RESERVATIONS_NO_SHOW: 'reservations:no_show',
+  RESERVATIONS_EXTEND: 'reservations:extend',
+  RESERVATIONS_ROOM_CHANGE: 'reservations:room_change',
+  RESERVATIONS_OVERRIDE_PRICING: 'reservations:override_pricing',
+  RESERVATIONS_MANAGE_BILLING: 'reservations:manage_billing',
+  RESERVATIONS_ADD_NOTE: 'reservations:add_note',
+  RESERVATIONS_RECORD_PAYMENT: 'reservations:record_payment',
+  RESERVATIONS_REFUND: 'reservations:refund',
+  RESERVATIONS_VIEW_AUDIT: 'reservations:view_audit',
+} as const
+
+export type ActionPermission = (typeof ACTIONS)[keyof typeof ACTIONS]
+export type Permission = ActionPermission
+
+export const ACTION_PERMISSIONS = Object.values(ACTIONS) as readonly ActionPermission[]
+
+// Accountant has the full reservation lifecycle like admin (DB RLS matches:
+// can_write_reservations() includes accountant since migration
+// 20260822000001, and rooms status updates since 20260822000002).
+const ACCOUNTANT_ACTIONS: readonly ActionPermission[] = ACTION_PERMISSIONS
+
+const FRONT_DESK_ACTIONS: readonly ActionPermission[] = [
+  ACTIONS.DASHBOARD_READ,
+  ACTIONS.BOOKINGS_READ,
+  ACTIONS.BOOKINGS_WRITE,
+  ACTIONS.GUESTS_READ,
+  ACTIONS.GUESTS_WRITE,
+  ACTIONS.ROOMS_READ,
+  ACTIONS.ROOMS_STATUS_UPDATE,
+  ACTIONS.ACCOUNTING_READ,
+  ACTIONS.INVOICES_CREATE,
+  ACTIONS.INVOICES_UPDATE,
+  ACTIONS.INVOICES_ISSUE,
+  ACTIONS.PAYMENTS_CREATE,
+  ACTIONS.CONTACTS_READ,
+  ACTIONS.CONTACTS_CREATE,
+  ACTIONS.CONTACTS_UPDATE,
+  ACTIONS.CONTACTS_DELETE,
+  ACTIONS.ACCOUNTING_REPORTS,
+  ACTIONS.ACCOUNTING_EXPORT,
+  ACTIONS.RESERVATIONS_VIEW_AUDIT,
+  ACTIONS.RESERVATIONS_READ,
+  ACTIONS.RESERVATIONS_CREATE,
+  ACTIONS.RESERVATIONS_UPDATE_DRAFT,
+  ACTIONS.RESERVATIONS_CONFIRM,
+  ACTIONS.RESERVATIONS_CANCEL,
+  ACTIONS.RESERVATIONS_CHECK_IN,
+  ACTIONS.RESERVATIONS_CHECK_OUT,
+  ACTIONS.RESERVATIONS_NO_SHOW,
+  ACTIONS.RESERVATIONS_EXTEND,
+  ACTIONS.RESERVATIONS_ROOM_CHANGE,
+  ACTIONS.RESERVATIONS_ADD_NOTE,
+  ACTIONS.RESERVATIONS_RECORD_PAYMENT,
+]
+
+export const ROLE_PERMISSIONS = {
+  [ROLES.ADMIN]: ACTION_PERMISSIONS,
+  [ROLES.ACCOUNTANT]: ACCOUNTANT_ACTIONS,
+  [ROLES.FRONT_DESK]: FRONT_DESK_ACTIONS,
+} as const satisfies Record<UserRole, readonly ActionPermission[]>
