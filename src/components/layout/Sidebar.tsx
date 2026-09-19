@@ -2,6 +2,7 @@
 
 import { memo, useCallback, useMemo, useState } from "react";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 
@@ -75,7 +76,7 @@ export const Sidebar = memo(function Sidebar() {
         className="mb-7 flex items-center gap-3 rounded-xl px-2 text-base font-semibold tracking-tight text-[#1A1A1A]"
       >
 <span className="grid h-10 w-10 place-items-center">
-  <img
+  <Image
     alt={t("common.appName")}
     className="h-10 w-10 object-contain"
     src="/Full Logo Green.png"

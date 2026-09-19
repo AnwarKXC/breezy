@@ -1,6 +1,6 @@
 ﻿// 📁 src/app/[locale]/(dashboard)/users/[id]/page.tsx - User Details Page Server Component
 
-import { UserDetailsView } from './UserDetailsView'
+import { UserDetailsView, type ReservationStats } from './UserDetailsView'
 import { getUserById } from '@/modules/users/services/userService'
 import { logUserViewed } from '@/modules/users/services/activityLogService'
 import { getCurrentSession } from '@/modules/users/services/authSession'
@@ -10,6 +10,8 @@ import ar from '@/i18n/locales/ar.json'
 import en from '@/i18n/locales/en.json'
 
 const translations = { ar, en }
+
+const RESERVATIONS_LIMIT = 50
 
 interface Reservation {
   id: string
@@ -44,11 +46,23 @@ export default async function UserDetailsRoutePage({
   let errorMessage: string | null = null
 
   // Fetched alongside the user instead of after it (only used when the user exists).
-  const reservationsPromise = prisma.reservations.findMany({
-    where: { created_by: id, deleted_at: null },
-    select: { id: true, created_by: true, reservation_number: true, check_in_date: true, check_out_date: true, status: true, total_amount: true },
-    orderBy: { created_at: 'desc' },
-  })
+  // The table shows the latest rows; the cards use database totals so they stay
+  // correct however many reservations the user has created.
+  const createdByUser = { created_by: id, deleted_at: null }
+  const reservationsPromise = Promise.all([
+    prisma.reservations.findMany({
+      where: createdByUser,
+      select: { id: true, created_by: true, reservation_number: true, check_in_date: true, check_out_date: true, status: true, total_amount: true },
+      orderBy: { created_at: 'desc' },
+      take: RESERVATIONS_LIMIT,
+    }),
+    prisma.reservations.count({ where: createdByUser }),
+    prisma.reservations.aggregate({
+      where: { ...createdByUser, status: { not: 'cancelled' } },
+      _sum: { total_amount: true },
+      _max: { check_in_date: true },
+    }),
+  ])
   reservationsPromise.catch(() => undefined)
 
   try {
@@ -83,9 +97,15 @@ export default async function UserDetailsRoutePage({
   } : null
 
   let reservations: Reservation[] = []
+  let stats: ReservationStats = { total: 0, revenue: 0, lastCheckIn: null }
 
   if (serializableUser) {
-    const dbReservations = await reservationsPromise
+    const [dbReservations, total, active] = await reservationsPromise
+    stats = {
+      total,
+      revenue: Number(active._sum.total_amount ?? 0),
+      lastCheckIn: active._max.check_in_date?.toISOString().slice(0, 10) ?? null,
+    }
 
     reservations = dbReservations.map((r) => ({
       id: r.id,
@@ -104,6 +124,7 @@ export default async function UserDetailsRoutePage({
       locale={locale}
       labels={labels}
       reservations={reservations}
+      stats={stats}
     />
   )
 }

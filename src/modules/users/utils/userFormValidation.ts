@@ -1,6 +1,5 @@
 import { UserCreateSchema, UserUpdateSchema } from '@/shared/validation'
 import type { CreateStaffUserInput } from '../services/authTypes'
-import type { UserRole } from '../types'
 
 export interface UserFormDraft {
   id?: string

@@ -1,7 +1,6 @@
 ﻿'use client'
 
 import { countryName } from '@/shared/static/countries'
-import { useMemo } from 'react'
 import { Modal } from '@/shared/components/Modal'
 import { useTranslation } from '@/i18n/hooks/useTranslation'
 import { BOOKING_STATUS_STYLES } from '../utils/roomStatusStyles'

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { memo, useMemo } from "react";
 import { useParams, usePathname } from "next/navigation";
 
@@ -37,10 +38,10 @@ export const Navbar = memo(function Navbar() {
     <header className={`fixed inset-x-0 top-0 z-30 flex h-16 items-center justify-between gap-3 border-b border-[#EAEAEA] bg-white px-4 sm:px-6 lg:sticky lg:inset-auto lg:top-0 lg:w-full lg:px-8 ${isRTL ? "flex-row-reverse" : ""}`}>
       <div className={`flex min-w-0 items-center gap-3 ${isRTL ? "flex-row-reverse text-right" : ""}`}>
 <span className="grid h-8 w-8 shrink-0 place-items-center">
-  <img
+  <Image
     alt={t("common.appName")}
     className="h-8 w-8 object-contain"
-    src="/logo Green.svg"
+    src="/logo-mark.png"
     width={32}
     height={32}
   />

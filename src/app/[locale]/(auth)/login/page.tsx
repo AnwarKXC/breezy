@@ -77,12 +77,13 @@ export default function LoginPage() {
         <div className="flex min-h-screen flex-col items-center justify-center px-6 py-10 sm:px-12">
           <div className="w-full max-w-[320px]">
             <div className="mb-8 text-center">
-              <img
+              <Image
                 alt="Breezy System"
                 className="mx-auto mb-5 h-20 w-20 object-contain"
                 src="/Full Logo Green.png"
                 width={80}
                 height={80}
+                priority
               />
               <h1 className="text-2xl font-bold tracking-tight">
                 {t("auth.login.title")}
@@ -141,10 +142,12 @@ export default function LoginPage() {
 
           <div className="mt-8 flex flex-col items-center gap-2 lg:hidden">
             <p className="text-xs text-[#787774]">Powered by Stepcreative.eg</p>
-            <img
+            <Image
               src="/logo-without-text-removebg-preview.png"
               alt="Logo"
               className="h-18 w-18 object-contain"
+              width={72}
+              height={72}
             />
           </div>
         </div>
@@ -154,7 +157,6 @@ export default function LoginPage() {
             alt="Logo"
             className="h-40 w-40 object-contain sm:h-52 sm:w-52 [filter:brightness(0)_invert(1)]"
             height={208}
-            priority
             src="/logo-without-text-removebg-preview.png"
             width={208}
           />

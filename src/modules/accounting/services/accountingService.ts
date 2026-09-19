@@ -22,7 +22,7 @@ import {
   getAccountingOverview, getFinanceTable, getFinancialHealth, getDailyRevenueReport,
   getMonthlyRevenueReport, getAccountsReceivableAging, getAccountingSettings, updateAccountingSetting,
 } from './reportsService'
-import { createLedgerEntry, getLedgerEntries } from './ledgerService'
+import { getLedgerEntries } from './ledgerService'
 import { updateInvoicePaidAmount, ensurePaymentLedgerEntry, getAllPayments, syncReservationPaymentTotals } from './paymentService'
 import { getExpenses } from './expenseService'
 import { recordReservationStatus, releaseRooms } from '@/modules/reservations/services/stayServer'

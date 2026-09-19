@@ -1401,7 +1401,8 @@
       "reservation": "الحجز",
       "checkIn": "تسجيل الوصول",
       "checkOut": "تسجيل المغادرة",
-      "total": "الإجمالي"
+      "total": "الإجمالي",
+      "showingLatest": "عرض أحدث {shown} من {total} حجز"
     }
   },
   "contacts": {

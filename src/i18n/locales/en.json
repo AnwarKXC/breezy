@@ -1331,7 +1331,8 @@
       "reservation": "Reservation",
       "checkIn": "Check In",
       "checkOut": "Check Out",
-      "total": "Total"
+      "total": "Total",
+      "showingLatest": "Showing the latest {shown} of {total} reservations"
     }
   },
   "contacts": {

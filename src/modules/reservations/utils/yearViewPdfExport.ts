@@ -149,7 +149,6 @@ export function buildYearViewPdfContent(payload: YearOverviewPayload, locale: st
 }
 
 export async function downloadYearViewPdf(payload: YearOverviewPayload, locale: string): Promise<void> {
-  const isRTL = locale === 'ar'
   // Arabic guest/company names can appear even in LTR reports, so always load the font.
   const pdfMake = await getPdfMake(true)
   const content = buildYearViewPdfContent(payload, locale)

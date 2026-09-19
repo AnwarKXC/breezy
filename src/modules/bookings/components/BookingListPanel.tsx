@@ -4,12 +4,25 @@ import { useEffect, useRef } from 'react'
 
 import { useTranslation } from '@/i18n/hooks/useTranslation'
 import { Card } from '@/shared/components/Card'
+import { CursorTableFooter } from '@/shared/table'
 import { BookingsTable, type BookingsTableRow } from './BookingsTable'
 import type { Booking } from '../types'
+
+export interface BookingListPagination {
+  page: number
+  pageSize: number
+  pageSizeOptions: readonly number[]
+  total: number
+  totalPages: number
+  onPageChange: (page: number) => void
+  onPageSizeChange: (pageSize: number) => void
+}
 
 interface BookingListPanelProps {
   rows: BookingsTableRow[]
   loading?: boolean
+  /** Server-side paging: `rows` is the current page only. */
+  pagination: BookingListPagination
   searchQuery: string
   onSearchChange: (value: string) => void
   onFilterClick?: () => void
@@ -32,6 +45,7 @@ interface BookingListPanelProps {
 export function BookingListPanel({
   rows,
   loading,
+  pagination,
   searchQuery,
   onSearchChange,
   onFilterClick,
@@ -111,6 +125,29 @@ export function BookingListPanel({
           {...callbacks}
         />
       </div>
+      {pagination.total > 0 && (
+        <div className="mt-3">
+          <CursorTableFooter
+            canNext={pagination.page < pagination.totalPages}
+            canPrevious={pagination.page > 1}
+            nextLabel={t('common.next')}
+            onNext={() => pagination.onPageChange(pagination.page + 1)}
+            onPageChange={pagination.onPageChange}
+            onPageSizeChange={pagination.onPageSizeChange}
+            onPrevious={() => pagination.onPageChange(pagination.page - 1)}
+            page={pagination.page}
+            pageLabel={t('common.showing')
+              .replace('{from}', String((pagination.page - 1) * pagination.pageSize + 1))
+              .replace('{to}', String(Math.min(pagination.page * pagination.pageSize, pagination.total)))
+              .replace('{total}', String(pagination.total))}
+            pageSize={pagination.pageSize}
+            pageSizeOptions={pagination.pageSizeOptions}
+            previousLabel={t('common.previous')}
+            rowsPerPageLabel={t('common.rowsPerPage')}
+            totalPages={pagination.totalPages}
+          />
+        </div>
+      )}
     </Card>
   )
 }

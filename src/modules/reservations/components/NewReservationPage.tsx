@@ -155,14 +155,10 @@ export function NewReservationPage() {
     return getOverrideFor(rt.id, occ) ?? getStandardRoomPrice(rt, occ)
   }
 
-  const subtotal = useMemo(
-    () => roomTypes.reduce((sum, rt) => {
-      const occupancies = roomOccupancies[rt.id] ?? []
-      if (occupancies.length === 0) return sum
-      return sum + occupancies.reduce((roomSum, occ) => roomSum + getRoomPrice(rt, occ) * nights, 0)
-    }, 0),
-    [roomTypes, roomOccupancies, getRoomPrice, nights],
-  )
+  const subtotal = roomTypes.reduce((sum, rt) => {
+    const occupancies = roomOccupancies[rt.id] ?? []
+    return sum + occupancies.reduce((roomSum, occ) => roomSum + getRoomPrice(rt, occ) * nights, 0)
+  }, 0)
   const serviceCharge = subtotal * serviceChargeRate
   const tax = (subtotal + serviceCharge) * vatRate
   const estimatedTotal = subtotal + serviceCharge + tax
@@ -302,7 +298,6 @@ export function NewReservationPage() {
 
   function updateRoomTypeCount(roomTypeId: string, value: number) {
     setServerError(null)
-    const prevCount = roomTypeCounts[roomTypeId] ?? 0
     setRoomTypeCounts((prev) => {
       const selectedWithoutCurrent = Object.entries(prev).reduce((sum, [id, count]) => {
         return id === roomTypeId ? sum : sum + count

@@ -8,7 +8,8 @@ import { useCallback, useEffect, useEffectEvent, useSyncExternalStore } from 're
  * - Data survives route changes, so revisiting a page renders cached rows at
  *   once and revalidates them in the background (every mount revalidates once
  *   the entry is older than `staleMs`, which only dedupes mount bursts).
- * - Concurrent requests for the same key share one fetch.
+ * - Mount-time loads of the same key share one request; an explicit refresh
+ *   always starts a new one, and a response never overwrites newer data.
  * - Entries are immutable snapshots, read through useSyncExternalStore.
  */
 interface Entry<T> {
@@ -16,6 +17,8 @@ interface Entry<T> {
   error?: Error
   fetching: boolean
   updatedAt: number
+  /** Bumped by every local mutation; responses requested before it are dropped. */
+  version: number
 }
 
 type Listener = () => void
@@ -26,9 +29,12 @@ const entries = new Map<string, Entry<unknown>>()
 const inflight = new Map<string, Promise<unknown>>()
 const listeners = new Map<string, Set<Listener>>()
 
+function getEntry<T>(key: string): Entry<T> {
+  return (entries.get(key) as Entry<T> | undefined) ?? { fetching: false, updatedAt: 0, version: 0 }
+}
+
 function setEntry<T>(key: string, patch: Partial<Entry<T>>) {
-  const prev = (entries.get(key) as Entry<T> | undefined) ?? { fetching: false, updatedAt: 0 }
-  entries.set(key, { ...prev, ...patch })
+  entries.set(key, { ...getEntry<T>(key), ...patch })
   listeners.get(key)?.forEach((listener) => listener())
 }
 
@@ -41,40 +47,47 @@ function subscribe(key: string, listener: Listener) {
   }
 }
 
-/** Fetches `key` (deduplicated) and stores the result. Never rejects. */
-export function loadResource<T>(key: string, fetcher: () => Promise<T>): Promise<T | undefined> {
+/**
+ * Fetches `key` and stores the result. Never rejects. Without `force`, joins a
+ * request already in flight; with it, supersedes that request.
+ */
+export function loadResource<T>(
+  key: string,
+  fetcher: () => Promise<T>,
+  { force = false }: { force?: boolean } = {},
+): Promise<T | undefined> {
   const pending = inflight.get(key) as Promise<T> | undefined
-  if (pending) return pending.catch(() => undefined)
+  if (pending && !force) return pending.catch(() => undefined)
 
   const promise = fetcher()
+  const version = getEntry<T>(key).version
   inflight.set(key, promise)
   setEntry<T>(key, { fetching: true })
 
+  // Only the latest request may write, and never over a newer local mutation.
+  const isLatest = () => inflight.get(key) === promise
+  const canApply = () => isLatest() && getEntry<T>(key).version === version
+
   return promise
     .then((data) => {
-      setEntry<T>(key, { data, error: undefined, fetching: false, updatedAt: Date.now() })
+      if (canApply()) setEntry<T>(key, { data, error: undefined, updatedAt: Date.now() })
       return data
     })
     .catch((error: unknown) => {
-      setEntry<T>(key, { error: error instanceof Error ? error : new Error(String(error)), fetching: false })
+      if (canApply()) setEntry<T>(key, { error: error instanceof Error ? error : new Error(String(error)) })
       return undefined
     })
     .finally(() => {
+      if (!isLatest()) return
       inflight.delete(key)
+      setEntry<T>(key, { fetching: false })
     })
 }
 
 /** Replaces cached data locally (optimistic updates after a mutation). */
 export function mutateResource<T>(key: string, update: (current: T | undefined) => T) {
-  const current = entries.get(key) as Entry<T> | undefined
-  setEntry<T>(key, { data: update(current?.data), updatedAt: Date.now() })
-}
-
-/** Marks entries whose key starts with `prefix` stale so the next read refetches. */
-export function invalidateResources(prefix: string) {
-  for (const [key, entry] of entries) {
-    if (key.startsWith(prefix)) entries.set(key, { ...entry, updatedAt: 0 })
-  }
+  const current = getEntry<T>(key)
+  setEntry<T>(key, { data: update(current.data), error: undefined, updatedAt: Date.now(), version: current.version + 1 })
 }
 
 const noopSubscribe = () => () => {}
@@ -88,6 +101,7 @@ export interface ResourceState<T> {
   isFetching: boolean
   /** When the current data was fetched (ms epoch), if ever. */
   updatedAt: number | undefined
+  /** Starts a fresh request (never reuses one begun before a mutation). */
   refresh: () => Promise<T | undefined>
   mutate: (update: (current: T | undefined) => T) => void
 }
@@ -97,22 +111,28 @@ export function useResource<T>(
   fetcher: () => Promise<T>,
   { staleMs = DEFAULT_STALE_MS }: { staleMs?: number } = {},
 ): ResourceState<T> {
+  const subscribeToKey = useCallback(
+    (listener: Listener) => (key ? subscribe(key, listener) : noopSubscribe()),
+    [key],
+  )
   const entry = useSyncExternalStore(
-    key ? (listener) => subscribe(key, listener) : noopSubscribe,
+    subscribeToKey,
     () => (key ? (entries.get(key) as Entry<T> | undefined) : undefined),
     () => undefined,
   )
 
-  const fetchLatest = useEffectEvent(() => (key ? loadResource(key, fetcher) : Promise.resolve(undefined)))
+  const fetchLatest = useEffectEvent((force: boolean) =>
+    key ? loadResource(key, fetcher, { force }) : Promise.resolve(undefined),
+  )
 
   useEffect(() => {
     if (!key) return
     const current = entries.get(key)
-    if (!current || Date.now() - current.updatedAt > staleMs) void fetchLatest()
+    if (!current || Date.now() - current.updatedAt > staleMs) void fetchLatest(false)
   }, [key, staleMs])
 
   const refresh = useCallback(
-    () => (key ? loadResource(key, fetcher) : Promise.resolve(undefined)),
+    () => (key ? loadResource(key, fetcher, { force: true }) : Promise.resolve(undefined)),
     [key, fetcher],
   )
   const mutate = useCallback(
@@ -127,7 +147,7 @@ export function useResource<T>(
     error: entry?.error,
     isLoading: key !== null && entry?.data === undefined && !entry?.error,
     isFetching: entry?.fetching ?? false,
-    updatedAt: entry?.data === undefined ? undefined : entry.updatedAt || undefined,
+    updatedAt: entry?.data === undefined ? undefined : entry.updatedAt,
     refresh,
     mutate,
   }

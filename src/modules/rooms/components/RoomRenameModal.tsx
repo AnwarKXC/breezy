@@ -1,6 +1,5 @@
 'use client'
 
-import { type FormEvent } from 'react'
 import { useTranslation } from '@/i18n/hooks/useTranslation'
 import { Modal, FloatingInput } from '@/shared'
 import type { Room } from '../types'

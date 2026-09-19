@@ -41,7 +41,7 @@ export function useUsersView(initialData?: UsersPage) {
     if (initialData) {
       dispatch(fetchUsersThunk.fulfilled(initialData, '', undefined))
     }
-  }, [])
+  }, [dispatch, initialData])
 
   useEffect(() => {
     if (hasInitialData.current) {

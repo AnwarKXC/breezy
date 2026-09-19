@@ -262,7 +262,7 @@ function hasArabic(text: string): boolean {
   return /[\u0600-\u06FF]/.test(text);
 }
 
-export function getPdfFont(text: string, _locale: string) {
+export function getPdfFont(text: string) {
   return hasArabic(text) ? "NotoSansArabic" : "Arial";
 }
 
@@ -305,7 +305,7 @@ export function applyPdfFonts<T>(value: T, locale: string): T {
     if (mixed) result.text = splitMixedPdfText(text);
     else {
       result.text = text;
-      result.font = getPdfFont(text, locale);
+      result.font = getPdfFont(text);
     }
   }
   return result as T;

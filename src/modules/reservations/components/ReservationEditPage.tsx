@@ -128,7 +128,7 @@ export function ReservationEditPage() {
     return { price, occCode, occLabel }
   }
 
-  const pricing = useMemo(() => {
+  function computePricing() {
     if (!datesValid || form.selectedRoomIds.length === 0) return null
     // Grouped by (type, occupancy, actual price) so a room whose price gets
     // overridden splits off into its own line instead of staying lumped in
@@ -156,7 +156,8 @@ export function ReservationEditPage() {
     const tax = (roomCharges + serviceCharge) * vatRate
     const total = roomCharges + serviceCharge + tax
     return { roomDetails, roomCharges, serviceCharge, tax, total }
-  }, [datesValid, form.selectedRoomIds.length, serviceChargeRate, vatRate, selectedRooms, roomTypeMap, getStandardRoomPrice, getOverrideFor, nights])
+  }
+  const pricing = computePricing()
 
   // Load initial data
   useEffect(() => {

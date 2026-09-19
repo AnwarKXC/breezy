@@ -2,7 +2,7 @@
 
 import { isCurrencyCode } from '@/shared/static/currencies'
 import { createContext, useContext, useCallback, useMemo, useSyncExternalStore, type ReactNode } from 'react'
-import { useResource } from '@/shared/data/useResource'
+import { loadResource, useResource } from '@/shared/data/useResource'
 import type { CurrencyCode } from '@/shared/utils/types'
 import { CURRENCY_SYMBOLS } from '@/shared/utils/types'
 import { invalidateDisplayCurrency } from '@/shared/currency/client'
@@ -36,7 +36,10 @@ function getStoredCurrency(): CurrencyCode | null {
   try {
     const stored = localStorage.getItem(STORAGE_KEY)
     if (isCurrencyCode(stored)) return stored
-  } catch (error) { console.error('[CurrencyContext] Failed to read stored currency:', error) }
+  } catch {
+    // Storage unavailable (private mode): fall back to the default. Runs on every
+    // render as a store snapshot, so it must stay silent.
+  }
   return null
 }
 
@@ -64,6 +67,11 @@ async function fetchRates(): Promise<Record<string, number> | null> {
   const res = await fetch(RATES_KEY)
   if (!res.ok) return null
   return ((await res.json())?.data?.rates ?? null) as Record<string, number> | null
+}
+
+/** Re-reads system settings (currency, VAT, service charge) after they are edited. */
+export function refreshAccountingSettings() {
+  return loadResource(SETTINGS_KEY, fetchSettings, { force: true })
 }
 
 function subscribeStorage(onChange: () => void) {

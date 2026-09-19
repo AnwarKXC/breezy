@@ -181,9 +181,9 @@ export function BookingsTable({
       data={rows}
       columns={columns}
       loading={loading}
-      paginate={true}
-      pageSize={10}
-      pageSizeOptions={[10, 20, 50, 100]}
+      // Paged server-side (BookingListPanel footer); rows are one page.
+      paginate={false}
+      sortable={false}
       emptyMessage={t('bookings.noBookings')}
       onRowClick={callbacks.onNavigate ? (row) => callbacks.onNavigate!((row as BookingsTableRow).booking) : undefined}
     />

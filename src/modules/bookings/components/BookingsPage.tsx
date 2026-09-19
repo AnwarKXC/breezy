@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
@@ -9,20 +9,19 @@ import { InfoHint } from '@/shared/components/InfoHint'
 import { BookingDeleteModal } from './BookingDeleteModal'
 import { useTranslation } from '@/i18n/hooks/useTranslation'
 import { useCurrency } from '@/shared/contexts/CurrencyContext'
-import { useBookings } from '../hooks/useBookings'
+import { useBookings, useBookingsPage } from '../hooks/useBookings'
+import { useDebounce } from '@/shared/hooks/useDebounce'
 import { useRooms } from '@/modules/rooms/hooks/useRooms'
 import { useRoomTypes } from '@/modules/room-types/hooks/useRoomTypes'
 import { usePricing } from '@/modules/pricing/hooks/usePricing'
 import { guestService } from '@/services/guestService'
 import { useResource } from '@/shared/data/useResource'
-import { roomService } from '@/services/roomService'
 import type { Guest } from '@/modules/guests/types'
 import { reservationService } from '@/services/reservationService'
 import { BookingListPanel } from './BookingListPanel'
 import { BookingsTableRow } from './BookingsTable'
 import { BookingStatsCards } from './BookingStatsCards'
 import { RoomStatusPanel } from './RoomStatusPanel'
-import { RoomDetailsModal } from './RoomDetailsModal'
 import { BookingDetailModal } from './BookingDetailModal'
 import { CheckoutConfirmModal, type SavedCharge } from './CheckoutConfirmModal'
 import { BookingListFilterModal } from './BookingListFilterModal'
@@ -31,20 +30,22 @@ import { toast } from '@/shared/toast/toastEvents'
 import { useCan } from '@/shared/rbac/useCan'
 import { ACTIONS } from '@/config/rbac'
 import type { Room } from '@/modules/rooms/types'
-import type { DerivedRoomAvailability } from '../utils/deriveRoomAvailability'
 import { deriveRoomPrice } from '../utils/deriveRoomPrice'
-import type { Booking, BookingStatus } from '../types'
+import type { Booking } from '../types'
 
 // Guests only feed the detail modal; a failed load just leaves it without guest info.
 const fetchGuests = () => guestService.getAll().catch(() => [] as Guest[])
 const EMPTY_GUESTS: Guest[] = []
+
+const LIST_PAGE_SIZES = [20, 50, 100] as const
 
 export function BookingsPage() {
   const router = useRouter()
   const { t, locale } = useTranslation()
   const { formatCurrency } = useCurrency()
   const canCreateReservation = useCan(ACTIONS.RESERVATIONS_CREATE)
-  const { bookings, loading: bookingsLoading, fetchBookings } = useBookings()
+  // Active stays feed the room grid and stats; the table pages through the server.
+  const { bookings, loading: bookingsLoading, fetchBookings: refreshActiveBookings } = useBookings()
   const { rooms, loading: roomsLoading, fetchRooms } = useRooms()
   const { items: roomTypes } = useRoomTypes()
   const { items: pricing } = usePricing()
@@ -78,26 +79,39 @@ export function BookingsPage() {
   }, [bookings])
 
   const [searchQuery, setSearchQuery] = useState('')
-  const [roomDetailOpen, setRoomDetailOpen] = useState(false)
-  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null)
-  const [selectedAvailability, setSelectedAvailability] = useState<DerivedRoomAvailability | null>(null)
-  const [selectedPriceLabel, setSelectedPriceLabel] = useState('')
-  const [selectedRoomHistory, setSelectedRoomHistory] = useState<Array<{
-    guestName: string
-    checkIn: string
-    checkOut: string
-    status: string
-    totalAmount: number
-    contactNumber?: string
-    idNumber?: string
-    country?: string
-  }>>([])
   const [bookingFilterOpen, setBookingFilterOpen] = useState(false)
   const [roomFilterOpen, setRoomFilterOpen] = useState(false)
   const [dateRange, setDateRange] = useState({ startDate: '', endDate: '' })
   const [roomStatusFilter, setRoomStatusFilter] = useState('')
   const [bookingStatusFilter, setBookingStatusFilter] = useState('')
   const [guestTypeFilter, setGuestTypeFilter] = useState('')
+
+  const debouncedSearch = useDebounce(searchQuery.trim(), 300)
+  const listFilters = {
+    search: debouncedSearch,
+    from: dateRange.startDate,
+    to: dateRange.endDate,
+    status: bookingStatusFilter,
+    guestType: guestTypeFilter,
+  }
+  // Any filter change returns the list to page 1.
+  const filtersKey = JSON.stringify(listFilters)
+  const [pagination, setPagination] = useState({ filtersKey, page: 1, pageSize: LIST_PAGE_SIZES[0] as number })
+  const listPage = pagination.filtersKey === filtersKey ? pagination.page : 1
+  const bookingList = useBookingsPage({ ...listFilters, page: listPage, pageSize: pagination.pageSize })
+  const listTotalPages = Math.max(1, Math.ceil(bookingList.total / pagination.pageSize))
+  // Rows removed from the last page (delete/cancel elsewhere): step back to the new last page.
+  if (!bookingList.loading && listPage > listTotalPages) {
+    setPagination({ filtersKey, page: listTotalPages, pageSize: pagination.pageSize })
+  }
+  const goToPage = (page: number) =>
+    setPagination((current) => ({ ...current, filtersKey, page: Math.min(Math.max(1, page), listTotalPages) }))
+
+  const { refresh: refreshBookingList } = bookingList
+  const fetchBookings = useCallback(
+    () => Promise.all([refreshActiveBookings(), refreshBookingList()]),
+    [refreshActiveBookings, refreshBookingList],
+  )
 
 
   const roomTypeMap = useMemo(
@@ -118,37 +132,9 @@ export function BookingsPage() {
     [guests],
   )
 
-  const handleRoomClick = useCallback((room: Room, _availability: DerivedRoomAvailability, _priceLabel: string) => {
+  const handleRoomClick = useCallback((room: Room) => {
     router.push(`/${locale}/rooms/${room.id}`)
   }, [locale, router])
-
-  const handleMarkRoomAvailable = useCallback(async (roomId: string) => {
-    const room = rooms.find((r) => r.id === roomId)
-    if (!room) return
-    try {
-      await roomService.setStatus(roomId, 'available', 'Cleaned in under 2 hours')
-    } catch {
-      toast.error('Failed to update room status')
-      return
-    }
-    toast.success(`Room ${room.number} marked as available`)
-    setRoomDetailOpen(false)
-    await fetchRooms()
-  }, [rooms, fetchRooms])
-
-  const handleSetMaintenance = useCallback(async (roomId: string) => {
-    const room = rooms.find((r) => r.id === roomId)
-    if (!room) return
-    try {
-      await roomService.setStatus(roomId, 'maintenance', 'Set to maintenance')
-    } catch {
-      toast.error('Failed to update room status')
-      return
-    }
-    toast.success(`Room ${room.number} set to maintenance`)
-    setRoomDetailOpen(false)
-    await fetchRooms()
-  }, [rooms, fetchRooms])
 
   const handleAddBooking = useCallback(() => {
     router.push(`/${locale}/reservations/new`)
@@ -413,62 +399,14 @@ export function BookingsPage() {
     }
   }, [deleteBookingInvoiceData])
 
-  const filteredBookings = useMemo(() => {
-    let result = bookings
-
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase()
-      result = result.filter(
-        (b) =>
-          b.guestName.toLowerCase().includes(q) ||
-          b.roomNumber.toLowerCase().includes(q),
-      )
-    }
-
-    if (dateRange.startDate) {
-      const start = new Date(dateRange.startDate)
-      result = result.filter((b) => new Date(b.checkIn) >= start || new Date(b.checkOut) >= start)
-    }
-    if (dateRange.endDate) {
-      const end = new Date(dateRange.endDate)
-      end.setHours(23, 59, 59, 999)
-      result = result.filter((b) => new Date(b.checkIn) <= end || new Date(b.checkOut) <= end)
-    }
-
-    if (bookingStatusFilter) {
-      result = result.filter((b) => b.status === bookingStatusFilter)
-    }
-
-    if (guestTypeFilter) {
-      result = result.filter((b) => b.guestType === guestTypeFilter)
-    }
-
-    // Group order: currently checked-in first, then upcoming (booked/confirmed),
-    // then checked-out, cancelled last. Nearest check-in date first within each group.
-    const statusRank: Record<BookingStatus, number> = {
-      'checked-in': 0,
-      booked: 1,
-      confirmed: 1,
-      'checked-out': 2,
-      cancelled: 3,
-    }
-    return [...result].sort((a, b) => {
-      const rankDiff = statusRank[a.status] - statusRank[b.status]
-      if (rankDiff !== 0) return rankDiff
-      return new Date(a.checkIn).getTime() - new Date(b.checkIn).getTime()
-    })
-  }, [bookings, searchQuery, dateRange, bookingStatusFilter, guestTypeFilter])
-
-  // Separate display bookings (for table) from all bookings (for room status grid)
+  // Stats cover all recent bookings, not just the current list page.
   const displayAllBookings = useMemo(
     () => bookings.filter((b) => !b.isSubBooking),
     [bookings],
   )
 
-  const displayBookings = useMemo(
-    () => filteredBookings.filter((b) => !b.isSubBooking),
-    [filteredBookings],
-  )
+  // Server-filtered and server-ordered (checked in, upcoming, checked out, cancelled).
+  const displayBookings = bookingList.bookings
 
   const tableRows: BookingsTableRow[] = useMemo(
     () =>
@@ -558,7 +496,16 @@ export function BookingsPage() {
         <div className="mt-5">
           <BookingListPanel
             rows={tableRows}
-            loading={bookingsLoading || roomsLoading || guestsLoading}
+            loading={bookingList.loading || roomsLoading || guestsLoading}
+            pagination={{
+              page: listPage,
+              pageSize: pagination.pageSize,
+              pageSizeOptions: LIST_PAGE_SIZES,
+              total: bookingList.total,
+              totalPages: listTotalPages,
+              onPageChange: goToPage,
+              onPageSizeChange: (pageSize) => setPagination({ filtersKey, page: 1, pageSize }),
+            }}
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
             onFilterClick={() => setBookingFilterOpen(true)}
@@ -575,18 +522,6 @@ export function BookingsPage() {
           />
         </div>
       </div>
-
-      <RoomDetailsModal
-        isOpen={roomDetailOpen}
-        onClose={() => setRoomDetailOpen(false)}
-        room={selectedRoom}
-        roomTypes={roomTypes}
-        availability={selectedAvailability}
-        priceLabel={selectedPriceLabel}
-        history={selectedRoomHistory}
-        onMarkAvailable={handleMarkRoomAvailable}
-        onSetMaintenance={handleSetMaintenance}
-      />
 
       <BookingListFilterModal
         isOpen={bookingFilterOpen}

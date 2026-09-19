@@ -29,7 +29,7 @@ function LanguageIcon() {
 }
 
 export function LanguageSwitcher() {
-  const { dir, locale, setLocale, t } = useTranslation()
+  const { locale, setLocale, t } = useTranslation()
   const dropdownId = useId()
   const pathname = usePathname()
   const router = useRouter()

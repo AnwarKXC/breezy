@@ -69,11 +69,11 @@ function downloadReportsCsv(report: DailyRevenueReport | MonthlyRevenueReport, p
   )
 }
 
-export function exportDailyRevenueCsv(report: DailyRevenueReport, fileName: string): void {
+export function exportDailyRevenueCsv(report: DailyRevenueReport): void {
   downloadReportsCsv(report, 'daily-revenue')
 }
 
-export function exportMonthlyRevenueCsv(report: MonthlyRevenueReport, fileName: string): void {
+export function exportMonthlyRevenueCsv(report: MonthlyRevenueReport): void {
   downloadReportsCsv(report, 'monthly-revenue')
 }
 

@@ -67,7 +67,8 @@ export function useTableState<T extends Record<string, unknown>>({
   const handleRowSelectionChange = (rowId: string, checked: boolean) => {
     if (!onSelectedRowIdsChange) return
     const nextIds = new Set(selectedRowIds)
-    checked ? nextIds.add(rowId) : nextIds.delete(rowId)
+    if (checked) nextIds.add(rowId)
+    else nextIds.delete(rowId)
     onSelectedRowIdsChange(Array.from(nextIds))
   }
   const handlePageSelectionChange = (checked: boolean) => {

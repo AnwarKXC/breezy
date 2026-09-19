@@ -95,7 +95,7 @@ export const ContactsPage = memo(function ContactsPage({ permissions }: { permis
   const phoneErrorDescription = getContactErrorDescription(form.phoneError, labels)
 
   const handleRowClick = useCallback(
-    (contact: Contact, event?: React.MouseEvent | MouseEvent) => {
+    (contact: Contact) => {
       document.body.classList.add('table-navigating')
       const wrapper = document.querySelector('.contacts-table-wrapper')
       if (wrapper) wrapper.classList.add('loading')

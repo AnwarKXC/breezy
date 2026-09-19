@@ -1,6 +1,5 @@
 'use client'
 
-import { type FormEvent } from 'react'
 import { Modal, DropdownSelect, FloatingInput, type CurrencyCode, CURRENCY_LABELS } from '@/shared'
 import type { RoomType } from '@/modules/room-types/types'
 

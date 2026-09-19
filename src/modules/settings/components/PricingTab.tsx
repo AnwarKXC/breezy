@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from '@/i18n/hooks/useTranslation'
 import { toast } from '@/shared/toast/toastEvents'
+import { refreshAccountingSettings } from '@/shared/contexts/CurrencyContext'
 
 interface AccountingSetting {
   key: string
@@ -28,7 +29,7 @@ export function PricingTab() {
       })
       .catch(() => toast.error(t('settingsPricing.loadFailed')))
       .finally(() => setLoading(false))
-  }, [])
+  }, [t])
 
   const save = useCallback(async () => {
     const sc = Number(serviceCharge)
@@ -39,7 +40,7 @@ export function PricingTab() {
     }
     setSaving(true)
     try {
-      await Promise.all([
+      const responses = await Promise.all([
         fetch('/api/accounting/settings', {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
@@ -51,6 +52,8 @@ export function PricingTab() {
           body: JSON.stringify({ key: 'vat_rate', value: { rate: vat } }),
         }),
       ])
+      if (responses.some((res) => !res.ok)) throw new Error('settings save failed')
+      void refreshAccountingSettings()
       toast.success(t('settingsPricing.saveSuccess'))
     } catch {
       toast.error(t('settingsPricing.saveFailed'))

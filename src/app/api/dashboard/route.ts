@@ -10,7 +10,7 @@ export async function GET(request: Request) {
 
     const data = await getDashboardData()
     return NextResponse.json({ data })
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'dashboard/fetch_failed' },
       { status: 500 },

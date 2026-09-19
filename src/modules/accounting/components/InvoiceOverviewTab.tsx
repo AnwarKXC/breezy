@@ -2,7 +2,6 @@
 
 import { formatDate, formatDateTime } from '@/shared/utils/date'
 import type { Invoice } from '../types'
-import { INVOICE_STATUS_LABELS } from '../types'
 import type { CurrencyCode } from '@/shared/utils/types'
 
 interface InvoiceOverviewTabProps {

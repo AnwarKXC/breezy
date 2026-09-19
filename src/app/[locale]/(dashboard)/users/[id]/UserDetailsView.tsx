@@ -5,12 +5,15 @@
 import { useRouter } from 'next/navigation'
 import { memo, useMemo } from 'react'
 import { useTranslation } from '@/i18n/hooks/useTranslation'
+import { useCurrency } from '@/shared/contexts/CurrencyContext'
 
 import type { Locale } from '@/i18n/config'
 import type { UserRole } from '@/modules/users/types'
 import { Table, type TableColumn } from '@/shared/table'
 
 // 📍 Placeholder types
+const NO_DETAILS: Record<string, string> = {}
+
 interface Reservation {
   id: string
   userId: string
@@ -31,16 +34,24 @@ interface SerializableUser {
   createdAt: string | null
 }
 
+/** Totals over all of the user's reservations (the table only lists the latest). */
+export interface ReservationStats {
+  total: number
+  /** Sum of non-cancelled reservation totals, in the system currency. */
+  revenue: number
+  lastCheckIn: string | null
+}
+
 interface UserDetailsViewProps {
   user: SerializableUser | null
   locale: Locale
   labels: Record<string, unknown>
   reservations: Reservation[]
+  stats: ReservationStats
 }
 
-function UserInfoCard({ user, locale, labels }: { user: SerializableUser | null; locale: Locale; labels: Record<string, unknown> }) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const details = (labels as any).details || {}
+function UserInfoCard({ user, labels }: { user: SerializableUser | null; labels: Record<string, unknown> }) {
+  const details = (labels.details ?? NO_DETAILS) as Record<string, string>
   const { t } = useTranslation()
   const roleKey = user?.role === 'front_desk' ? 'frontDesk' : (user?.role as string) ?? ''
   const translatedRole = roleKey ? ((labels.roles as Record<string, string>)?.[roleKey] ?? user?.role) : ''
@@ -83,9 +94,9 @@ function UserInfoCard({ user, locale, labels }: { user: SerializableUser | null;
 
 type ReservationRow = Reservation & Record<string, unknown>
 
-function ReservationsTable({ reservations, locale, labels }: { reservations: Reservation[]; locale: Locale; labels: Record<string, unknown> }) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const details = (labels as any).details || {}
+function ReservationsTable({ reservations, total, locale, labels }: { reservations: Reservation[]; total: number; locale: Locale; labels: Record<string, unknown> }) {
+  const { formatCurrency } = useCurrency()
+  const details = (labels.details ?? NO_DETAILS) as Record<string, string>
   const router = useRouter()
   const { t } = useTranslation()
   const getStatusColor = (status: Reservation['status']) => {
@@ -119,13 +130,20 @@ function ReservationsTable({ reservations, locale, labels }: { reservations: Res
     {
       key: 'totalPrice',
       label: details.total || 'Total',
-      render: (_value, reservation) => `$${reservation.totalPrice}`,
+      render: (_value, reservation) => formatCurrency(reservation.totalPrice),
     },
-  ], [details, t])
+  ], [details, formatCurrency, t])
 
   return (
     <div className="rounded-xl bg-white p-6 ">
       <h2 className="mb-4 text-lg font-bold text-[#1A1A1A]">{details.reservations || 'Reservations'}</h2>
+      {total > reservations.length && (
+        <p className="-mt-2 mb-4 text-sm text-[#787774]">
+          {(details.showingLatest ?? '')
+            .replace('{shown}', String(reservations.length))
+            .replace('{total}', String(total))}
+        </p>
+      )}
       <Table
         columns={columns}
         data={reservations as ReservationRow[]}
@@ -141,27 +159,14 @@ function ReservationsTable({ reservations, locale, labels }: { reservations: Res
   )
 }
 
-function AnalyticsCards({
-  reservations,
-  labels,
-}: {
-  reservations: Reservation[]
-  labels: Record<string, unknown>
-}) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const details = (labels as any).details || {}
-  const totalReservations = reservations.length
-  const totalRevenue = reservations
-    .filter((r) => r.status !== 'cancelled')
-    .reduce((sum, r) => sum + r.totalPrice, 0)
-  const lastBooking = reservations
-    .filter((r) => r.status !== 'cancelled')
-    .sort((a, b) => new Date(b.checkIn).getTime() - new Date(a.checkIn).getTime())[0]
+function AnalyticsCards({ stats, labels }: { stats: ReservationStats; labels: Record<string, unknown> }) {
+  const details = (labels.details ?? NO_DETAILS) as Record<string, string>
+  const { formatCurrency } = useCurrency()
 
   const cards = [
-    { label: details.totalBookings || 'Total Bookings', value: totalReservations.toString(), icon: '📅' },
-    { label: details.totalSpent || 'Total Spent', value: `$${totalRevenue.toLocaleString()}`, icon: '💰' },
-    { label: details.lastBooking || 'Last Booking', value: lastBooking?.checkIn || '-', icon: '📆' },
+    { label: details.totalBookings || 'Total Bookings', value: stats.total.toString(), icon: '📅' },
+    { label: details.totalSpent || 'Total Spent', value: formatCurrency(stats.revenue), icon: '💰' },
+    { label: details.lastBooking || 'Last Booking', value: stats.lastCheckIn ?? '-', icon: '📆' },
   ]
 
   return (
@@ -186,11 +191,11 @@ export const UserDetailsView = memo(function UserDetailsViewComponent({
   locale,
   labels,
   reservations,
+  stats,
 }: UserDetailsViewProps) {
   const router = useRouter()
   const { t } = useTranslation()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const details = (labels as any).details || {}
+  const details = (labels.details ?? NO_DETAILS) as Record<string, string>
 
   return (
     <main className="min-h-screen bg-[#F4F5F7] px-4 py-6 sm:px-6 lg:px-8">
@@ -210,13 +215,13 @@ export const UserDetailsView = memo(function UserDetailsViewComponent({
         </div>
 
         {/* Analytics Cards */}
-        <AnalyticsCards reservations={reservations} labels={labels} />
+        <AnalyticsCards stats={stats} labels={labels} />
 
         {/* User Info */}
-        <UserInfoCard user={user} locale={locale} labels={labels} />
+        <UserInfoCard user={user} labels={labels} />
 
         {/* Reservations Table */}
-        <ReservationsTable reservations={reservations} locale={locale} labels={labels} />
+        <ReservationsTable reservations={reservations} total={stats.total} locale={locale} labels={labels} />
       </div>
     </main>
   )

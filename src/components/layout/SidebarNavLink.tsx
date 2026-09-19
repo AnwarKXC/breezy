@@ -1,10 +1,12 @@
+"use client";
+
 import { memo } from "react";
 import Link, { useLinkStatus } from "next/link";
 
 // Immediate feedback while the next route streams in (loading.tsx takes over after).
 function PendingIndicator() {
   const { pending } = useLinkStatus();
-  return pending ? <span aria-hidden className="ms-auto h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-[#2563EB]" /> : null;
+  return pending ? <span aria-hidden className="ms-auto h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-[#787774]" /> : null;
 }
 
 interface SidebarNavLinkProps {

@@ -92,7 +92,7 @@ export function InvoicesTab({ t, locale, invoiceFilters, onInvoiceFiltersChange 
     return f
   }, [statusFilter, dateRangeStart, dateRangeEnd])
 
-  const { invoices, loading, getNextNumber, loadById, refresh } = useInvoices(filters)
+  const { invoices, loading, loadById, refresh } = useInvoices(filters)
 
   const filteredInvoices = useMemo(() => {
     if (!searchQuery) return invoices
@@ -126,11 +126,6 @@ export function InvoicesTab({ t, locale, invoiceFilters, onInvoiceFiltersChange 
       value: key,
     })),
   ], [t])
-
-  const handleCreateClick = useCallback(() => {
-    getNextNumber()
-    setWizardMode('from-booking')
-  }, [getNextNumber])
 
   const handleEditClick = useCallback((invoice: Invoice) => {
     setEditingInvoice(invoice)

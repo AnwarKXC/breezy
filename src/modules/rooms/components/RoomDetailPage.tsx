@@ -4,7 +4,6 @@ import { useParams, useRouter } from 'next/navigation'
 import { useCallback, useMemo, useState } from 'react'
 import { useResource } from '@/shared/data/useResource'
 import { SkeletonCard } from '@/shared/components/SkeletonCard'
-import { StatusBadge } from '@/shared/components/StatusBadge'
 import { Table } from '@/shared/table'
 import { ToolbarExportGroup } from '@/shared/components/toolbar/ToolbarExportGroup'
 import { toast } from '@/shared/toast/toastEvents'
@@ -286,13 +285,6 @@ export function RoomDetailPage() {
     room.status === 'cleaning' && { label: actionLabels.available, nextStatus: 'available' as const },
     room.status === 'dirty' && { label: actionLabels.available, nextStatus: 'available' as const },
   ].filter(Boolean) as { label: string; nextStatus: RoomStatus }[]
-
-  const ACCENT_BORDER: Record<string, string> = {
-    indigo: 'border-t-[#333333]',
-    emerald: 'border-t-[#333333]',
-    amber: 'border-t-[#333333]',
-    violet: 'border-t-[#333333]',
-  }
 
   const amenitiesList = Array.isArray(room.amenities) ? room.amenities : []
 

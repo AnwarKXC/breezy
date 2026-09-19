@@ -6,9 +6,7 @@ import { useCurrency } from '@/shared/contexts/CurrencyContext'
 import { useLocale } from '@/i18n/components/LocaleContext'
 import { toast } from '@/shared/toast/toastEvents'
 import { downloadInvoicePdf } from '../utils/invoicePdfExport'
-import { formatDate } from '@/shared/utils/date'
-import type { Invoice } from '../types'
-import { PAYMENT_METHOD_LABELS } from '../types'
+import { PAYMENT_METHOD_LABELS, type Payment } from '../types'
 
 export type DetailTab = 'overview' | 'items' | 'payments' | 'ledger' | 'events'
 
@@ -30,6 +28,8 @@ function eventLabels(type: string, t: (key: string) => string): string {
   }
   return labels[type] ?? type
 }
+
+const NO_PAYMENTS: Payment[] = []
 
 export function useInvoiceDetail(invoiceId: string, t: (key: string) => string) {
   const { formatCurrency } = useCurrency()
@@ -89,7 +89,7 @@ export function useInvoiceDetail(invoiceId: string, t: (key: string) => string) 
   ]
 
   const invoice = currentInvoice
-  const payments = invoice?.payments ?? []
+  const payments = invoice?.payments ?? NO_PAYMENTS
 
   const timeline = useMemo(() => {
     if (!invoice) return []

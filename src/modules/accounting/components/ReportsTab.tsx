@@ -10,7 +10,7 @@ import { formatDate } from '@/shared/utils/date'
 import type { DailyRevenueReport, MonthlyRevenueReport, ReportInvoiceDetail, ReportExpenseDetail } from '../types'
 import { exportDailyRevenueCsv, exportMonthlyRevenueCsv } from '../utils/reportCsvExport'
 import { exportDailyRevenuePdf, exportMonthlyRevenuePdf } from '../utils/reportPdfExport'
-import { INVOICE_STATUS_LABELS, PAYMENT_METHOD_LABELS, COST_CENTER_LABELS } from '../types'
+import { INVOICE_STATUS_LABELS, PAYMENT_METHOD_LABELS } from '../types'
 
 interface Props {
   t: (key: string) => string
@@ -251,14 +251,14 @@ export function ReportsTab({ t }: Props) {
     await new Promise<void>(r => setTimeout(r, 0))
     try {
       if (reportType === 'daily' && dailyReport) {
-        exportDailyRevenueCsv(dailyReport, `daily-revenue-${date}.csv`)
+        exportDailyRevenueCsv(dailyReport)
       } else if (reportType === 'monthly' && monthlyReport) {
-        exportMonthlyRevenueCsv(monthlyReport, `monthly-revenue-${month}.csv`)
+        exportMonthlyRevenueCsv(monthlyReport)
       }
     } finally {
       setExportingCsv(false)
     }
-  }, [reportType, dailyReport, monthlyReport, date, month])
+  }, [reportType, dailyReport, monthlyReport])
 
   const handleExportPdf = useCallback(async () => {
     setExportingPdf(true)

@@ -1,5 +1,4 @@
 import type { Booking } from '@/modules/bookings/types'
-import { safeListLimit, type ListOptions } from '@/services/baseCrudService'
 
 function mapReservationStatus(status: string): Booking['status'] {
   switch (status) {
@@ -102,12 +101,55 @@ function mapReservationToBooking(row: Record<string, unknown>): Booking[] {
   return [displayBooking, ...subBookings]
 }
 
+export interface BookingListQuery {
+  page: number
+  pageSize: number
+  search?: string
+  from?: string
+  to?: string
+  status?: string
+  guestType?: string
+}
+
+export interface BookingPage {
+  /** One display row per reservation, in server order. */
+  bookings: Booking[]
+  total: number
+}
+
+async function fetchBoard(query: string) {
+  const res = await fetch(`/api/reservations/board?${query}`)
+  const json = (await res.json().catch(() => null)) as
+    | { ok?: boolean; data?: Record<string, unknown>[]; total?: number; error?: { message?: string } }
+    | null
+  if (!res.ok || !json?.ok) throw new Error(json?.error?.message ?? `Failed to load reservations (${res.status})`)
+  return json
+}
+
+export function bookingListQueryString(query: BookingListQuery): string {
+  const params = new URLSearchParams({ page: String(query.page), pageSize: String(query.pageSize) })
+  if (query.search) params.set('q', query.search)
+  if (query.from) params.set('from', query.from)
+  if (query.to) params.set('to', query.to)
+  if (query.status) params.set('status', query.status)
+  if (query.guestType) params.set('guestType', query.guestType)
+  return params.toString()
+}
+
 export const bookingService = {
-  async getAll(options: ListOptions = {}): Promise<Booking[]> {
-    const res = await fetch(`/api/reservations/board?limit=${safeListLimit(options.limit)}`)
-    const json = (await res.json().catch(() => null)) as { ok?: boolean; data?: Record<string, unknown>[] } | null
-    if (!res.ok || !json?.ok) throw new Error(`Failed to load reservations (${res.status})`)
+  /** Current and upcoming stays plus the last week's bookings (room grid + stats). */
+  async getActive(): Promise<Booking[]> {
+    const json = await fetchBoard('scope=active')
     return (json.data ?? []).flatMap(mapReservationToBooking)
+  },
+
+  /** One server-filtered, server-ordered page (query from bookingListQueryString). */
+  async getPage(queryString: string): Promise<BookingPage> {
+    const json = await fetchBoard(queryString)
+    return {
+      bookings: (json.data ?? []).map((row) => mapReservationToBooking(row)[0]),
+      total: json.total ?? 0,
+    }
   },
 }
 

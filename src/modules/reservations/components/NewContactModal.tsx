@@ -6,17 +6,6 @@ import { toast } from '@/shared/toast/toastEvents'
 import { countryOptions } from '@/shared/static/countries'
 import { useEscapeKey } from '@/shared/hooks/useEscapeKey'
 
-interface ContactCreateData {
-  type: 'individual' | 'company'
-  name: string
-  phone?: string
-  email?: string
-  idPassport?: string
-  country?: string
-  city?: string
-  responsiblePerson?: string
-}
-
 interface NewContactModalProps {
   isOpen: boolean
   onClose: () => void
@@ -77,7 +66,7 @@ export function NewContactModal({ isOpen, onClose, onCreated }: NewContactModalP
       })
       reset()
       onClose()
-    } catch (err) {
+    } catch {
       toast.error(t('reservations.failedToCreateContact'))
     } finally {
       setSaving(false)

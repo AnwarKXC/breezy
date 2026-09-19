@@ -220,7 +220,6 @@ export function ExpenseManager({ t }: ExpenseManagerProps) {
   // ─── Category detail view ────────────────────────────
   if (selectedCategoryId && selectedCategory) {
     const catTotal = categoryExpenses.reduce((sum, e) => sum + Number(e.amount), 0)
-    const catAvg = categoryExpenses.length > 0 ? catTotal / categoryExpenses.length : 0
     const displayExpenses = selectedCategoryId ? categoryExpenses : filteredExpenses
 
     return (
