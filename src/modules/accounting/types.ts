@@ -1,5 +1,6 @@
 import type { Tables, TablesInsert, TablesUpdate, Enums } from '@/services/db/rowTypes'
 import type { CurrencyCode } from '@/shared/static/currencies'
+import type { Money } from '@/shared/currency/money'
 
 export type PaymentMethod = Enums<'payment_method'>
 
@@ -177,32 +178,32 @@ export interface FinanceRow {
   contactName: string
   contactType: string
   invoiceCount: number
-  totalInvoiced: number
-  totalPaid: number
-  balance: number
+  totalInvoiced: Money
+  totalPaid: Money
+  balance: Money
 }
 
 export interface FinancialHealth {
-  totalRevenue: number
-  totalExpenses: number
-  netBalance: number
-  outstanding: number
+  totalRevenue: Money
+  totalExpenses: Money
+  netBalance: Money
+  outstanding: Money
 }
 
 export interface AccountingOverview {
-  todayRevenue: number
-  monthToDateRevenue: number
-  outstandingBalance: number
+  todayRevenue: Money
+  monthToDateRevenue: Money
+  outstandingBalance: Money
   paidInvoices: number
   unpaidInvoices: number
-  totalExpenses: number
-  netProfit: number
-  cashCollectedToday: number
-  cardPaymentsToday: number
-  bankPaymentsToday: number
-  onlinePaymentsToday: number
-  depositsHeld: number
-  totalRefunds: number
+  totalExpenses: Money
+  netProfit: Money
+  cashCollectedToday: Money
+  cardPaymentsToday: Money
+  bankPaymentsToday: Money
+  onlinePaymentsToday: Money
+  depositsHeld: Money
+  totalRefunds: Money
   occupancyRate: number | null
   averageDailyRate: number | null
   revPAR: number | null
@@ -218,6 +219,7 @@ export interface ReportInvoiceDetail {
   paidAmount: number
   refundedAmount: number
   remainingBalance: number
+  currency: string
   status: string
   issueDate: string
   paymentMethod: string | null
@@ -239,13 +241,13 @@ export interface ReportExpenseDetail {
 
 export interface DailyRevenueReport {
   date: string
-  roomRevenue: number
-  extraServices: number
-  taxCollected: number
-  totalRevenue: number
-  expenses: number
-  netRevenue: number
-  payments: { method: string; amount: number }[]
+  roomRevenue: Money
+  extraServices: Money
+  taxCollected: Money
+  totalRevenue: Money
+  expenses: Money
+  netRevenue: Money
+  payments: { method: string; amount: Money }[]
   occupancyCount: number
   invoices: ReportInvoiceDetail[]
   expenseDetails: ReportExpenseDetail[]
@@ -253,11 +255,11 @@ export interface DailyRevenueReport {
 
 export interface MonthlyRevenueReport {
   month: string
-  roomRevenue: number
-  otherRevenue: number
-  totalRevenue: number
-  expenses: number
-  netProfit: number
+  roomRevenue: Money
+  otherRevenue: Money
+  totalRevenue: Money
+  expenses: Money
+  netProfit: Money
   occupancyRate: number
   averageDailyRate: number
   invoices: ReportInvoiceDetail[]
@@ -265,11 +267,11 @@ export interface MonthlyRevenueReport {
 }
 
 export interface AccountsReceivableAging {
-  current: number
-  days1to30: number
-  days31to60: number
-  days61plus: number
-  total: number
+  current: Money
+  days1to30: Money
+  days31to60: Money
+  days61plus: Money
+  total: Money
 }
 
 export interface InvoiceContactLookup {

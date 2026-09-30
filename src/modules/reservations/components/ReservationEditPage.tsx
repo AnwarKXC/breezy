@@ -661,7 +661,7 @@ export function ReservationEditPage() {
                         <span className="text-sm font-semibold text-[#1A1A1A]">{formatCurrency(g.price * g.count * nights)}</span>
                       </div>
                       <div className="mt-1.5 flex items-center gap-1.5">
-                        {hasOverride && (
+                        {hasOverride && g.standardPrice > 0 && (
                           <span className="text-[10px] text-[#787774] line-through">{formatCurrency(g.standardPrice)}</span>
                         )}
                         <input

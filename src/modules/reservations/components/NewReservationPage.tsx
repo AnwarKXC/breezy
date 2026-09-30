@@ -776,7 +776,7 @@ export function NewReservationPage() {
                                     )}
                                   </p>
                                   <div className="flex items-center gap-1">
-                                    {custom !== undefined && (
+                                    {custom !== undefined && std > 0 && (
                                       <span className="text-[10px] text-[#787774] line-through">{formatCurrency(std)}</span>
                                     )}
                                     <input

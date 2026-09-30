@@ -16,6 +16,8 @@ export interface Booking {
   status: BookingStatus
   totalAmount: number
   paidAmount: number
+  /** The reservation's own currency (amounts are never converted). */
+  currency: string
   createdAt: Date
   updatedAt: Date
   reservationId?: string    // original reservation id when expanded from reservation_rooms

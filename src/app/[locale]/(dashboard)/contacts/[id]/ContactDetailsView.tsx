@@ -29,6 +29,7 @@ import { buildInvoicesCsv } from '@/modules/contacts/utils/invoiceCsvExport'
 import { exportInvoicesPdf } from '@/modules/contacts/utils/invoicePdfExport'
 import { DeleteConfirmationDialog } from '@/shared/components/DeleteConfirmationDialog'
 import { useCurrency } from '@/shared/contexts/CurrencyContext'
+import { ViewInCurrencyToggle } from '@/shared/components/ViewInCurrencyToggle'
 import { useCan } from '@/shared/rbac/useCan'
 import { ACTIONS } from '@/config/rbac'
 
@@ -167,24 +168,22 @@ function HeroSection({ contact, labels, permissions, onDelete, onEdit }: { conta
 
 function ContactAnalytics({ invoices }: { invoices: Invoice[] }) {
   const { t } = useTranslation()
-  const { formatCurrency } = useCurrency()
-  const totalRevenue = useMemo(
-    () => invoices.filter((i) => i.status === 'paid').reduce((sum, i) => sum + Number(i.amount), 0),
-    [invoices],
-  )
-  const remaining = useMemo(
-    () => invoices.filter((i) => i.status === 'pending' || i.status === 'overdue').reduce((sum, i) => sum + Number(i.amount), 0),
-    [invoices],
-  )
+  const { formatTotals } = useCurrency()
+  // A contact can be invoiced in several currencies: totals stay per currency.
+  const totalRevenue = invoices.filter((i) => i.status === 'paid').map((i) => ({ amount: Number(i.amount), currency: i.currency }))
+  const remaining = invoices.filter((i) => i.status === 'pending' || i.status === 'overdue').map((i) => ({ amount: Number(i.amount), currency: i.currency }))
   const lastInvoice = invoices.length ? invoices.reduce((latest, i) => i.issueDate > latest.issueDate ? i : latest) : null
 
   return (
+    <div className="space-y-3">
+    <ViewInCurrencyToggle className="justify-end" />
     <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <AnalyticsCard label={t('accounting.invoices.summary.totalInvoices')} value={invoices.length} accent="indigo" />
-      <AnalyticsCard label={t('accounting.invoices.amount')} value={formatCurrency(totalRevenue)} accent="emerald" />
-      <AnalyticsCard label={t('accounting.finance.outstanding')} value={formatCurrency(remaining)} accent="amber" />
+      <AnalyticsCard label={t('accounting.invoices.amount')} value={formatTotals(totalRevenue)} accent="emerald" />
+      <AnalyticsCard label={t('accounting.finance.outstanding')} value={formatTotals(remaining)} accent="amber" />
       <AnalyticsCard label={t('accounting.invoices.invoice')} value={lastInvoice ? `#${lastInvoice.invoiceNumber}` : '—'} accent="violet" />
     </section>
+    </div>
   )
 }
 

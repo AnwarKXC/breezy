@@ -8,11 +8,12 @@ export type RoomPriceSource = 'booking' | 'override' | 'room_type' | 'room' | 'm
 export interface DeriveRoomPriceInput {
   room: Pick<Room, 'price' | 'roomTypeId'>
   roomType?: Pick<RoomType, 'basePrice'> | null
-  pricing?: Pick<RoomTypePricing, 'price' | 'effectiveFrom' | 'effectiveUntil'> | null
-  booking?: Pick<Booking, 'totalAmount' | 'checkIn' | 'checkOut'> | null
+  pricing?: Pick<RoomTypePricing, 'price' | 'effectiveFrom' | 'effectiveUntil'> & { currency?: string } | null
+  booking?: Pick<Booking, 'totalAmount' | 'checkIn' | 'checkOut'> & { currency?: string } | null
   contactPriceOverride?: number | null
   nights?: number
-  formatCurrency: (amount: number) => string
+  /** Formats in `code`; omitted = the system currency. */
+  formatCurrency: (amount: number, code?: string | null) => string
 }
 
 export interface DerivedRoomPrice {
@@ -46,17 +47,21 @@ export function deriveRoomPrice(input: DeriveRoomPriceInput): DerivedRoomPrice {
 
   let pricePerNight: number | null = null
   let source: RoomPriceSource = 'missing'
+  // Currency of whichever price wins (a booking's own, else the rate row's).
+  let currency: string | null = null
 
   if (booking && booking.totalAmount > 0) {
     const n = nights && nights > 0 ? nights : bookingNights(booking)
     pricePerNight = booking.totalAmount / n
     source = 'booking'
+    currency = booking.currency ?? null
   } else if (contactPriceOverride && contactPriceOverride > 0) {
     pricePerNight = contactPriceOverride
     source = 'override'
   } else if (isPricingActive(pricing) && pricing!.price > 0) {
     pricePerNight = pricing!.price
     source = 'room_type'
+    currency = pricing!.currency ?? null
   } else if (roomType && roomType.basePrice > 0) {
     pricePerNight = roomType.basePrice
     source = 'room_type'
@@ -69,9 +74,9 @@ export function deriveRoomPrice(input: DeriveRoomPriceInput): DerivedRoomPrice {
     pricePerNight !== null && nights && nights > 0 ? pricePerNight * nights : null
 
   const displayPricePerNight =
-    pricePerNight !== null ? `${formatCurrency(pricePerNight)} / night` : PRICE_NOT_SET
+    pricePerNight !== null ? `${formatCurrency(pricePerNight, currency)} / night` : PRICE_NOT_SET
   const displayTotalPrice =
-    totalPrice !== null ? `Total: ${formatCurrency(totalPrice)}` : null
+    totalPrice !== null ? `Total: ${formatCurrency(totalPrice, currency)}` : null
 
   return {
     pricePerNight,

@@ -18,7 +18,7 @@ interface RoomSelectionGridProps {
  rooms: Room[]
   roomTypeMap: Map<string, RoomType>; pricingMap: Map<string, RoomTypePricing>; roomTypeCounts: Record<string, number>; roomTypeAvailability: Record<string, number>; totalRooms: number
   selectedRoomIds: Set<string>; roomAvailabilityMap: Map<string, RoomAvailabilityStatus>; overduePendingRooms: Set<string>; dirtyRoomsMap: Map<string, string>; bookings: Booking[]
- formatCurrency: (amount: number) => string
+ formatCurrency: (amount: number, code?: string | null) => string
  statusLabel: (status: RoomAvailabilityStatus) => string
  roomCount: number
  selectedRoomTypeId: string

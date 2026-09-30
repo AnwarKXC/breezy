@@ -7,7 +7,7 @@ import { StatusBadge } from '@/shared/components/StatusBadge'
 import { InvoicePaymentsModal } from './InvoicePaymentsModal'
 import { VoidConfirmDialog } from './VoidConfirmDialog'
 import { RefundConfirmDialog } from './RefundConfirmDialog'
-import { useCurrency } from '@/shared/contexts/CurrencyContext'
+import { CurrencyScope, useCurrency } from '@/shared/contexts/CurrencyContext'
 import type { CurrencyCode } from '@/shared/utils/types'
 import { useLocale } from '@/i18n/components/LocaleContext'
 import { downloadInvoicePdf } from '../utils/invoicePdfExport'
@@ -139,6 +139,7 @@ export function InvoiceDetailModal({ invoiceId, t, onClose, onEdit }: Props) {
       title={`${t('accounting.invoices.invoice')} #${invoice.invoiceNumber}`}
       size="xl"
     >
+      <CurrencyScope code={invoice.currency}>
       <div className="flex max-h-[min(84vh,860px)] flex-col overflow-hidden">
         <div className="shrink-0 border-b border-[#EAEAEA] pb-4">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
@@ -565,6 +566,7 @@ export function InvoiceDetailModal({ invoiceId, t, onClose, onEdit }: Props) {
           onRefunded={() => { setShowRefund(false); loadById(invoiceId) }}
         />
       )}
+      </CurrencyScope>
     </Modal>
   )
 }

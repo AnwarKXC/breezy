@@ -1,6 +1,7 @@
 ﻿'use client'
 
 import { useCurrency } from '@/shared/contexts/CurrencyContext'
+import { isNonNegativeMoney } from '@/shared/currency/money'
 import type { FinancialHealth } from '../types'
 
 interface FinancialHealthCardsProps {
@@ -12,7 +13,7 @@ interface FinancialHealthCardsProps {
 const cardClass = 'rounded-xl border border-[#EAEAEA] bg-white p-5 space-y-1'
 
 export function FinancialHealthCards({ stats, loading, t }: FinancialHealthCardsProps) {
-  const { formatCurrency } = useCurrency()
+  const { formatTotals } = useCurrency()
 
   if (loading) {
     return (
@@ -27,7 +28,7 @@ export function FinancialHealthCards({ stats, loading, t }: FinancialHealthCards
   const cards = [
     { label: t('accounting.finance.totalRevenue'), value: stats.totalRevenue, color: 'text-green-600' },
     { label: t('accounting.finance.totalExpenses'), value: stats.totalExpenses, color: 'text-[#9F2F2D]' },
-    { label: t('accounting.finance.netBalance'), value: stats.netBalance, color: stats.netBalance >= 0 ? 'text-green-600' : 'text-[#9F2F2D]' },
+    { label: t('accounting.finance.netBalance'), value: stats.netBalance, color: isNonNegativeMoney(stats.netBalance) ? 'text-green-600' : 'text-[#9F2F2D]' },
     { label: t('accounting.finance.outstanding'), value: stats.outstanding, color: 'text-orange-600' },
   ]
 
@@ -36,8 +37,8 @@ export function FinancialHealthCards({ stats, loading, t }: FinancialHealthCards
       {cards.map((card) => (
         <div key={card.label} className={cardClass}>
           <p className="text-sm text-[#787774]">{card.label}</p>
-          <p className={`text-2xl font-bold ${card.color}`}>
-            {formatCurrency(Number(card.value))}
+          <p className={`break-words text-2xl font-bold ${card.color}`}>
+            {formatTotals(card.value)}
           </p>
         </div>
       ))}

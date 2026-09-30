@@ -3,12 +3,14 @@ import 'server-only'
 import type { Prisma } from '@/generated/prisma/client'
 import { prisma } from '@/services/db/prisma'
 import { dbDate, todayDate } from '@/services/db/rows'
+import { toMoney, type Money } from '@/shared/currency/money'
 
 export interface DashboardApiResponse {
   totalUsers: number
   activeBookings: number
   availableRooms: number
-  totalRevenue: number
+  /** One total per currency; never summed across currencies. */
+  totalRevenue: Money
   occupancyRate: number
   todayCheckIns: number
   todayCheckOuts: number
@@ -26,7 +28,8 @@ export async function getDashboardData(): Promise<DashboardApiResponse> {
     prisma.reservations.count({ where: { ...liveStay, check_in_date: today } }),
     prisma.reservations.count({ where: { ...liveStay, check_out_date: today } }),
     // Summed in the database instead of loading every reservation row.
-    prisma.reservations.aggregate({
+    prisma.reservations.groupBy({
+      by: ['currency'],
       where: { deleted_at: null, status: { in: ['confirmed', 'checked_in', 'checked_out'] } },
       _sum: { total_amount: true },
     }),
@@ -36,7 +39,7 @@ export async function getDashboardData(): Promise<DashboardApiResponse> {
     totalUsers,
     activeBookings,
     availableRooms,
-    totalRevenue: Number(revenue._sum.total_amount ?? 0),
+    totalRevenue: toMoney(revenue.map((g) => ({ amount: Number(g._sum.total_amount ?? 0), currency: g.currency }))),
     occupancyRate: totalRooms > 0 ? Math.round(((totalRooms - availableRooms) / totalRooms) * 100) : 0,
     todayCheckIns,
     todayCheckOuts,

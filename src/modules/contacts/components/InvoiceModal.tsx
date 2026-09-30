@@ -66,7 +66,7 @@ export function InvoiceModal({ invoice, labels, onClose }: InvoiceModalProps) {
           </div>
           <div className="flex justify-between">
             <dt className="text-sm font-medium text-[#787774]">{labels.amount}</dt>
-            <dd className="text-sm font-semibold text-[#1A1A1A]">{formatCurrency(Number(invoice.amount))}</dd>
+            <dd className="text-sm font-semibold text-[#1A1A1A]">{formatCurrency(Number(invoice.amount), invoice.currency)}</dd>
           </div>
           <div className="flex justify-between items-center">
             <dt className="text-sm font-medium text-[#787774]">{labels.status}</dt>

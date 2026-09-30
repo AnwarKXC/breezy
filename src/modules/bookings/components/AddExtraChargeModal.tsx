@@ -33,7 +33,7 @@ interface AddExtraChargeModalProps {
   isOpen: boolean
   onClose: () => void
   booking: Booking | null
-  formatCurrency: (amount: number) => string
+  formatCurrency: (amount: number, code?: string | null) => string
   onSave: (bookingId: string, charges: DayCharge[]) => Promise<void>
   savedCharges?: SavedCharge[]
 }

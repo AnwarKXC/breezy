@@ -7,6 +7,7 @@ import { PaymentsTab } from './PaymentsTab'
 import { ExpenseManager } from './ExpenseManager'
 import { LedgerTab } from './LedgerTab'
 import { ReportsTab } from './ReportsTab'
+import { ViewInCurrencyToggle } from '@/shared/components/ViewInCurrencyToggle'
 import { AccountingPageSkeleton } from './AccountingPageSkeleton'
 import { useTranslation } from '@/i18n/hooks/useTranslation'
 
@@ -104,6 +105,9 @@ export function AccountingPage({ locale }: AccountingPageProps) {
           </button>
         ))}
       </div>
+
+      {/* Totals are per currency; this converts them on demand with live rates (expenses are already in the system currency). */}
+      {activeTab !== 'expenses' && <ViewInCurrencyToggle className="justify-end" />}
 
       {tabContent}
     </div>

@@ -117,6 +117,7 @@ export function ReservationDetailPage() {
       status: bookingStatus,
       totalAmount: Number(roomFields?.total_amount ?? detailFields.total_amount ?? 0),
       paidAmount: Number(detailFields.paid_amount ?? 0),
+      currency: detail.currency ?? '',
       createdAt: new Date(roomFields?.created_at ?? detailFields.created_at ?? new Date()),
       updatedAt: new Date(roomFields?.updated_at ?? detailFields.updated_at ?? new Date()),
       occupancyLabel: occLabel,

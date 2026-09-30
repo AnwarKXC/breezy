@@ -25,7 +25,9 @@ export function ShortenBookingModal(props: ShortenBookingModalProps) {
 }
 
 function ShortenBookingModalContent({ isOpen, onClose, booking, onShorten }: ShortenBookingModalProps) {
-  const { formatCurrency } = useCurrency()
+  const { formatCurrency: formatIn } = useCurrency()
+  // Amounts are in the reservation's own currency.
+  const formatCurrency = (amount: number) => formatIn(amount, booking?.currency)
   const [newCheckOut, setNewCheckOut] = useState('')
   const [saving, setSaving] = useState(false)
 

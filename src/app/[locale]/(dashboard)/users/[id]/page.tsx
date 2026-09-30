@@ -23,6 +23,7 @@ interface Reservation {
   checkOut: string
   status: string
   totalPrice: number
+  currency: string
 }
 
 function UserDetailsErrorState({ error, label }: { error: string; label: string }) {
@@ -57,15 +58,20 @@ export default async function UserDetailsRoutePage({
   const reservationsPromise = Promise.all([
     prisma.reservations.findMany({
       where: createdByUser,
-      select: { id: true, created_by: true, reservation_number: true, check_in_date: true, check_out_date: true, status: true, total_amount: true },
+      select: { id: true, created_by: true, reservation_number: true, check_in_date: true, check_out_date: true, status: true, total_amount: true, currency: true },
       orderBy: { created_at: 'desc' },
       take: RESERVATIONS_LIMIT,
     }),
     prisma.reservations.count({ where: createdByUser }),
     prisma.reservations.aggregate({
       where: { ...createdByUser, status: { not: 'cancelled' } },
-      _sum: { total_amount: true },
       _max: { check_in_date: true },
+    }),
+    // Reservations can be in different currencies: one total per currency.
+    prisma.reservations.groupBy({
+      by: ['currency'],
+      where: { ...createdByUser, status: { not: 'cancelled' } },
+      _sum: { total_amount: true },
     }),
   ])
   reservationsPromise.catch(() => undefined)
@@ -102,13 +108,13 @@ export default async function UserDetailsRoutePage({
   } : null
 
   let reservations: Reservation[] = []
-  let stats: ReservationStats = { total: 0, revenue: 0, lastCheckIn: null }
+  let stats: ReservationStats = { total: 0, revenue: [], lastCheckIn: null }
 
   if (serializableUser) {
-    const [dbReservations, total, active] = await reservationsPromise
+    const [dbReservations, total, active, revenueByCurrency] = await reservationsPromise
     stats = {
       total,
-      revenue: Number(active._sum.total_amount ?? 0),
+      revenue: revenueByCurrency.map((g) => ({ amount: Number(g._sum.total_amount ?? 0), currency: g.currency })),
       lastCheckIn: active._max.check_in_date?.toISOString().slice(0, 10) ?? null,
     }
 
@@ -120,6 +126,7 @@ export default async function UserDetailsRoutePage({
       checkOut: r.check_out_date.toISOString().slice(0, 10),
       status: r.status,
       totalPrice: Number(r.total_amount),
+      currency: r.currency,
     }))
   }
 

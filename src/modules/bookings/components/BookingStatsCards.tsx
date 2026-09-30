@@ -2,11 +2,14 @@
 
 import { useTranslation } from '@/i18n/hooks/useTranslation'
 import { InfoHint } from '@/shared/components/InfoHint'
+import { ViewInCurrencyToggle } from '@/shared/components/ViewInCurrencyToggle'
 import type { Booking } from '../types'
+import type { MoneyRow } from '@/shared/contexts/CurrencyContext'
 
 interface BookingStatsCardsProps {
   bookings: Booking[]
-  formatCurrency: (amount: number) => string
+  /** Per-currency (or on-demand converted) total of mixed-currency rows. */
+  formatTotals: (rows: MoneyRow[]) => string
   loading?: boolean
 }
 
@@ -19,7 +22,7 @@ interface StatCard {
   bg: string
 }
 
-function calculateStats(bookings: Booking[], formatCurrency: (n: number) => string, now: Date): StatCard[] {
+function calculateStats(bookings: Booking[], formatTotals: (rows: MoneyRow[]) => string, now: Date): StatCard[] {
   const weekAgo = new Date(now)
   weekAgo.setDate(weekAgo.getDate() - 7)
 
@@ -28,7 +31,8 @@ function calculateStats(bookings: Booking[], formatCurrency: (n: number) => stri
   const booked = thisWeek.filter((b) => b.status === 'booked').length
   const occupied = thisWeek.filter((b) => b.status === 'confirmed' || b.status === 'checked-in').length
   const cancelled = thisWeek.filter((b) => b.status === 'cancelled').length
-  const revenue = thisWeek.reduce((sum, b) => sum + b.totalAmount, 0)
+  // Reservations can be in different currencies: never add them into one number.
+  const revenue = formatTotals(thisWeek.map((b) => ({ amount: b.totalAmount, currency: b.currency })))
 
   return [
     {
@@ -58,7 +62,7 @@ function calculateStats(bookings: Booking[], formatCurrency: (n: number) => stri
     {
       label: 'bookings.stats.totalRevenue',
       hint: 'bookings.stats.totalRevenueHint',
-      value: formatCurrency(revenue),
+      value: revenue,
       accent: 'text-[#1A1A1A]',
       icon: '$',
       bg: 'bg-[#F5F5F5]',
@@ -66,9 +70,9 @@ function calculateStats(bookings: Booking[], formatCurrency: (n: number) => stri
   ]
 }
 
-export function BookingStatsCards({ bookings, formatCurrency, loading }: BookingStatsCardsProps) {
+export function BookingStatsCards({ bookings, formatTotals, loading }: BookingStatsCardsProps) {
   const { t } = useTranslation()
-  const stats = calculateStats(bookings, formatCurrency, new Date())
+  const stats = calculateStats(bookings, formatTotals, new Date())
 
   return (
     <section aria-label={t('bookings.stats.periodLabel')} className="flex flex-col gap-3">
@@ -99,6 +103,7 @@ export function BookingStatsCards({ bookings, formatCurrency, loading }: Booking
         </div>
       ))}
       </div>
+      <ViewInCurrencyToggle />
     </section>
   )
 }

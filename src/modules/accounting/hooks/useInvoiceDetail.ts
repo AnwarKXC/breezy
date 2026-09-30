@@ -32,9 +32,11 @@ function eventLabels(type: string, t: (key: string) => string): string {
 const NO_PAYMENTS: Payment[] = []
 
 export function useInvoiceDetail(invoiceId: string, t: (key: string) => string) {
-  const { formatCurrency } = useCurrency()
+  const { formatCurrency: formatIn } = useCurrency()
   const locale = useLocale()
   const { currentInvoice, loadById, invoiceLedger, invoiceEvents, loadLedger, loadEvents, clearCurrent } = useInvoices()
+  // Everything in an invoice's detail is in the invoice's own currency.
+  const formatCurrency = (amount: number, code?: string | null) => formatIn(amount, code ?? currentInvoice?.currency)
   const [activeTab, setActiveTab] = useState<DetailTab>('overview')
   const [showPayments, setShowPayments] = useState(false)
   const [showVoid, setShowVoid] = useState(false)

@@ -61,7 +61,7 @@ interface CheckoutConfirmModalProps {
   isOpen: boolean
   onClose: () => void
   booking: Booking | null
-  formatCurrency: (amount: number) => string
+  formatCurrency: (amount: number, code?: string | null) => string
   onConfirm: (bookingId: string, extraCharges: ExtraCharge[], payment: CheckoutPaymentInfo) => Promise<void>
   savedCharges?: SavedCharge[]
   pricingBreakdown?: PricingBreakdown

@@ -22,6 +22,7 @@ const RESERVATION_SELECT = {
   check_out_date: true,
   total_amount: true,
   paid_amount: true,
+  currency: true,
   company_id: true,
   booker_name: true,
   created_at: true,

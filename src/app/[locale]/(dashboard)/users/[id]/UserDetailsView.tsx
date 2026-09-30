@@ -5,7 +5,7 @@
 import { useRouter } from 'next/navigation'
 import { memo, useMemo } from 'react'
 import { useTranslation } from '@/i18n/hooks/useTranslation'
-import { useCurrency } from '@/shared/contexts/CurrencyContext'
+import { useCurrency, type MoneyRow } from '@/shared/contexts/CurrencyContext'
 
 import type { Locale } from '@/i18n/config'
 import type { UserRole } from '@/modules/users/types'
@@ -22,6 +22,7 @@ interface Reservation {
   checkOut: string
   status: string
   totalPrice: number
+  currency: string
 }
 
 // 📍 Client-safe user type (createdAt is ISO string, not Timestamp)
@@ -37,8 +38,8 @@ interface SerializableUser {
 /** Totals over all of the user's reservations (the table only lists the latest). */
 export interface ReservationStats {
   total: number
-  /** Sum of non-cancelled reservation totals, in the system currency. */
-  revenue: number
+  /** Non-cancelled reservation totals, one per currency (never converted). */
+  revenue: MoneyRow[]
   lastCheckIn: string | null
 }
 
@@ -130,7 +131,7 @@ function ReservationsTable({ reservations, total, locale, labels }: { reservatio
     {
       key: 'totalPrice',
       label: details.total || 'Total',
-      render: (_value, reservation) => formatCurrency(reservation.totalPrice),
+      render: (_value, reservation) => formatCurrency(reservation.totalPrice, reservation.currency),
     },
   ], [details, formatCurrency, t])
 
@@ -161,11 +162,11 @@ function ReservationsTable({ reservations, total, locale, labels }: { reservatio
 
 function AnalyticsCards({ stats, labels }: { stats: ReservationStats; labels: Record<string, unknown> }) {
   const details = (labels.details ?? NO_DETAILS) as Record<string, string>
-  const { formatCurrency } = useCurrency()
+  const { formatTotals } = useCurrency()
 
   const cards = [
     { label: details.totalBookings || 'Total Reservations', value: stats.total.toString(), icon: '📅' },
-    { label: details.totalSpent || 'Total Spent', value: formatCurrency(stats.revenue), icon: '💰' },
+    { label: details.totalSpent || 'Total Spent', value: formatTotals(stats.revenue), icon: '💰' },
     { label: details.lastBooking || 'Last Reservation', value: stats.lastCheckIn ?? '-', icon: '📆' },
   ]
 

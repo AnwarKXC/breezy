@@ -8,6 +8,7 @@ import { prisma } from '@/services/db/prisma'
 import { dbDate, serializeRow, todayDate } from '@/services/db/rows'
 import { getEffectiveRate } from '@/modules/reservations/services/pricingService'
 import { getSystemCurrency } from '@/shared/currency/server'
+import { toMoney } from '@/shared/currency/money'
 
 const INACTIVE_ROOM_STATUSES: reservation_room_status[] = ['cancelled', 'released']
 
@@ -83,7 +84,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       }),
       prisma.reservation_rooms.findMany({
         where: { room_id: id, deleted_at: null, status: { not: 'cancelled' } },
-        select: { rate_per_night: true, check_in_date: true, check_out_date: true },
+        select: { rate_per_night: true, check_in_date: true, check_out_date: true, reservations: { select: { currency: true } } },
       }),
     ])
 
@@ -96,10 +97,11 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       changed_by: h.changed_by ?? null,
     }))
 
-    const totalRevenue = revenueRooms.reduce((sum, rr) => {
+    // Stays are priced in their reservation's currency: one total per currency.
+    const totalRevenue = toMoney(revenueRooms.map((rr) => {
       const nights = Math.max(1, Math.round((rr.check_out_date.getTime() - rr.check_in_date.getTime()) / 86400000))
-      return sum + Number(rr.rate_per_night ?? 0) * nights
-    }, 0)
+      return { amount: Number(rr.rate_per_night ?? 0) * nights, currency: rr.reservations.currency }
+    }))
 
     const mappedHistory = bookingHistory.map((rr) => {
       const stay = mapStay(rr)
@@ -139,7 +141,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
         pagination: { total: filteredCount, limit, offset },
         revenue: {
           total: totalRevenue,
-          currency: 'EGP',
           bookingCount: revenueRooms.length,
         },
       },

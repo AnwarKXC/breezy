@@ -1,7 +1,7 @@
 'use client'
 
 import { isCurrencyCode } from '@/shared/static/currencies'
-import { createContext, useContext, useCallback, useMemo, useSyncExternalStore, type ReactNode } from 'react'
+import { createContext, useContext, useCallback, useMemo, useState, useSyncExternalStore, type ReactNode } from 'react'
 import { loadResource, useResource } from '@/shared/data/useResource'
 import type { CurrencyCode } from '@/shared/utils/types'
 import { CURRENCY_SYMBOLS } from '@/shared/utils/types'
@@ -19,9 +19,23 @@ interface CurrencyContextType {
    * system currency). Amounts are never converted between currencies.
    */
   formatCurrency: (amount: number, code?: CurrencyCode | string | null) => string
+  /**
+   * Total of mixed-currency rows. Normally one figure per currency
+   * (`EGP 10,000 · $500`); while "view in default currency" is on and live
+   * rates are loaded, one approximate figure in the system currency.
+   */
+  formatTotals: (rows: MoneyRow[]) => string
+  /** On-demand view: convert totals into the system currency with live rates. */
+  viewInDefault: boolean
+  setViewInDefault: (on: boolean) => void
+  fx: { loading: boolean; error: string | null; fetchedAt: number | null }
   setCurrency: (code: CurrencyCode) => Promise<void>
   loading: boolean
 }
+
+import type { MoneyRow } from '@/shared/currency/money'
+
+export type { MoneyRow }
 
 const CurrencyContext = createContext<CurrencyContextType | null>(null)
 
@@ -55,6 +69,15 @@ async function fetchSettings(): Promise<Setting[]> {
   const code = settings.find((s) => s.key === 'currency')?.value?.code
   if (isCurrencyCode(code)) storeCurrency(code)
   return settings
+}
+
+type FxRates = { rates: Record<string, number>; fetchedAt: number }
+
+async function fetchFxRates(base: CurrencyCode): Promise<FxRates> {
+  const res = await fetch(`/api/currency/rates?base=${base}`)
+  const json = await res.json().catch(() => null)
+  if (!res.ok || !json?.data?.rates) throw new Error(json?.error?.message ?? 'Exchange rates are unavailable right now')
+  return { rates: json.data.rates, fetchedAt: json.data.fetchedAt }
 }
 
 /** Re-reads system settings (currency, VAT, service charge) after they are edited. */
@@ -121,15 +144,44 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
     [currencyCode],
   )
 
+  // Live rates load only after the user asks for the converted view.
+  const [viewInDefault, setViewInDefault] = useState(false)
+  const fxResource = useResource(viewInDefault ? `/api/currency/rates?base=${currencyCode}` : null, () => fetchFxRates(currencyCode))
+  const rates = viewInDefault ? fxResource.data?.rates ?? null : null
+  const fx = useMemo(() => ({
+    loading: viewInDefault && fxResource.isLoading,
+    error: viewInDefault && fxResource.error ? fxResource.error.message : null,
+    fetchedAt: viewInDefault ? fxResource.data?.fetchedAt ?? null : null,
+  }), [viewInDefault, fxResource.isLoading, fxResource.error, fxResource.data])
+
+  const formatTotals = useCallback((rows: MoneyRow[]) => {
+    if (rates) {
+      let total = 0
+      for (const row of rows) {
+        const code = isCurrencyCode(row.currency) ? row.currency : currencyCode
+        const rate = code === currencyCode ? 1 : rates[code]
+        // A currency without a rate can't be folded in: keep the split view.
+        if (!rate || !Number.isFinite(rate)) return formatMoneyTotals(rows, currencyCode)
+        total += row.amount / rate
+      }
+      return `≈ ${formatMoney(Math.round(total * 100) / 100, currencyCode)}`
+    }
+    return formatMoneyTotals(rows, currencyCode)
+  }, [rates, currencyCode])
+
   const value = useMemo<CurrencyContextType>(() => ({
     currencyCode,
     currencySymbol: CURRENCY_SYMBOLS[currencyCode],
     vatRate,
     serviceChargeRate,
     formatCurrency,
+    formatTotals,
+    viewInDefault,
+    setViewInDefault,
+    fx,
     setCurrency,
     loading,
-  }), [currencyCode, vatRate, serviceChargeRate, formatCurrency, setCurrency, loading])
+  }), [currencyCode, vatRate, serviceChargeRate, formatCurrency, formatTotals, viewInDefault, fx, setCurrency, loading])
 
   return (
     <CurrencyContext.Provider value={value}>
@@ -149,7 +201,7 @@ export function formatMoney(amount: number, code: CurrencyCode): string {
  * Totals of mixed-currency rows, one per currency (`EGP 10,000 · $500`): amounts
  * in different currencies are never added together.
  */
-export function formatMoneyTotals(rows: Array<{ amount: number; currency: string }>, fallback: CurrencyCode): string {
+export function formatMoneyTotals(rows: MoneyRow[], fallback: CurrencyCode): string {
   const totals = new Map<CurrencyCode, number>()
   for (const row of rows) {
     const code = isCurrencyCode(row.currency) ? row.currency : fallback

@@ -11,7 +11,7 @@ import { buildAndDownloadPdf } from '@/shared/utils/pdfMake'
 import { roomService } from '@/services/roomService'
 import { useTranslation } from '@/i18n/hooks/useTranslation'
 import { useCurrency } from '@/shared/contexts/CurrencyContext'
-import type { CurrencyCode } from '@/shared/utils/types'
+import type { Money } from '@/shared/currency/money'
 
 type RoomStatus = 'available' | 'occupied' | 'maintenance' | 'cleaning' | 'dirty'
 
@@ -68,8 +68,8 @@ interface RoomDetailData {
     offset: number
   }
   revenue: {
-    total: number
-    currency: string
+    /** One total per currency (stays keep their reservation's currency). */
+    total: Money
     bookingCount: number
   }
 }
@@ -124,7 +124,7 @@ export function RoomDetailPage() {
   const { t } = useTranslation()
   const { id, locale } = useParams<{ id: string; locale: string }>()
   const router = useRouter()
-  const { formatCurrency } = useCurrency()
+  const { formatCurrency, formatTotals } = useCurrency()
   const roomDetail = useResource(`/api/rooms/${id}/history`, () => fetchRoomDetail(id))
   const data = roomDetail.data ?? null
   const history = data?.statusHistory ?? EMPTY_HISTORY
@@ -345,7 +345,7 @@ export function RoomDetailPage() {
 
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            { label: t('rooms.detail.totalRevenue'), value: formatCurrency(data.revenue?.total ?? 0, data.revenue?.currency as CurrencyCode | undefined), tint: 'bg-[#EDF3EC]' },
+            { label: t('rooms.detail.totalRevenue'), value: formatTotals(data.revenue?.total ?? []), tint: 'bg-[#EDF3EC]' },
             { label: t('rooms.detail.nightlyRate'), value: formatCurrency(Number(room.price)), tint: 'bg-indigo-50' },
             { label: t('rooms.detail.roomType'), value: room.roomType?.name ?? '—', tint: 'bg-[#FBF3DB]' },
             { label: t('rooms.detail.upcoming'), value: data.upcomingReservations.length, tint: 'bg-violet-50' },

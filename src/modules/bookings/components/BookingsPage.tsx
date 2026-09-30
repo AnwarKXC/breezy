@@ -42,7 +42,7 @@ const LIST_PAGE_SIZES = [20, 50, 100] as const
 export function BookingsPage() {
   const router = useRouter()
   const { t, locale } = useTranslation()
-  const { formatCurrency } = useCurrency()
+  const { formatCurrency, formatTotals } = useCurrency()
   const canCreateReservation = useCan(ACTIONS.RESERVATIONS_CREATE)
   // Active stays feed the room grid and stats; the table pages through the server.
   const { bookings, loading: bookingsLoading, fetchBookings: refreshActiveBookings } = useBookings()
@@ -488,7 +488,7 @@ export function BookingsPage() {
           />
           <BookingStatsCards
             bookings={displayAllBookings}
-            formatCurrency={formatCurrency}
+            formatTotals={formatTotals}
             loading={bookingsLoading}
           />
         </div>
@@ -557,7 +557,8 @@ export function BookingsPage() {
         isOpen={!!checkoutBooking}
         onClose={() => { setCheckoutBooking(null); setCheckoutSavedCharges(null) }}
         booking={checkoutBooking}
-        formatCurrency={formatCurrency}
+        formatCurrency={(amount) => formatCurrency(amount, checkoutBooking?.currency)}
+        currency={checkoutBooking?.currency}
         onConfirm={handleCheckoutConfirm}
         savedCharges={checkoutSavedCharges ?? []}
         invoiceSummary={checkoutBooking ? {

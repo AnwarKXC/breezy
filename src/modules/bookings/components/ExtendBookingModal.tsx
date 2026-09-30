@@ -26,7 +26,9 @@ export function ExtendBookingModal(props: ExtendBookingModalProps) {
 }
 
 function ExtendBookingModalContent({ isOpen, onClose, booking, onExtend }: ExtendBookingModalProps) {
-  const { formatCurrency } = useCurrency()
+  const { formatCurrency: formatIn } = useCurrency()
+  // Amounts are in the reservation's own currency.
+  const formatCurrency = (amount: number) => formatIn(amount, booking?.currency)
   const [newCheckOut, setNewCheckOut] = useState('')
   const [checkState, setCheckState] = useState<CheckState>('idle')
   const [conflictMessage, setConflictMessage] = useState('')

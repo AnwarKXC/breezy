@@ -18,7 +18,7 @@ interface RoomStatusPanelProps {
   bookings: Booking[]
   roomReservationDates?: Map<string, string>
   selectedDate: Date
-  formatCurrency: (amount: number) => string
+  formatCurrency: (amount: number, code?: string | null) => string
   statusFilter?: string
   onRoomClick?: (room: Room, availability: DerivedRoomAvailability, priceLabel: string) => void
   onFilterClick?: () => void

@@ -9,7 +9,7 @@ import type { RoomTypePricing } from '@/modules/pricing/types'
 interface BookingSummaryCardProps {
  selectedRooms: Room[]
  nights: number
-  roomTypeMap: Map<string, RoomType>; pricingMap: Map<string, RoomTypePricing>; dirtyRoomsMap: Map<string, string>; formatCurrency: (amount: number) => string
+  roomTypeMap: Map<string, RoomType>; pricingMap: Map<string, RoomTypePricing>; dirtyRoomsMap: Map<string, string>; formatCurrency: (amount: number, code?: string | null) => string
  totalAmount: number
 }
 

@@ -5,7 +5,7 @@ import { fetchData, useResource } from '@/shared/data/useResource'
 import { Table } from '@/shared/components/Table'
 import type { TableColumn } from '@/shared/table/types'
 import { FloatingInput } from '@/shared/components/FloatingField'
-import { formatMoneyTotals, useCurrency } from '@/shared/contexts/CurrencyContext'
+import { useCurrency } from '@/shared/contexts/CurrencyContext'
 
 import { useLocale } from '@/i18n/components/LocaleContext'
 import { formatDateTime } from '@/shared/utils/date'
@@ -20,7 +20,7 @@ interface Props {
 }
 
 export function PaymentsTab({ t }: Props) {
-  const { formatCurrency, currencyCode } = useCurrency()
+  const { formatCurrency, formatTotals } = useCurrency()
   const locale = useLocale()
   const [fromDate, setFromDate] = useState('')
   const [toDate, setToDate] = useState('')
@@ -50,7 +50,7 @@ export function PaymentsTab({ t }: Props) {
     }
   }, [locale])
 
-  const totals = formatMoneyTotals(payments.map((p) => ({ amount: Number(p.amount), currency: p.currency })), currencyCode)
+  const totals = formatTotals(payments.map((p) => ({ amount: Number(p.amount), currency: p.currency })))
 
   const columns: TableColumn<Payment>[] = useMemo(() => [
     {

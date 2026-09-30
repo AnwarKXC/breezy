@@ -4,6 +4,7 @@ import { useCallback } from 'react'
 import { useInitialFetch } from '@/shared/hooks/useInitialFetch'
 import { useAccountingOverview, useAccounting } from '../hooks'
 import { useCurrency } from '@/shared/contexts/CurrencyContext'
+import { isNonNegativeMoney } from '@/shared/currency/money'
 import { Skeleton } from '@/shared/components/Skeleton'
 import { InfoHint } from '@/shared/components/InfoHint'
 
@@ -16,7 +17,7 @@ const cardClass = 'rounded-xl border border-[#EAEAEA] bg-white p-5 space-y-1'
 export function AccountingDashboardTab({ t }: Props) {
   const { overview, loading, refresh } = useAccountingOverview()
   const { financialHealth, loadFinancialHealth } = useAccounting()
-  const { formatCurrency } = useCurrency()
+  const { formatTotals } = useCurrency()
 
   useInitialFetch(loadFinancialHealth)
 
@@ -39,28 +40,28 @@ export function AccountingDashboardTab({ t }: Props) {
   }
 
   const summaryCards: Array<{ label: string; hint: string; value: string; color: string }> = [
-    { label: t('accounting.overview.todayRevenue'), hint: t('accounting.hints.overview.todayRevenue'), value: formatCurrency(overview?.todayRevenue ?? 0), color: 'text-green-600' },
-    { label: t('accounting.overview.monthRevenue'), hint: t('accounting.hints.overview.monthRevenue'), value: formatCurrency(overview?.monthToDateRevenue ?? 0), color: 'text-[#1A1A1A]' },
-    { label: t('accounting.overview.outstanding'), hint: t('accounting.hints.overview.outstanding'), value: formatCurrency(overview?.outstandingBalance ?? 0), color: 'text-amber-600' },
-    { label: t('accounting.overview.netProfit'), hint: t('accounting.hints.overview.netProfit'), value: formatCurrency(overview?.netProfit ?? 0), color: (overview?.netProfit ?? 0) >= 0 ? 'text-green-600' : 'text-[#9F2F2D]' },
+    { label: t('accounting.overview.todayRevenue'), hint: t('accounting.hints.overview.todayRevenue'), value: formatTotals(overview?.todayRevenue ?? []), color: 'text-green-600' },
+    { label: t('accounting.overview.monthRevenue'), hint: t('accounting.hints.overview.monthRevenue'), value: formatTotals(overview?.monthToDateRevenue ?? []), color: 'text-[#1A1A1A]' },
+    { label: t('accounting.overview.outstanding'), hint: t('accounting.hints.overview.outstanding'), value: formatTotals(overview?.outstandingBalance ?? []), color: 'text-amber-600' },
+    { label: t('accounting.overview.netProfit'), hint: t('accounting.hints.overview.netProfit'), value: formatTotals(overview?.netProfit ?? []), color: isNonNegativeMoney(overview?.netProfit) ? 'text-green-600' : 'text-[#9F2F2D]' },
     { label: t('accounting.overview.paidInvoices'), hint: t('accounting.hints.overview.paidInvoices'), value: String(overview?.paidInvoices ?? 0), color: 'text-cyan-600' },
     { label: t('accounting.overview.unpaidInvoices'), hint: t('accounting.hints.overview.unpaidInvoices'), value: String(overview?.unpaidInvoices ?? 0), color: 'text-[#9F2F2D]' },
-    { label: t('accounting.overview.totalExpenses'), hint: t('accounting.hints.overview.totalExpenses'), value: formatCurrency(overview?.totalExpenses ?? 0), color: 'text-purple-600' },
-    { label: t('accounting.overview.totalRefunds'), hint: t('accounting.hints.overview.totalRefunds'), value: formatCurrency(overview?.totalRefunds ?? 0), color: 'text-[#9F2F2D]' },
+    { label: t('accounting.overview.totalExpenses'), hint: t('accounting.hints.overview.totalExpenses'), value: formatTotals(overview?.totalExpenses ?? []), color: 'text-purple-600' },
+    { label: t('accounting.overview.totalRefunds'), hint: t('accounting.hints.overview.totalRefunds'), value: formatTotals(overview?.totalRefunds ?? []), color: 'text-[#9F2F2D]' },
   ]
 
   const paymentCards: Array<{ label: string; hint: string; value: string }> = [
-    { label: t('accounting.overview.cashToday'), hint: t('accounting.hints.overview.cashToday'), value: formatCurrency(overview?.cashCollectedToday ?? 0) },
-    { label: t('accounting.overview.cardToday'), hint: t('accounting.hints.overview.cardToday'), value: formatCurrency(overview?.cardPaymentsToday ?? 0) },
-    { label: t('accounting.overview.bankToday'), hint: t('accounting.hints.overview.bankToday'), value: formatCurrency(overview?.bankPaymentsToday ?? 0) },
-    { label: t('accounting.overview.onlineToday'), hint: t('accounting.hints.overview.onlineToday'), value: formatCurrency(overview?.onlinePaymentsToday ?? 0) },
+    { label: t('accounting.overview.cashToday'), hint: t('accounting.hints.overview.cashToday'), value: formatTotals(overview?.cashCollectedToday ?? []) },
+    { label: t('accounting.overview.cardToday'), hint: t('accounting.hints.overview.cardToday'), value: formatTotals(overview?.cardPaymentsToday ?? []) },
+    { label: t('accounting.overview.bankToday'), hint: t('accounting.hints.overview.bankToday'), value: formatTotals(overview?.bankPaymentsToday ?? []) },
+    { label: t('accounting.overview.onlineToday'), hint: t('accounting.hints.overview.onlineToday'), value: formatTotals(overview?.onlinePaymentsToday ?? []) },
   ]
 
   const financialCards: Array<{ label: string; hint: string; value: string; color: string }> = [
-    { label: t('accounting.finance.totalRevenue'), hint: t('accounting.hints.finance.totalRevenue'), value: formatCurrency(financialHealth?.totalRevenue ?? 0), color: 'text-green-600' },
-    { label: t('accounting.finance.totalExpenses'), hint: t('accounting.hints.finance.totalExpenses'), value: formatCurrency(financialHealth?.totalExpenses ?? 0), color: 'text-[#9F2F2D]' },
-    { label: t('accounting.finance.netBalance'), hint: t('accounting.hints.finance.netBalance'), value: formatCurrency(financialHealth?.netBalance ?? 0), color: (financialHealth?.netBalance ?? 0) >= 0 ? 'text-green-600' : 'text-[#9F2F2D]' },
-    { label: t('accounting.finance.outstanding'), hint: t('accounting.hints.finance.outstanding'), value: formatCurrency(financialHealth?.outstanding ?? 0), color: 'text-amber-600' },
+    { label: t('accounting.finance.totalRevenue'), hint: t('accounting.hints.finance.totalRevenue'), value: formatTotals(financialHealth?.totalRevenue ?? []), color: 'text-green-600' },
+    { label: t('accounting.finance.totalExpenses'), hint: t('accounting.hints.finance.totalExpenses'), value: formatTotals(financialHealth?.totalExpenses ?? []), color: 'text-[#9F2F2D]' },
+    { label: t('accounting.finance.netBalance'), hint: t('accounting.hints.finance.netBalance'), value: formatTotals(financialHealth?.netBalance ?? []), color: isNonNegativeMoney(financialHealth?.netBalance) ? 'text-green-600' : 'text-[#9F2F2D]' },
+    { label: t('accounting.finance.outstanding'), hint: t('accounting.hints.finance.outstanding'), value: formatTotals(financialHealth?.outstanding ?? []), color: 'text-amber-600' },
   ]
 
   return (

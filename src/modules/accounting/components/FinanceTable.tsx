@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import { Table } from '@/shared/table'
 import type { TableColumn } from '@/shared/table'
 import type { FinanceRow } from '../types'
+import type { Money } from '@/shared/currency/money'
 import { useCurrency } from '@/shared/contexts/CurrencyContext'
 
 interface FinanceTableProps {
@@ -14,7 +15,7 @@ interface FinanceTableProps {
 }
 
 export function FinanceTable({ rows, loading, onRowClick, t }: FinanceTableProps) {
-  const { formatCurrency } = useCurrency()
+  const { formatTotals } = useCurrency()
   const columns: TableColumn[] = useMemo(
     () => [
       { key: 'contactName', label: t('accounting.finance.contact'), sortable: true },
@@ -22,30 +23,30 @@ export function FinanceTable({ rows, loading, onRowClick, t }: FinanceTableProps
       {
         key: 'totalInvoiced',
         label: t('accounting.finance.invoiced'),
-        sortable: true,
-        render: (v) => formatCurrency(Number(v)),
+        sortable: false,
+        render: (v) => formatTotals(v as Money),
       },
       {
         key: 'totalPaid',
         label: t('accounting.finance.paid'),
-        sortable: true,
-        render: (v) => formatCurrency(Number(v)),
+        sortable: false,
+        render: (v) => formatTotals(v as Money),
       },
       {
         key: 'balance',
         label: t('accounting.finance.balance'),
-        sortable: true,
+        sortable: false,
         render: (v) => {
-          const balance = Number(v)
+          const balance = v as Money
           return (
-            <span className={balance > 0 ? 'text-[#9F2F2D] font-medium' : 'text-green-600 font-medium'}>
-              {formatCurrency(balance)}
+            <span className={balance.some((m) => m.amount > 0) ? 'text-[#9F2F2D] font-medium' : 'text-green-600 font-medium'}>
+              {formatTotals(balance)}
             </span>
           )
         },
       },
     ],
-    [t, formatCurrency],
+    [t, formatTotals],
   )
 
   return (

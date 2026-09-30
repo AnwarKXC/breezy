@@ -1,19 +1,25 @@
 import { buildAndDownloadPdf } from '@/shared/utils/pdfMake'
 import type { PdfSection } from '@/shared/utils/pdfMake'
 import type { Locale } from '@/i18n/config'
+import { toMoney, type Money } from '@/shared/currency/money'
 import type { DailyRevenueReport, MonthlyRevenueReport, AccountsReceivableAging, ReportInvoiceDetail, ReportExpenseDetail } from '../types'
 
 function formatCurrency(value: number, currency: string): string {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency, minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(value)
 }
 
+/** One figure per currency (`EGP 10,000 · $500`); PDFs never convert between currencies. */
+function formatMoney(value: Money, fallback: string): string {
+  return value.length === 0 ? formatCurrency(0, fallback) : value.map((m) => formatCurrency(m.amount, m.currency || fallback)).join(' · ')
+}
+
 function combinedRows(invoices: ReportInvoiceDetail[], expenses: ReportExpenseDetail[], currency: string): string[][] {
   const inv = invoices.map((i) => [
     'Invoice', i.invoiceNumber,
     i.guestName ?? i.companyName ?? '—',
-    formatCurrency(i.amount, currency), formatCurrency(i.paidAmount, currency),
-    i.refundedAmount > 0 ? formatCurrency(i.refundedAmount, currency) : '—',
-    formatCurrency(i.remainingBalance, currency),
+    formatCurrency(i.amount, i.currency), formatCurrency(i.paidAmount, i.currency),
+    i.refundedAmount > 0 ? formatCurrency(i.refundedAmount, i.currency) : '—',
+    formatCurrency(i.remainingBalance, i.currency),
     i.paymentMethod ?? '—', i.status, i.issueDate?.slice(0, 10) ?? '—',
   ])
   const exp = expenses.map((e) => [
@@ -26,10 +32,11 @@ function combinedRows(invoices: ReportInvoiceDetail[], expenses: ReportExpenseDe
   return [...inv, ...exp].sort((a, b) => a[9].localeCompare(b[9])).reverse()
 }
 
-function buildSections(report: { totalRevenue: number; expenses: number }, invoices: ReportInvoiceDetail[], expenses: ReportExpenseDetail[], summaryRows: string[][], mainTitle: string, currency: string): PdfSection[] {
-  const totalPaid = invoices.reduce((s, i) => s + i.paidAmount, 0)
-  const totalRefunded = invoices.reduce((s, i) => s + i.refundedAmount, 0)
-  const totalRemaining = invoices.reduce((s, i) => s + i.remainingBalance, 0)
+function buildSections(report: { totalRevenue: Money; expenses: Money }, invoices: ReportInvoiceDetail[], expenses: ReportExpenseDetail[], summaryRows: string[][], mainTitle: string, currency: string): PdfSection[] {
+  const invoiceTotal = (value: (i: ReportInvoiceDetail) => number) => toMoney(invoices.map((i) => ({ amount: value(i), currency: i.currency })))
+  const totalPaid = invoiceTotal((i) => i.paidAmount)
+  const totalRefunded = invoiceTotal((i) => i.refundedAmount)
+  const totalRemaining = invoiceTotal((i) => i.remainingBalance)
 
   const sections: PdfSection[] = [
     { title: mainTitle, headers: ['Metric', 'Value'], rows: summaryRows },
@@ -45,11 +52,11 @@ function buildSections(report: { totalRevenue: number; expenses: number }, invoi
       title: 'Summary Totals',
       headers: ['Metric', 'Value'],
       rows: [
-        ['Total Revenue', formatCurrency(report.totalRevenue, currency)],
-        ['Total Paid', formatCurrency(totalPaid, currency)],
-        ['Total Refunded', formatCurrency(totalRefunded, currency)],
-        ['Total Remaining', formatCurrency(totalRemaining, currency)],
-        ['Total Expenses', formatCurrency(report.expenses, currency)],
+        ['Total Revenue', formatMoney(report.totalRevenue, currency)],
+        ['Total Paid', formatMoney(totalPaid, currency)],
+        ['Total Refunded', formatMoney(totalRefunded, currency)],
+        ['Total Remaining', formatMoney(totalRemaining, currency)],
+        ['Total Expenses', formatMoney(report.expenses, currency)],
       ],
     })
   }
@@ -59,14 +66,14 @@ function buildSections(report: { totalRevenue: number; expenses: number }, invoi
 
 export async function exportDailyRevenuePdf(report: DailyRevenueReport, locale: Locale, fileName: string, currency: string): Promise<void> {
   const summaryRows = [
-    ['Room Revenue', formatCurrency(report.roomRevenue, currency)],
-    ['Extra Services', formatCurrency(report.extraServices, currency)],
-    ['Tax Collected', formatCurrency(report.taxCollected, currency)],
-    ['Total Revenue', formatCurrency(report.totalRevenue, currency)],
-    ['Expenses', formatCurrency(report.expenses, currency)],
-    ['Net Revenue', formatCurrency(report.netRevenue, currency)],
+    ['Room Revenue', formatMoney(report.roomRevenue, currency)],
+    ['Extra Services', formatMoney(report.extraServices, currency)],
+    ['Tax Collected', formatMoney(report.taxCollected, currency)],
+    ['Total Revenue', formatMoney(report.totalRevenue, currency)],
+    ['Expenses', formatMoney(report.expenses, currency)],
+    ['Net Revenue', formatMoney(report.netRevenue, currency)],
     ['Occupancy Count', String(report.occupancyCount)],
-    ...report.payments.map((p) => [`Payment: ${p.method}`, formatCurrency(p.amount, currency)]),
+    ...report.payments.map((p) => [`Payment: ${p.method}`, formatMoney(p.amount, currency)]),
   ]
 
   await buildAndDownloadPdf({
@@ -79,11 +86,11 @@ export async function exportDailyRevenuePdf(report: DailyRevenueReport, locale: 
 
 export async function exportMonthlyRevenuePdf(report: MonthlyRevenueReport, locale: Locale, fileName: string, currency: string): Promise<void> {
   const summaryRows = [
-    ['Room Revenue', formatCurrency(report.roomRevenue, currency)],
-    ['Other Revenue', formatCurrency(report.otherRevenue, currency)],
-    ['Total Revenue', formatCurrency(report.totalRevenue, currency)],
-    ['Expenses', formatCurrency(report.expenses, currency)],
-    ['Net Profit', formatCurrency(report.netProfit, currency)],
+    ['Room Revenue', formatMoney(report.roomRevenue, currency)],
+    ['Other Revenue', formatMoney(report.otherRevenue, currency)],
+    ['Total Revenue', formatMoney(report.totalRevenue, currency)],
+    ['Expenses', formatMoney(report.expenses, currency)],
+    ['Net Profit', formatMoney(report.netProfit, currency)],
     ['Occupancy Rate', `${report.occupancyRate.toFixed(1)}%`],
     ['Average Daily Rate', formatCurrency(report.averageDailyRate, currency)],
   ]
@@ -98,11 +105,11 @@ export async function exportMonthlyRevenuePdf(report: MonthlyRevenueReport, loca
 
 export async function exportAgingPdf(report: AccountsReceivableAging, locale: Locale, fileName: string, currency: string): Promise<void> {
   const rows = [
-    ['Current', formatCurrency(report.current, currency)],
-    ['1-30 Days', formatCurrency(report.days1to30, currency)],
-    ['31-60 Days', formatCurrency(report.days31to60, currency)],
-    ['61+ Days', formatCurrency(report.days61plus, currency)],
-    ['Total', formatCurrency(report.total, currency)],
+    ['Current', formatMoney(report.current, currency)],
+    ['1-30 Days', formatMoney(report.days1to30, currency)],
+    ['31-60 Days', formatMoney(report.days31to60, currency)],
+    ['61+ Days', formatMoney(report.days61plus, currency)],
+    ['Total', formatMoney(report.total, currency)],
   ]
   await buildAndDownloadPdf({
     title: 'Accounts Receivable Aging',

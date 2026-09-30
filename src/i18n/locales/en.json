@@ -1659,7 +1659,12 @@
       "GBP": "British Pound",
       "defaultTitle": "Default currency",
       "defaultHint": "Used for new reservations, invoices and rates unless another currency is chosen. Existing records keep their own currency; amounts are never converted.",
-      "label": "Currency"
+      "label": "Currency",
+      "viewIn": "View in {currency}",
+      "byCurrency": "Show by currency",
+      "fxLoading": "Loading live rates…",
+      "fxNote": "Approximate totals at today's live rate",
+      "fxError": "Live rates unavailable — showing totals per currency"
     },
     "manageEmail": "Connect the hotel mailbox to read, send and reply to email",
     "email": {

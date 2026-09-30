@@ -6,7 +6,7 @@ import { Table } from '@/shared/components/Table'
 import type { TableColumn } from '@/shared/table/types'
 import { FloatingInput } from '@/shared/components/FloatingField'
 import { StatusBadge } from '@/shared/components/StatusBadge'
-import { formatMoneyTotals, useCurrency } from '@/shared/contexts/CurrencyContext'
+import { useCurrency } from '@/shared/contexts/CurrencyContext'
 import { useLocale } from '@/i18n/components/LocaleContext'
 import { formatDate, formatDateTime } from '@/shared/utils/date'
 import type { LedgerEntry, Invoice } from '../types'
@@ -18,7 +18,7 @@ interface Props {
 }
 
 export function LedgerTab({ t }: Props) {
-  const { formatCurrency, currencyCode } = useCurrency()
+  const { formatCurrency, formatTotals } = useCurrency()
   const locale = useLocale()
   const [typeFilter, setTypeFilter] = useState('')
   const [fromDate, setFromDate] = useState('')
@@ -52,8 +52,8 @@ export function LedgerTab({ t }: Props) {
 
   // Cash-basis: every ledger row is a real money movement; totals stay per currency.
   const totals = {
-    income: formatMoneyTotals(ledgerEntries.filter((e) => Number(e.incomeAmount) > 0).map((e) => ({ amount: Number(e.incomeAmount), currency: e.currency })), currencyCode),
-    outcome: formatMoneyTotals(ledgerEntries.filter((e) => Number(e.outcomeAmount) > 0).map((e) => ({ amount: Number(e.outcomeAmount), currency: e.currency })), currencyCode),
+    income: formatTotals(ledgerEntries.filter((e) => Number(e.incomeAmount) > 0).map((e) => ({ amount: Number(e.incomeAmount), currency: e.currency }))),
+    outcome: formatTotals(ledgerEntries.filter((e) => Number(e.outcomeAmount) > 0).map((e) => ({ amount: Number(e.outcomeAmount), currency: e.currency }))),
   }
 
   const columns: TableColumn<LedgerEntry>[] = useMemo(() => [

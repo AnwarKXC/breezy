@@ -18,7 +18,7 @@ function getNowMs(): number {
 }
 
 export function InvoiceSummaryCards({ invoices, t }: Props) {
-  const { formatCurrency } = useCurrency()
+  const { formatTotals } = useCurrency()
   const [now, setNow] = useState(() => getNowMs())
   const [todaysPayments, setTodaysPayments] = useState<Payment[]>([])
 
@@ -55,16 +55,14 @@ export function InvoiceSummaryCards({ invoices, t }: Props) {
     const voided = invoices.filter((i) => i.status === 'void').length
     const refunded = invoices.filter((i) => i.status === 'refunded').length
 
+    // Invoices and payments carry their own currency: totals stay per currency.
     const outstandingBalance = invoices
       .filter((i) => i.status !== 'void' && i.status !== 'refunded')
-      .reduce((sum, i) => sum + i.remainingBalance, 0)
+      .map((i) => ({ amount: i.remainingBalance, currency: i.currency }))
 
-    const paidToday = todaysPayments.reduce(
-      (sum, p) => sum + Number(p.amount ?? 0),
-      0,
-    )
+    const paidToday = todaysPayments.map((p) => ({ amount: Number(p.amount ?? 0), currency: p.currency }))
 
-    const refundedTotal = invoices.reduce((sum, i) => sum + i.refundedAmount, 0)
+    const refundedTotal = invoices.map((i) => ({ amount: i.refundedAmount, currency: i.currency }))
 
     const dueSoon = invoices.filter((i) => {
       if (i.status === 'paid' || i.status === 'void' || i.status === 'refunded') return false
@@ -80,43 +78,43 @@ export function InvoiceSummaryCards({ invoices, t }: Props) {
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
       <div className="rounded-xl border border-[#EAEAEA] bg-white p-4">
         <p className="text-xs font-medium text-[#787774]">{t('accounting.invoices.summary.totalInvoices')}</p>
-        <p className="mt-1 text-2xl font-semibold text-[#1A1A1A]">{stats.total}</p>
+        <p className="mt-1 break-words text-2xl font-semibold text-[#1A1A1A]">{stats.total}</p>
       </div>
       <div className="rounded-xl border border-[#EAEAEA] bg-white p-4">
         <p className="text-xs font-medium text-[#787774]">{t('accounting.invoices.summary.outstandingBalance')}</p>
-        <p className="mt-1 text-2xl font-semibold text-amber-600">{formatCurrency(stats.outstandingBalance)}</p>
+        <p className="mt-1 break-words text-2xl font-semibold text-amber-600">{formatTotals(stats.outstandingBalance)}</p>
       </div>
       <div className="rounded-xl border border-[#EAEAEA] bg-white p-4">
         <p className="text-xs font-medium text-[#787774]">{t('accounting.invoices.summary.paidToday')}</p>
-        <p className="mt-1 text-2xl font-semibold text-[#346538]">{formatCurrency(stats.paidToday)}</p>
+        <p className="mt-1 break-words text-2xl font-semibold text-[#346538]">{formatTotals(stats.paidToday)}</p>
       </div>
       <div className="rounded-xl border border-[#EAEAEA] bg-white p-4">
         <p className="text-xs font-medium text-[#787774]">{t('accounting.invoices.summary.dueSoon')}</p>
-        <p className="mt-1 text-2xl font-semibold text-rose-600">{stats.dueSoon}</p>
+        <p className="mt-1 break-words text-2xl font-semibold text-rose-600">{stats.dueSoon}</p>
       </div>
       <div className="rounded-xl border border-[#EAEAEA] bg-white p-4">
         <p className="text-xs font-medium text-[#787774]">{t('accounting.invoices.summary.draft')}</p>
-        <p className="mt-1 text-2xl font-semibold text-[#787774]">{stats.draft}</p>
+        <p className="mt-1 break-words text-2xl font-semibold text-[#787774]">{stats.draft}</p>
       </div>
       <div className="rounded-xl border border-[#EAEAEA] bg-white p-4">
         <p className="text-xs font-medium text-[#787774]">{t('accounting.invoices.summary.refundedAmount')}</p>
-        <p className="mt-1 text-2xl font-semibold text-[#9F2F2D]">{formatCurrency(stats.refundedTotal)}</p>
+        <p className="mt-1 break-words text-2xl font-semibold text-[#9F2F2D]">{formatTotals(stats.refundedTotal)}</p>
       </div>
       <div className="rounded-xl border border-[#EAEAEA] bg-white p-4">
         <p className="text-xs font-medium text-[#787774]">{t('accounting.invoices.summary.paid')}</p>
-        <p className="mt-1 text-2xl font-semibold text-[#346538]">{stats.paid}</p>
+        <p className="mt-1 break-words text-2xl font-semibold text-[#346538]">{stats.paid}</p>
       </div>
       <div className="rounded-xl border border-[#EAEAEA] bg-white p-4">
         <p className="text-xs font-medium text-[#787774]">{t('accounting.invoices.summary.partial')}</p>
-        <p className="mt-1 text-2xl font-semibold text-amber-500">{stats.partial}</p>
+        <p className="mt-1 break-words text-2xl font-semibold text-amber-500">{stats.partial}</p>
       </div>
       <div className="rounded-xl border border-[#EAEAEA] bg-white p-4">
         <p className="text-xs font-medium text-[#787774]">{t('accounting.invoices.summary.overdue')}</p>
-        <p className="mt-1 text-2xl font-semibold text-[#9F2F2D]">{stats.overdue}</p>
+        <p className="mt-1 break-words text-2xl font-semibold text-[#9F2F2D]">{stats.overdue}</p>
       </div>
       <div className="rounded-xl border border-[#EAEAEA] bg-white p-4">
         <p className="text-xs font-medium text-[#787774]">{t('accounting.invoices.summary.voided')}</p>
-        <p className="mt-1 text-2xl font-semibold text-[#787774]">{stats.voided}</p>
+        <p className="mt-1 break-words text-2xl font-semibold text-[#787774]">{stats.voided}</p>
       </div>
     </div>
   )

@@ -86,6 +86,7 @@ function mapReservationToBooking(row: Record<string, unknown>): Booking | null {
     status: mapResStatus(row.status as string),
     totalAmount: Number(row.total_amount),
     paidAmount: Number(row.paid_amount),
+    currency: String(row.currency ?? ''),
     createdAt: new Date(row.created_at as string),
     updatedAt: new Date(row.updated_at as string),
     reservationId: row.id as string,

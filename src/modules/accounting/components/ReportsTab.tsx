@@ -5,6 +5,7 @@ import { fetchData, useResource } from '@/shared/data/useResource'
 import { Skeleton } from '@/shared/components/Skeleton'
 import { ToolbarExportGroup } from '@/shared/components/toolbar'
 import { useCurrency } from '@/shared/contexts/CurrencyContext'
+import { isNonNegativeMoney, toMoney } from '@/shared/currency/money'
 import { useLocale } from '@/i18n/components/LocaleContext'
 import { formatDate } from '@/shared/utils/date'
 import type { DailyRevenueReport, MonthlyRevenueReport, ReportInvoiceDetail, ReportExpenseDetail } from '../types'
@@ -25,6 +26,8 @@ interface CombinedRow {
   description: string
   secondary: string
   amount: number
+  /** Invoices carry their own currency; expenses are in the system currency. */
+  currency?: string
   paidAmount: number
   refundedAmount: number
   remainingBalance: number
@@ -51,7 +54,7 @@ function MetricCard({ label, value, context, positive }: {
   return (
     <div className={cardClass}>
       <p className="text-sm text-[#787774]">{label}</p>
-      <p className={`text-2xl font-bold ${positive === true ? 'text-green-600' : positive === false ? 'text-[#9F2F2D]' : 'text-[#1A1A1A]'}`}>{value}</p>
+      <p className={`break-words text-2xl font-bold ${positive === true ? 'text-green-600' : positive === false ? 'text-[#9F2F2D]' : 'text-[#1A1A1A]'}`}>{value}</p>
       {context && <p className="text-xs text-[#BBBBBB]">{context}</p>}
     </div>
   )
@@ -119,7 +122,7 @@ function Pagination({ page, totalPages, onPrev, onNext, from, to, total, t }: {
 }
 
 function CombinedTable({ rows, page, totalPages, onPrev, onNext, formatCurrency, onDownloadInvoice, printingId, t }: {
-  rows: CombinedRow[]; page: number; totalPages: number; onPrev: () => void; onNext: () => void; formatCurrency: (n: number) => string; onDownloadInvoice?: (id: string) => void; printingId?: string | null; t: (key: string) => string
+  rows: CombinedRow[]; page: number; totalPages: number; onPrev: () => void; onNext: () => void; formatCurrency: (n: number, code?: string | null) => string; onDownloadInvoice?: (id: string) => void; printingId?: string | null; t: (key: string) => string
 }) {
   if (rows.length === 0) return <p className="text-sm text-[#787774] py-4">{t('accounting.reports.noRecords')}</p>
   return (
@@ -158,11 +161,11 @@ function CombinedTable({ rows, page, totalPages, onPrev, onNext, formatCurrency,
                 <td className={`${tableCellClass} text-[#787774]`}>
                   {r.type === 'invoice' ? (r.secondary || '—') : (r.category || '—')}
                 </td>
-                <td className={tableCellClass}>{formatCurrency(r.amount)}</td>
-                <td className={tableCellClass}>{formatCurrency(r.paidAmount)}</td>
-                <td className={tableCellClass}>{r.refundedAmount > 0 ? formatCurrency(r.refundedAmount) : '—'}</td>
+                <td className={tableCellClass}>{formatCurrency(r.amount, r.currency)}</td>
+                <td className={tableCellClass}>{formatCurrency(r.paidAmount, r.currency)}</td>
+                <td className={tableCellClass}>{r.refundedAmount > 0 ? formatCurrency(r.refundedAmount, r.currency) : '—'}</td>
                 <td className={`${tableCellClass} font-medium ${r.remainingBalance > 0 ? 'text-[#9F2F2D]' : 'text-green-600'}`}>
-                  {r.remainingBalance > 0 ? formatCurrency(r.remainingBalance) : '0'}
+                  {r.remainingBalance > 0 ? formatCurrency(r.remainingBalance, r.currency) : '0'}
                 </td>
                 <td className={`${tableCellClass} text-[#787774]`}>
                   {r.method ? (PAYMENT_METHOD_LABELS[r.method as keyof typeof PAYMENT_METHOD_LABELS] ?? r.method) : '—'}
@@ -186,7 +189,7 @@ function mergeRows(invoices: ReportInvoiceDetail[], expenses: ReportExpenseDetai
     invoiceNumber: i.invoiceNumber,
     description: `${i.invoiceNumber} - ${i.guestName ?? i.companyName ?? ''}`,
     secondary: i.guestName ?? i.companyName ?? '—',
-    amount: i.amount, paidAmount: i.paidAmount, refundedAmount: i.refundedAmount,
+    amount: i.amount, currency: i.currency, paidAmount: i.paidAmount, refundedAmount: i.refundedAmount,
     remainingBalance: i.remainingBalance, totalAmount: i.amount, taxAmount: 0,
     vendor: null, category: null, costCenter: null, room: i.roomNumber,
     method: i.paymentMethod, status: i.status, date: i.issueDate,
@@ -208,7 +211,7 @@ const EMPTY_INVOICES: DailyRevenueReport['invoices'] = []
 const EMPTY_EXPENSES: DailyRevenueReport['expenseDetails'] = []
 
 export function ReportsTab({ t }: Props) {
-  const { formatCurrency, currencyCode } = useCurrency()
+  const { formatCurrency, formatTotals, currencyCode } = useCurrency()
   const locale = useLocale()
   const [reportType, setReportType] = useState<'daily' | 'monthly'>('daily')
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10))
@@ -240,25 +243,27 @@ export function ReportsTab({ t }: Props) {
   const totalPages = Math.max(1, Math.ceil(allRows.length / PAGE_SIZE))
   const pageRows = allRows.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE)
 
-  const totalPaid = invoices.reduce((s, i) => s + i.paidAmount, 0)
-  const totalRefunded = invoices.reduce((s, i) => s + i.refundedAmount, 0)
-  const totalRemaining = invoices.reduce((s, i) => s + i.remainingBalance, 0)
-  const totalAmount = (reportType === 'daily' ? dailyReport?.totalRevenue : monthlyReport?.totalRevenue) ?? 0
-  const totalExpenses = (reportType === 'daily' ? dailyReport?.expenses : monthlyReport?.expenses) ?? 0
+  // Invoices can be in different currencies: totals stay per currency.
+  const invoiceTotal = (value: (i: (typeof invoices)[number]) => number) => toMoney(invoices.map((i) => ({ amount: value(i), currency: i.currency })))
+  const totalPaid = invoiceTotal((i) => i.paidAmount)
+  const totalRefunded = invoiceTotal((i) => i.refundedAmount)
+  const totalRemaining = invoiceTotal((i) => i.remainingBalance)
+  const totalAmount = (reportType === 'daily' ? dailyReport?.totalRevenue : monthlyReport?.totalRevenue) ?? []
+  const totalExpenses = (reportType === 'daily' ? dailyReport?.expenses : monthlyReport?.expenses) ?? []
 
   const handleExportCsv = useCallback(async () => {
     setExportingCsv(true)
     await new Promise<void>(r => setTimeout(r, 0))
     try {
       if (reportType === 'daily' && dailyReport) {
-        exportDailyRevenueCsv(dailyReport)
+        exportDailyRevenueCsv(dailyReport, currencyCode)
       } else if (reportType === 'monthly' && monthlyReport) {
-        exportMonthlyRevenueCsv(monthlyReport)
+        exportMonthlyRevenueCsv(monthlyReport, currencyCode)
       }
     } finally {
       setExportingCsv(false)
     }
-  }, [reportType, dailyReport, monthlyReport])
+  }, [reportType, dailyReport, monthlyReport, currencyCode])
 
   const handleExportPdf = useCallback(async () => {
     setExportingPdf(true)
@@ -337,10 +342,10 @@ export function ReportsTab({ t }: Props) {
       {!loading && reportType === 'daily' && dailyReport && (
         <div className="space-y-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <MetricCard label={t('accounting.reports.roomRevenue')} value={formatCurrency(dailyReport.roomRevenue)} />
-            <MetricCard label={t('accounting.reports.extraServices')} value={formatCurrency(dailyReport.extraServices)} />
-            <MetricCard label={t('accounting.reports.taxCollected')} value={formatCurrency(dailyReport.taxCollected)} />
-            <MetricCard label={t('accounting.reports.netRevenue')} value={formatCurrency(dailyReport.netRevenue)} positive={dailyReport.netRevenue >= 0} />
+            <MetricCard label={t('accounting.reports.roomRevenue')} value={formatTotals(dailyReport.roomRevenue)} />
+            <MetricCard label={t('accounting.reports.extraServices')} value={formatTotals(dailyReport.extraServices)} />
+            <MetricCard label={t('accounting.reports.taxCollected')} value={formatTotals(dailyReport.taxCollected)} />
+            <MetricCard label={t('accounting.reports.netRevenue')} value={formatTotals(dailyReport.netRevenue)} positive={isNonNegativeMoney(dailyReport.netRevenue)} />
           </div>
 
           <div className={cardClass}>
@@ -349,7 +354,7 @@ export function ReportsTab({ t }: Props) {
             {dailyReport.payments.map((p, i) => (
               <div key={i} className="flex justify-between py-1 text-sm border-b border-gray-50 last:border-0">
                 <span className="text-[#555555]">{PAYMENT_METHOD_LABELS[p.method as keyof typeof PAYMENT_METHOD_LABELS] ?? p.method}</span>
-                <span className="font-medium">{formatCurrency(p.amount)}</span>
+                <span className="font-medium">{formatTotals(p.amount)}</span>
               </div>
             ))}
           </div>
@@ -361,12 +366,12 @@ export function ReportsTab({ t }: Props) {
               onNext={() => setPage(p => Math.min(totalPages - 1, p + 1))}
               formatCurrency={formatCurrency} onDownloadInvoice={handleDownloadInvoice} printingId={printingId} t={t} />
             <div className="mt-3 pt-3 border-t border-[#EAEAEA] space-y-1">
-              <SummaryRow label={t('accounting.reports.totalRevenue')} value={formatCurrency(totalAmount)} />
-              <SummaryRow label={t('accounting.finance.paid')} value={formatCurrency(totalPaid)} positive />
-              <SummaryRow label={t('accounting.invoices.refunded')} value={formatCurrency(totalRefunded)} positive={false} />
-              <SummaryRow label={t('accounting.overview.outstanding')} value={formatCurrency(totalRemaining)}
-                positive={totalRemaining <= 0} />
-              <SummaryRow label={t('accounting.overview.totalExpenses')} value={formatCurrency(totalExpenses)} positive={false} />
+              <SummaryRow label={t('accounting.reports.totalRevenue')} value={formatTotals(totalAmount)} />
+              <SummaryRow label={t('accounting.finance.paid')} value={formatTotals(totalPaid)} positive />
+              <SummaryRow label={t('accounting.invoices.refunded')} value={formatTotals(totalRefunded)} positive={false} />
+              <SummaryRow label={t('accounting.overview.outstanding')} value={formatTotals(totalRemaining)}
+                positive={totalRemaining.length === 0} />
+              <SummaryRow label={t('accounting.overview.totalExpenses')} value={formatTotals(totalExpenses)} positive={false} />
             </div>
           </div>
         </div>
@@ -375,11 +380,11 @@ export function ReportsTab({ t }: Props) {
       {!loading && reportType === 'monthly' && monthlyReport && (
         <div className="space-y-6">
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <MetricCard label={t('accounting.reports.roomRevenue')} value={formatCurrency(monthlyReport.roomRevenue)} />
-            <MetricCard label={t('accounting.reports.otherRevenue')} value={formatCurrency(monthlyReport.otherRevenue)} />
-            <MetricCard label={t('accounting.reports.totalRevenue')} value={formatCurrency(monthlyReport.totalRevenue)} positive />
-            <MetricCard label={t('accounting.reports.expenses')} value={formatCurrency(monthlyReport.expenses)} positive={false} />
-            <MetricCard label={t('accounting.reports.netProfit')} value={formatCurrency(monthlyReport.netProfit)} positive={monthlyReport.netProfit >= 0} />
+            <MetricCard label={t('accounting.reports.roomRevenue')} value={formatTotals(monthlyReport.roomRevenue)} />
+            <MetricCard label={t('accounting.reports.otherRevenue')} value={formatTotals(monthlyReport.otherRevenue)} />
+            <MetricCard label={t('accounting.reports.totalRevenue')} value={formatTotals(monthlyReport.totalRevenue)} positive />
+            <MetricCard label={t('accounting.reports.expenses')} value={formatTotals(monthlyReport.expenses)} positive={false} />
+            <MetricCard label={t('accounting.reports.netProfit')} value={formatTotals(monthlyReport.netProfit)} positive={isNonNegativeMoney(monthlyReport.netProfit)} />
             <MetricCard label={t('accounting.reports.occupancyRate')} value={monthlyReport.occupancyRate > 0 ? `${monthlyReport.occupancyRate.toFixed(1)}%` : '—'} />
           </div>
 
@@ -390,12 +395,12 @@ export function ReportsTab({ t }: Props) {
               onNext={() => setPage(p => Math.min(totalPages - 1, p + 1))}
               formatCurrency={formatCurrency} onDownloadInvoice={handleDownloadInvoice} printingId={printingId} t={t} />
             <div className="mt-3 pt-3 border-t border-[#EAEAEA] space-y-1">
-              <SummaryRow label={t('accounting.reports.totalRevenue')} value={formatCurrency(totalAmount)} />
-              <SummaryRow label={t('accounting.finance.paid')} value={formatCurrency(totalPaid)} positive />
-              <SummaryRow label={t('accounting.invoices.refunded')} value={formatCurrency(totalRefunded)} positive={false} />
-              <SummaryRow label={t('accounting.overview.outstanding')} value={formatCurrency(totalRemaining)}
-                positive={totalRemaining <= 0} />
-              <SummaryRow label={t('accounting.overview.totalExpenses')} value={formatCurrency(totalExpenses)} positive={false} />
+              <SummaryRow label={t('accounting.reports.totalRevenue')} value={formatTotals(totalAmount)} />
+              <SummaryRow label={t('accounting.finance.paid')} value={formatTotals(totalPaid)} positive />
+              <SummaryRow label={t('accounting.invoices.refunded')} value={formatTotals(totalRefunded)} positive={false} />
+              <SummaryRow label={t('accounting.overview.outstanding')} value={formatTotals(totalRemaining)}
+                positive={totalRemaining.length === 0} />
+              <SummaryRow label={t('accounting.overview.totalExpenses')} value={formatTotals(totalExpenses)} positive={false} />
             </div>
           </div>
         </div>
