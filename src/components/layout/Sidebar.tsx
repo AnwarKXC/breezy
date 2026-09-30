@@ -2,7 +2,6 @@
 
 import { memo, useCallback, useMemo, useState } from "react";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 
@@ -28,6 +27,7 @@ import {
 } from "./LayoutIcons";
 import { SidebarNavLink } from "./SidebarNavLink";
 import { SidebarSocialLinks } from "./SidebarSocialLinks";
+import { BrandLogo, useBranding } from "@/shared/branding/BrandingContext";
 
 const navIcons: Record<DashboardNavIcon, () => React.ReactNode> = {
   accounting: () => <AccountingIcon />,
@@ -48,6 +48,7 @@ export const Sidebar = memo(function Sidebar() {
   const router = useRouter();
   const params = useParams<{ locale?: string | string[] }>();
   const { t } = useTranslation();
+  const { displayName } = useBranding();
   const { loading, logout, role } = useAuth();
   const [logoutError, setLogoutError] = useState<string | null>(null);
   const navItems = useMemo(() => {
@@ -76,17 +77,11 @@ export const Sidebar = memo(function Sidebar() {
         // Same height and bottom border as the top bar, so they read as one line.
         className="-mx-5 mb-6 flex h-16 shrink-0 items-center gap-3 border-b border-line px-7 text-base font-semibold tracking-tight text-ink"
       >
-<span className="grid h-10 w-10 place-items-center">
-  <Image
-    alt={t("common.appName")}
-    className="h-10 w-10 object-contain"
-    src="/Full Logo Green.png"
-    width={40}
-    height={40}
-  />
-</span>
+        <span className="grid h-10 w-10 place-items-center">
+          <BrandLogo size={40} className="h-10 w-10 object-contain" />
+        </span>
         <span className="min-w-0">
-          <span className="block truncate">{t("common.appName")}</span>
+          <span className="block truncate">{displayName}</span>
           <span className="block truncate text-xs font-medium text-[#787774]">
             {t("layout.admin")}
           </span>

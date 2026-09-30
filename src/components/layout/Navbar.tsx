@@ -9,6 +9,7 @@ import { DASHBOARD_TITLE_KEYS } from "@/config/navigation";
 import type { Locale } from "@/i18n/config";
 import { useTranslation } from "@/i18n/hooks/useTranslation";
 import { TopbarActions } from "./TopbarActions";
+import { BrandLogo, useBranding } from "@/shared/branding/BrandingContext";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -50,6 +51,7 @@ export const Navbar = memo(function Navbar() {
   const pathname = usePathname();
   const params = useParams<{ locale?: string | string[] }>();
   const { t, isRTL } = useTranslation();
+  const { displayName, hasCustomLogo } = useBranding();
   const locale = getLocaleParam(params.locale);
   const localePrefix = `/${locale}`;
   const parents = buildParentCrumbs(pathname.replace(new RegExp(`^/${locale}`), ""), localePrefix, t);
@@ -58,8 +60,12 @@ export const Navbar = memo(function Navbar() {
     <header className="fixed inset-x-0 top-0 z-30 flex h-16 items-center justify-between gap-3 border-b border-line bg-white px-4 sm:px-6 lg:sticky lg:inset-auto lg:top-0 lg:w-full lg:px-8">
       <div className="flex min-w-0 items-center gap-3">
         {/* The sidebar carries the brand on desktop; show it here only on smaller screens. */}
-        <Link href={localePrefix} className="shrink-0 lg:hidden" aria-label={t("common.appName")}>
-          <Image alt="" className="h-8 w-8 object-contain" src="/logo-mark.png" width={32} height={32} priority unoptimized />
+        <Link href={localePrefix} className="shrink-0 lg:hidden" aria-label={displayName}>
+          {hasCustomLogo ? (
+            <BrandLogo size={32} className="h-8 w-8 object-contain" priority />
+          ) : (
+            <Image alt="" className="h-8 w-8 object-contain" src="/logo-mark.png" width={32} height={32} priority unoptimized />
+          )}
         </Link>
 
         {parents.length > 0 && (

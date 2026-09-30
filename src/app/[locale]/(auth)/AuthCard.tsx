@@ -1,18 +1,11 @@
-import Image from "next/image";
+import { BrandLogo } from "@/shared/branding/BrandingContext";
 
 export function AuthCard({ title, subtitle, children }: { title: string; subtitle: string; children: React.ReactNode }) {
   return (
     <main className="flex min-h-screen items-center justify-center bg-white px-6 py-10 text-[#111111]">
       <div className="w-full max-w-[320px]">
         <div className="mb-8 text-center">
-          <Image
-            alt="Breezy System"
-            className="mx-auto mb-5 h-20 w-20 object-contain"
-            src="/Full Logo Green.png"
-            width={80}
-            height={80}
-            priority
-          />
+          <BrandLogo size={80} className="mx-auto mb-5 h-20 w-20 object-contain" priority />
           <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
           <p className="mt-1 text-xs font-medium text-[#787774]">{subtitle}</p>
         </div>

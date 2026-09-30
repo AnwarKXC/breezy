@@ -1,10 +1,12 @@
 import type { MetadataRoute } from "next";
+import { getBranding } from "@/shared/branding/server";
 
-export default function manifest(): MetadataRoute.Manifest {
+export default async function manifest(): Promise<MetadataRoute.Manifest> {
+  const { displayName } = await getBranding();
   return {
     id: "/",
-    name: "Breezy System",
-    short_name: "Breezy",
+    name: displayName,
+    short_name: displayName,
     description: "Hotel Management System for staff dashboard",
     start_url: "/en/reservations",
     scope: "/",

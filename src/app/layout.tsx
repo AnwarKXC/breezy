@@ -4,6 +4,8 @@ import { headers } from "next/headers";
 import { ReduxProvider } from "@/store/provider";
 import { ToastProvider } from "@/shared/toast";
 import { CsrfBootstrap } from "@/shared/components/CsrfBootstrap";
+import { BrandingProvider } from "@/shared/branding/BrandingContext";
+import { getBranding } from "@/shared/branding/server";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -12,15 +14,18 @@ const poppins = Poppins({
   weight: ["400", "500", "600", "700"],
 });
 
-export const metadata: Metadata = {
-  title: "Breezy System",
-  description: "Hotel Management System for staff dashboard",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "Breezy",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { displayName } = await getBranding();
+  return {
+    title: displayName,
+    description: "Hotel Management System for staff dashboard",
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "default",
+      title: displayName,
+    },
+  };
+}
 
 export default async function RootLayout({
   children,
@@ -30,6 +35,7 @@ export default async function RootLayout({
   const headersList = await headers()
   const locale = headersList.get('x-locale') || 'en'
   const dir = headersList.get('x-dir') || 'ltr'
+  const branding = await getBranding()
 
   return (
     <html
@@ -42,7 +48,7 @@ export default async function RootLayout({
         <CsrfBootstrap />
         <ReduxProvider>
           <ToastProvider>
-            {children}
+            <BrandingProvider value={branding}>{children}</BrandingProvider>
           </ToastProvider>
         </ReduxProvider>
       </body>

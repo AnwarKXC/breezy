@@ -12,6 +12,7 @@ function downloadBuffer(buffer: ArrayBuffer, fileName: string) {
 }
 import type { Invoice, InvoiceItem, Payment } from '../types'
 import { INVOICE_ITEM_TYPE_LABELS, INVOICE_STATUS_LABELS, PAYMENT_METHOD_LABELS } from '../types'
+import type { PublicBranding } from '@/shared/branding/branding'
 
 type InvoiceForPdf = Invoice & { payments?: Payment[] }
 
@@ -115,8 +116,19 @@ const C = {
   danger: '#DC2626',
 } as const
 
-// ── Logo loading (cached across calls within page lifecycle) ──
-let logoBase64Promise: Promise<string> | null = null
+// ── Organization branding (name, logo, contacts from Settings > Organization) ──
+async function loadBranding(): Promise<PublicBranding | null> {
+  try {
+    const res = await fetch('/api/branding')
+    if (!res.ok) return null
+    return ((await res.json()) as { data?: PublicBranding }).data ?? null
+  } catch {
+    return null
+  }
+}
+
+// ── Logo loading (cached per URL within page lifecycle) ──
+const logoDataUriPromises = new Map<string, Promise<string>>()
 
 function arrayBufferToBase64(buf: ArrayBuffer): string {
   const bytes = new Uint8Array(buf)
@@ -125,17 +137,20 @@ function arrayBufferToBase64(buf: ArrayBuffer): string {
   return btoa(binary)
 }
 
-async function loadLogoBase64(): Promise<string> {
-  logoBase64Promise ??= fetch('/Profile_Picture_White.png')
-    .then((r) => {
+// pdfmake only embeds PNG and JPEG.
+async function loadLogoDataUri(url: string): Promise<string> {
+  let promise = logoDataUriPromises.get(url)
+  if (!promise) {
+    promise = fetch(url).then(async (r) => {
       if (!r.ok) throw new Error('Logo not found')
-      if (!(r.headers.get('content-type') ?? '').startsWith('image/')) {
-        throw new Error('Logo response is not an image (got: ' + r.headers.get('content-type') + ')')
-      }
-      return r.arrayBuffer()
+      const type = r.headers.get('content-type') ?? ''
+      if (type !== 'image/png' && type !== 'image/jpeg') throw new Error('Unsupported logo type: ' + type)
+      return `data:${type};base64,${arrayBufferToBase64(await r.arrayBuffer())}`
     })
-    .then(arrayBufferToBase64)
-  return logoBase64Promise
+    promise.catch(() => logoDataUriPromises.delete(url))
+    logoDataUriPromises.set(url, promise)
+  }
+  return promise
 }
 
 const EN_INVOICE_PDF_LABELS = {
@@ -276,13 +291,18 @@ export async function downloadInvoicePdf(invoice: InvoiceForPdf, locale: string)
   const stayNights = computeNights(stayCheckIn, stayCheckOut)
 
   // ── Load logo ──
+  const branding = await loadBranding()
   let logoDataUri = ''
   try {
-    const b64 = await loadLogoBase64()
-    logoDataUri = `data:image/png;base64,${b64}`
+    logoDataUri = await loadLogoDataUri(branding?.hasCustomLogo ? branding.logoUrl : '/Profile_Picture_White.png')
   } catch {
     // Proceed without logo image
   }
+  const brandName = (branding?.name || 'Breezy Hotel').toUpperCase()
+  // Until the organization is configured, keep the original hotel contact line.
+  const contactLines = branding && (branding.name || branding.email || branding.phones.length || branding.address)
+    ? [branding.email, branding.phones.join('  ·  '), branding.address].filter(Boolean)
+    : ['breezyislandresort@gmail.com']
 
   // ── Cell helper ──
   function cell(
@@ -305,8 +325,8 @@ export async function downloadInvoicePdf(invoice: InvoiceForPdf, locale: string)
   const brandDetails: Record<string, unknown> = {
     width: '*',
     stack: [
-      { text: 'BREEZY HOTEL', fontSize: 16, bold: true, color: C.green, letterSpacing: 1.5, alignment: brandAlignment },
-      { text: 'breezyislandresort@gmail.com', fontSize: 8, color: C.textMuted, alignment: brandAlignment, margin: [0, 2, 0, 0] },
+      { text: brandName, fontSize: 16, bold: true, color: C.green, letterSpacing: 1.5, alignment: brandAlignment },
+      ...contactLines.map((line) => ({ text: line, fontSize: 8, color: C.textMuted, alignment: brandAlignment, margin: [0, 2, 0, 0] })),
     ],
   }
   const brandColumns: Record<string, unknown>[] = [brandDetails]

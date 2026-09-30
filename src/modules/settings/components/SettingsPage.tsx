@@ -9,6 +9,7 @@ import { CurrencyTab } from './CurrencyTab'
 import { PricingTab } from './PricingTab'
 import { EmailTab } from './email/EmailTab'
 import { ThemeTab } from './ThemeTab'
+import { OrganizationTab } from './OrganizationTab'
 
 function Icon({ children }: { children: ReactNode }) {
   return (
@@ -42,6 +43,14 @@ const CurrencyIcon = () => (
   </Icon>
 )
 
+const OrganizationIcon = () => (
+  <Icon>
+    <path d="M3 21h18" />
+    <path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16" />
+    <path d="M9 7h.01M15 7h.01M9 11h.01M15 11h.01M9 15h.01M15 15h.01" />
+  </Icon>
+)
+
 const ThemeIcon = () => (
   <Icon>
     <path d="M12 22a10 10 0 1 1 10-10c0 2.5-2 3.5-4 3.5h-2a2 2 0 0 0-1.5 3.3A2 2 0 0 1 12 22Z" />
@@ -69,6 +78,7 @@ const EmailIcon = () => (
 )
 
 const SECTIONS = [
+  { id: 'organization', icon: OrganizationIcon, titleKey: 'settings.tabs.organization', descriptionKey: 'settings.manageOrganization' },
   { id: 'rooms', icon: RoomsIcon, titleKey: 'settings.tabs.rooms', descriptionKey: 'settings.manageRooms' },
   { id: 'pricing', icon: TaxIcon, titleKey: 'settings.tabs.pricing', descriptionKey: 'settings.managePricing' },
   { id: 'currency', icon: CurrencyIcon, titleKey: 'settings.tabs.currency', descriptionKey: 'settings.manageCurrency' },
@@ -152,6 +162,7 @@ export function SettingsPage({ permissions, theme }: SettingsPageProps) {
       {active.id === 'pricing' && <PricingTab />}
       {active.id === 'currency' && <CurrencyTab />}
       {active.id === 'email' && <EmailTab canEdit={permissions?.canWriteSettings ?? false} />}
+      {active.id === 'organization' && <OrganizationTab canEdit={permissions?.canWriteSettings ?? false} />}
       {active.id === 'theme' && (
         <ThemeTab initialPrimaryColor={theme.primaryColor} canEdit={permissions?.canWriteSettings ?? false} />
       )}

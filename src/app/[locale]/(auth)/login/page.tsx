@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import Image from "next/image";
+import { BrandLogo } from "@/shared/branding/BrandingContext";
 import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -87,14 +88,7 @@ export default function LoginPage() {
         <div className="flex min-h-screen flex-col items-center justify-center px-6 py-10 sm:px-12">
           <div className="w-full max-w-[320px]">
             <div className="mb-8 text-center">
-              <Image
-                alt="Breezy System"
-                className="mx-auto mb-5 h-20 w-20 object-contain"
-                src="/Full Logo Green.png"
-                width={80}
-                height={80}
-                priority
-              />
+              <BrandLogo size={80} className="mx-auto mb-5 h-20 w-20 object-contain" priority />
               <h1 className="text-2xl font-bold tracking-tight">
                 {t("auth.login.title")}
               </h1>
