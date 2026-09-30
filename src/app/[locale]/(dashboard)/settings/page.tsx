@@ -6,6 +6,7 @@ import { requireSettingsRead, getSettingsUiPermissions } from '@/modules/setting
 import ar from '@/i18n/locales/ar.json'
 import en from '@/i18n/locales/en.json'
 import { PageSkeleton } from "@/shared/components/PageSkeleton";
+import { getAppTheme } from '@/shared/theme/server'
 
 const translations = { ar, en }
 
@@ -37,7 +38,7 @@ export default async function SettingsRoutePage({
 }) {
   const { locale: rawLocale } = await params
   const locale = checkLocale(rawLocale)
-  let permissions = { canDeleteRooms: false }
+  let permissions = { canDeleteRooms: false, canWriteSettings: false }
   let accessLabels: ReturnType<typeof getAccessLabels> | null = null
 
   try {
@@ -55,9 +56,11 @@ export default async function SettingsRoutePage({
     return <SettingsAccessState {...accessLabels} />
   }
 
+  const theme = await getAppTheme()
+
   return (
     <Suspense fallback={<PageSkeleton />}>
-      <SettingsPage permissions={permissions} />
+      <SettingsPage permissions={permissions} theme={{ primaryColor: theme.primaryColor }} />
     </Suspense>
   )
 }

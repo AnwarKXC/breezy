@@ -34,5 +34,6 @@ export async function requireSettingsWrite(): Promise<void> {
 export function getSettingsUiPermissions(session: VerifiedSession) {
   return {
     canDeleteRooms: session.role === 'admin',
+    canWriteSettings: canPerformAction(session.role, ACTIONS.SETTINGS_WRITE),
   }
 }

@@ -63,14 +63,14 @@ export const BottomNav = memo(function BottomNav() {
               key={item.href || "dashboard"}
               href={href}
               className={`flex min-w-0 flex-col items-center justify-center px-1 py-1.5 transition-all duration-200 ${
-                active ? "text-[#1A1A1A]" : "text-[#787774] hover:text-[#1A1A1A]"
+                active ? "text-accent" : "text-[#787774] hover:text-[#1A1A1A]"
               }`}
             >
-              <span className={active ? "text-[#1A1A1A]" : "text-[#787774]"}>
+              <span className={active ? "text-accent" : "text-[#787774]"}>
                 {navIcons[item.icon]()}
               </span>
               <span
-                className={`mt-0.5 max-w-full truncate text-[11px] font-medium ${active ? "text-[#1A1A1A]" : "text-[#787774]"}`}
+                className={`mt-0.5 max-w-full truncate text-[11px] font-medium ${active ? "text-accent" : "text-[#787774]"}`}
               >
                 {t(item.labelKey)}
               </span>

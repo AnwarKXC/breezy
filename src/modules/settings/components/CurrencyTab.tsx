@@ -23,7 +23,7 @@ export function CurrencyTab() {
               className={`
                 rounded-xl border bg-white p-5 text-left transition-all duration-200
                 ${active
-                  ? 'border-gray-900 ring-1 ring-gray-900 '
+                  ? 'border-accent ring-1 ring-accent'
                   : 'border-[#EAEAEA] hover:border-gray-400 hover:'
                 }
                 ${loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}

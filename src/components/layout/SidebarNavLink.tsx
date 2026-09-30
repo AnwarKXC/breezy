@@ -29,7 +29,7 @@ export const SidebarNavLink = memo(function SidebarNavLink({
       aria-current={isActive ? "page" : undefined}
       className={`flex h-10 items-center gap-3 rounded-md px-4 text-sm font-medium transition-all duration-200 ${
         isActive
-          ? "bg-[#F5F5F5] text-[#1A1A1A]"
+          ? "bg-[#F5F5F5] text-accent"
           : "text-[#787774] hover:bg-[#F5F5F5] hover:text-[#1A1A1A]"
       }`}
       href={href}

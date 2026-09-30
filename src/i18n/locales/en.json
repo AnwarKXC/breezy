@@ -1627,16 +1627,132 @@
     "manageRooms": "Manage room types, rooms, and pricing",
     "manageCurrency": "Change system currency",
     "managePricing": "Configure service charge and VAT percentages",
+    "manageTheme": "Dashboard primary color and reset to default",
     "tabs": {
       "roomTypes": "Room Types",
       "rooms": "Rooms",
       "pricing": "Tax & service charge",
-      "currency": "Currency"
+      "currency": "Currency",
+      "theme": "Theme",
+      "email": "Email"
+    },
+    "theme": {
+      "primaryColor": "Primary color",
+      "primaryColorHint": "Used for primary buttons and the active navigation item. Applies to every user of this system.",
+      "presets": "Preset colors",
+      "customColor": "Custom color",
+      "preview": "Preview",
+      "previewButton": "Primary button",
+      "previewActiveLink": "Active link",
+      "previewOutline": "Outline",
+      "reset": "Reset to default",
+      "discard": "Discard changes",
+      "saved": "Theme saved",
+      "resetDone": "Theme reset to default",
+      "saveFailed": "Failed to save theme"
     },
     "currency": {
       "USD": "United States Dollar",
       "EGP": "Egyptian Pound",
-      "EUR": "Euro"
+      "EUR": "Euro",
+      "GBP": "British Pound",
+      "defaultTitle": "Default currency",
+      "defaultHint": "Used for new reservations, invoices and rates unless another currency is chosen. Existing records keep their own currency; amounts are never converted.",
+      "label": "Currency"
+    },
+    "manageEmail": "Connect the hotel mailbox to read, send and reply to email",
+    "email": {
+      "connectedAs": "Connected as",
+      "views": {
+        "mailbox": "Mailbox",
+        "account": "Account"
+      },
+      "folders": {
+        "inbox": "Inbox",
+        "sent": "Sent",
+        "trash": "Trash"
+      },
+      "presets": {
+        "gmail": "Gmail / Google Workspace",
+        "zoho": "Zoho Mail",
+        "custom": "Domain email (cPanel, Hostinger, other)"
+      },
+      "help": {
+        "gmail": "Use a 16-character App Password, not your normal Gmail password. In your Google Account: Security → turn on 2-Step Verification → search \"App passwords\" → create one named \"Hotel System\" → paste it here. IMAP is always on for Gmail.",
+        "zoho": "In Zoho Mail: Settings → Mail Accounts → IMAP Access → enable IMAP. If 2-factor login is on, create an Application-Specific Password under Zoho Accounts → Security and use it here.",
+        "custom": "Find the IMAP and SMTP settings in your hosting panel (cPanel: Email Accounts → Connect Devices). Usually IMAP port 993 and SMTP port 465 with SSL on, and the username is the full email address."
+      },
+      "account": {
+        "provider": "Email provider",
+        "credentials": "Mailbox login",
+        "displayName": "Sender name",
+        "displayNamePlaceholder": "e.g. Breezy Island Reception",
+        "email": "Email address",
+        "username": "Username (if different from the address)",
+        "password": "Password",
+        "appPassword": "App password",
+        "passwordKeep": "Leave empty to keep the saved password",
+        "imap": "Incoming mail (IMAP)",
+        "imapHint": "Used to read the inbox",
+        "smtp": "Outgoing mail (SMTP)",
+        "smtpHint": "Used to send and reply",
+        "host": "Server",
+        "port": "Port",
+        "ssl": "Use SSL/TLS",
+        "save": "Test & save",
+        "testing": "Testing connection…",
+        "saved": "Mailbox connected",
+        "disconnect": "Disconnect",
+        "disconnectConfirm": "Disconnect this mailbox? Emails stay on your mail server.",
+        "disconnected": "Mailbox disconnected"
+      },
+      "inbox": {
+        "search": "Search subject, sender or recipient",
+        "refresh": "Refresh",
+        "loading": "Loading…",
+        "empty": "No messages in this folder.",
+        "selectMessage": "Select a message to read it.",
+        "noSubject": "(no subject)",
+        "unread": "Unread",
+        "hasAttachments": "Has attachments",
+        "newer": "Newer",
+        "older": "Older",
+        "back": "← Back to list",
+        "reply": "Reply",
+        "replyAll": "Reply all",
+        "forward": "Forward",
+        "markUnread": "Mark unread",
+        "markedUnread": "Marked as unread",
+        "delete": "Delete",
+        "deleteForever": "Delete forever",
+        "movedToTrash": "Moved to Trash",
+        "deletedForever": "Deleted permanently"
+      },
+      "compose": {
+        "title": "New email",
+        "reply": "Reply",
+        "close": "Close",
+        "to": "To",
+        "cc": "Cc",
+        "subject": "Subject",
+        "body": "Message",
+        "attach": "Attach files",
+        "removeAttachment": "Remove attachment",
+        "send": "Send",
+        "sending": "Sending…",
+        "sent": "Email sent"
+      },
+      "errors": {
+        "generic": "Something went wrong. Try again.",
+        "not_configured": "No mailbox is connected yet.",
+        "imap_failed": "Could not sign in to the incoming (IMAP) server. Check the address, password and server settings.",
+        "smtp_failed": "Could not sign in to the outgoing (SMTP) server. Check the password and SMTP settings.",
+        "password_required": "Enter the mailbox password.",
+        "encryption_key_missing": "Server is missing EMAIL_ENCRYPTION_KEY. Ask your administrator to set it.",
+        "server_unreachable": "The mail server did not respond. Try again in a moment.",
+        "message_not_found": "This message no longer exists.",
+        "attachments_too_large": "Attachments are limited to 10 files and 10 MB in total."
+      }
     }
   },
   "settingsPricing": {

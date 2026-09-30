@@ -7,6 +7,8 @@ import { useTranslation } from '@/i18n/hooks/useTranslation'
 import { RoomManagement } from '@/modules/rooms/components/RoomManagement'
 import { CurrencyTab } from './CurrencyTab'
 import { PricingTab } from './PricingTab'
+import { EmailTab } from './email/EmailTab'
+import { ThemeTab } from './ThemeTab'
 
 function Icon({ children }: { children: ReactNode }) {
   return (
@@ -40,6 +42,15 @@ const CurrencyIcon = () => (
   </Icon>
 )
 
+const ThemeIcon = () => (
+  <Icon>
+    <path d="M12 22a10 10 0 1 1 10-10c0 2.5-2 3.5-4 3.5h-2a2 2 0 0 0-1.5 3.3A2 2 0 0 1 12 22Z" />
+    <circle cx="7.5" cy="10.5" r="1" />
+    <circle cx="12" cy="7" r="1" />
+    <circle cx="16.5" cy="10.5" r="1" />
+  </Icon>
+)
+
 /** Points "back" or "forward" in reading direction (mirrored in RTL). */
 function Chevron({ direction, isRTL }: { direction: 'back' | 'forward'; isRTL: boolean }) {
   const pointsLeft = (direction === 'back') !== isRTL
@@ -50,10 +61,19 @@ function Chevron({ direction, isRTL }: { direction: 'back' | 'forward'; isRTL: b
   )
 }
 
+const EmailIcon = () => (
+  <Icon>
+    <rect x="3" y="5" width="18" height="14" rx="2" />
+    <path d="m3 7 9 6 9-6" />
+  </Icon>
+)
+
 const SECTIONS = [
   { id: 'rooms', icon: RoomsIcon, titleKey: 'settings.tabs.rooms', descriptionKey: 'settings.manageRooms' },
   { id: 'pricing', icon: TaxIcon, titleKey: 'settings.tabs.pricing', descriptionKey: 'settings.managePricing' },
   { id: 'currency', icon: CurrencyIcon, titleKey: 'settings.tabs.currency', descriptionKey: 'settings.manageCurrency' },
+  { id: 'theme', icon: ThemeIcon, titleKey: 'settings.tabs.theme', descriptionKey: 'settings.manageTheme' },
+  { id: 'email', icon: EmailIcon, titleKey: 'settings.tabs.email', descriptionKey: 'settings.manageEmail' },
 ] as const
 
 type SectionId = (typeof SECTIONS)[number]['id']
@@ -67,7 +87,12 @@ function PageHeading({ title, description }: { title: string; description: strin
   )
 }
 
-export function SettingsPage({ permissions }: { permissions?: { canDeleteRooms: boolean } }) {
+export interface SettingsPageProps {
+  permissions?: { canDeleteRooms: boolean; canWriteSettings: boolean }
+  theme: { primaryColor: string }
+}
+
+export function SettingsPage({ permissions, theme }: SettingsPageProps) {
   const { t, isRTL } = useTranslation()
   const searchParams = useSearchParams()
   const pathname = usePathname()
@@ -126,6 +151,10 @@ export function SettingsPage({ permissions }: { permissions?: { canDeleteRooms: 
       {active.id === 'rooms' && <RoomManagement canDeleteRooms={permissions?.canDeleteRooms ?? false} />}
       {active.id === 'pricing' && <PricingTab />}
       {active.id === 'currency' && <CurrencyTab />}
+      {active.id === 'email' && <EmailTab canEdit={permissions?.canWriteSettings ?? false} />}
+      {active.id === 'theme' && (
+        <ThemeTab initialPrimaryColor={theme.primaryColor} canEdit={permissions?.canWriteSettings ?? false} />
+      )}
     </div>
   )
 }

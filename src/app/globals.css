@@ -5,8 +5,10 @@
   --color-foreground: var(--foreground);
   --color-ink: #1A1A1A;
   --color-ink-muted: #787774;
-  --color-accent: #1A1A1A;
-  --color-accent-hover: #333333;
+  /* Primary color: overridable per deployment from Settings > Theme (--app-primary). */
+  --color-accent: var(--app-primary, #1A1A1A);
+  --color-accent-hover: color-mix(in oklab, var(--app-primary, #1A1A1A) 85%, white);
+  --color-accent-foreground: var(--app-primary-foreground, #FFFFFF);
   --color-line: #EAEAEA;
   --color-page-bg: #F7F6F3;
   --color-surface-muted: #F9F9F8;
