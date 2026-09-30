@@ -42,6 +42,8 @@ export interface RoomAvailabilityArgs {
   capacity?: number | null;
   contactId?: string | null;
   excludeReservationId?: string | null;
+  /** Prices resolve only from rate rows in this currency. */
+  currency: string;
 }
 
 export async function getRoomAvailability(args: RoomAvailabilityArgs, tx: DbTransaction | typeof prisma = prisma) {
@@ -53,6 +55,7 @@ export async function getRoomAvailability(args: RoomAvailabilityArgs, tx: DbTran
       args.capacity ?? null,
       args.contactId ?? null,
       args.excludeReservationId ?? null,
+      args.currency,
     ),
   );
   return rows.map((row) => plain<RoomAvailabilityRow>(row));
@@ -79,6 +82,7 @@ export async function createReservationWithRooms(
     contactId?: string | null;
     guestName?: string;
     guestId?: string | null;
+    currency: string;
   },
 ) {
   return withActor(actorId, async (tx) => {
@@ -91,6 +95,7 @@ export async function createReservationWithRooms(
         args.guestName ?? "",
         args.guestId ?? null,
         actorId,
+        args.currency,
       ),
     );
     return row?.result;

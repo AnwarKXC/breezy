@@ -5,7 +5,6 @@ import { secureMutationEndpoint } from '@/shared/secureEndpoint'
 import { prisma } from '@/services/db/prisma'
 import { toRows } from '@/services/db/rows'
 import { ReservationExtrasSchema, zodErrorMessage } from '@/shared/validation'
-import { getSystemCurrency } from '@/shared/currency/server'
 import { syncOpenInvoicesForReservation } from '@/modules/reservations/services/pricingService'
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -24,7 +23,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     let created
     try {
       created = await prisma.$transaction(async (tx) => {
-        const currency = await getSystemCurrency()
+        const reservation = await tx.reservations.findUnique({ where: { id }, select: { currency: true } })
+        if (!reservation) throw new Error('Reservation not found')
+        const currency = reservation.currency
         const rows = await tx.reservation_pricing_items.createManyAndReturn({
           data: charges.map((charge) => ({
             reservation_id: id,

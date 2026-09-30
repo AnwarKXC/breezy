@@ -6,7 +6,7 @@ import { Table } from '@/shared/components/Table'
 import type { TableColumn } from '@/shared/table/types'
 import { FloatingInput } from '@/shared/components/FloatingField'
 import { StatusBadge } from '@/shared/components/StatusBadge'
-import { useCurrency } from '@/shared/contexts/CurrencyContext'
+import { formatMoneyTotals, useCurrency } from '@/shared/contexts/CurrencyContext'
 import { useLocale } from '@/i18n/components/LocaleContext'
 import { formatDate, formatDateTime } from '@/shared/utils/date'
 import type { LedgerEntry, Invoice } from '../types'
@@ -18,7 +18,7 @@ interface Props {
 }
 
 export function LedgerTab({ t }: Props) {
-  const { formatCurrency } = useCurrency()
+  const { formatCurrency, currencyCode } = useCurrency()
   const locale = useLocale()
   const [typeFilter, setTypeFilter] = useState('')
   const [fromDate, setFromDate] = useState('')
@@ -50,16 +50,11 @@ export function LedgerTab({ t }: Props) {
     }
   }, [locale])
 
-  const totals = useMemo(() => {
-    // Cash-basis: every ledger row is a real money movement.
-    return ledgerEntries.reduce(
-      (acc, e) => ({
-        income: acc.income + Number(e.incomeAmount),
-        outcome: acc.outcome + Number(e.outcomeAmount),
-      }),
-      { income: 0, outcome: 0 },
-    )
-  }, [ledgerEntries])
+  // Cash-basis: every ledger row is a real money movement; totals stay per currency.
+  const totals = {
+    income: formatMoneyTotals(ledgerEntries.filter((e) => Number(e.incomeAmount) > 0).map((e) => ({ amount: Number(e.incomeAmount), currency: e.currency })), currencyCode),
+    outcome: formatMoneyTotals(ledgerEntries.filter((e) => Number(e.outcomeAmount) > 0).map((e) => ({ amount: Number(e.outcomeAmount), currency: e.currency })), currencyCode),
+  }
 
   const columns: TableColumn<LedgerEntry>[] = useMemo(() => [
     {
@@ -109,12 +104,12 @@ export function LedgerTab({ t }: Props) {
     {
       key: 'incomeAmount',
       label: t('accounting.ledger.income'),
-      render: (v) => Number(v) > 0 ? formatCurrency(Number(v)) : '-',
+      render: (v, row) => Number(v) > 0 ? formatCurrency(Number(v), row.currency) : '-',
     },
     {
       key: 'outcomeAmount',
       label: t('accounting.ledger.outcome'),
-      render: (v) => Number(v) > 0 ? formatCurrency(Number(v)) : '-',
+      render: (v, row) => Number(v) > 0 ? formatCurrency(Number(v), row.currency) : '-',
     },
     {
       key: 'transactionDate',
@@ -160,11 +155,11 @@ export function LedgerTab({ t }: Props) {
       <div className="grid grid-cols-2 gap-4">
         <div className="rounded-xl border border-[#EAEAEA] bg-white p-5 space-y-1">
           <p className="text-sm text-[#787774]">{t('accounting.ledger.totalIncome')}</p>
-          <p className="text-2xl font-bold text-green-600">{formatCurrency(totals.income)}</p>
+          <p className="text-2xl font-bold text-green-600">{totals.income}</p>
         </div>
         <div className="rounded-xl border border-[#EAEAEA] bg-white p-5 space-y-1">
           <p className="text-sm text-[#787774]">{t('accounting.ledger.totalOutcome')}</p>
-          <p className="text-2xl font-bold text-[#9F2F2D]">{formatCurrency(totals.outcome)}</p>
+          <p className="text-2xl font-bold text-[#9F2F2D]">{totals.outcome}</p>
         </div>
       </div>
 

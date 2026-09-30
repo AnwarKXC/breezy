@@ -24,7 +24,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
     const reservation = await prisma.reservations.findFirst({
       where: { id, deleted_at: null },
-      select: { check_in_date: true, check_out_date: true, status: true },
+      select: { check_in_date: true, check_out_date: true, status: true, currency: true },
     })
     if (!reservation) {
       return NextResponse.json({ ok: false, error: { code: 'NOT_FOUND', message: 'Reservation not found' } }, { status: 404 })
@@ -61,7 +61,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       if (newCheckOut <= currentCheckOut) {
         return NextResponse.json({ ok: false, error: { code: 'VALIDATION_ERROR', message: 'New checkout must be after current room checkout' } }, { status: 400 })
       }
-      const availability = await getRoomAvailability({ checkIn: currentCheckOut, checkOut: newCheckOut, excludeReservationId: id })
+      const availability = await getRoomAvailability({ checkIn: currentCheckOut, checkOut: newCheckOut, excludeReservationId: id, currency: reservation.currency })
       if (availability.some((c) => c.room_id === targetRoomId && c.status === 'unavailable')) {
         return NextResponse.json({ ok: false, error: { code: 'EXTENSION_CONFLICT', message: 'Room is not available for extension period' } }, { status: 409 })
       }

@@ -34,10 +34,12 @@ export function ReservationEditPage() {
   const { id, locale } = useParams<{ id: string; locale: string }>()
   const router = useRouter()
   const { t } = useTranslation()
-  const { formatCurrency, vatRate: vatPercent, serviceChargeRate: serviceChargePercent } = useCurrency()
+  const { formatCurrency: formatIn, currencyCode: systemCurrency, vatRate: vatPercent, serviceChargeRate: serviceChargePercent } = useCurrency()
 
   // Data
   const [detail, setDetail] = useState<ReservationDetail | null>(null)
+  // Amounts and rates are in the reservation's own currency (no conversion).
+  const formatCurrency = (amount: number) => formatIn(amount, detail?.currency)
   const [allRooms, setAllRooms] = useState<Room[]>([])
   const [roomTypes, setRoomTypes] = useState<RoomType[]>([])
   const [availableRoomIds, setAvailableRoomIds] = useState<Set<string>>(new Set())
@@ -113,7 +115,8 @@ export function ReservationEditPage() {
     const occCode = roomOccupancies[room.id] ?? defaultOcc
     const occLabel = occCode === 'T' ? 'Triple' : occCode === 'D' ? 'Double' : 'Single'
     if (!rt) return { price: 0, occCode, occLabel }
-    let price = rt.basePrice
+    // basePrice is the system-currency price; other currencies only have their own rows.
+    let price = !detail?.currency || detail.currency === systemCurrency ? rt.basePrice : 0
     const pricing = roomTypePricing[rt.id]
     if (pricing) {
       if (occCode === 'S' && pricing.price_single != null) price = pricing.price_single
@@ -187,8 +190,8 @@ export function ReservationEditPage() {
           fetchJson<RoomTypePricing[]>('/api/pricing'),
         ])
 
-        // Most recent pricing window first (nulls last), first row per type wins.
-        const sortedPricing = [...(pricingData ?? [])].sort((a, b) =>
+        // Most recent pricing window in the reservation's currency first, first row per type wins.
+        const sortedPricing = (pricingData ?? []).filter((row) => row.currency === data.currency).sort((a, b) =>
           (b.effectiveFrom ?? '').localeCompare(a.effectiveFrom ?? ''),
         )
         const pricingMap: Record<string, { price: number; price_single?: number; price_double?: number; price_triple?: number }> = {}
@@ -246,12 +249,12 @@ export function ReservationEditPage() {
 
           // Fetch company price overrides if company reservation
           if (data.companyInfo?.company_id) {
-            const overridesData = await fetchJson<Array<{ roomCategory: string; occupancyCode: string; price: number }>>(
+            const overridesData = await fetchJson<Array<{ roomCategory: string; occupancyCode: string; price: number; currency: string }>>(
               `/api/contacts/${data.companyInfo.company_id}/price-overrides`,
             )
             if (!cancelled && overridesData) {
               const overrides: Record<string, Record<string, number>> = {}
-              for (const row of overridesData) {
+              for (const row of overridesData.filter((o) => o.currency === data.currency)) {
                 if (!overrides[row.roomCategory]) overrides[row.roomCategory] = {}
                 overrides[row.roomCategory][row.occupancyCode] = Number(row.price)
               }

@@ -695,6 +695,7 @@ export type Database = {
           description: string | null
           id: string
           idempotency_key: string | null
+          currency: string
           invoice_id: string
           payment_number: string | null
           received_by: string | null
@@ -712,6 +713,7 @@ export type Database = {
           description?: string | null
           id?: string
           idempotency_key?: string | null
+          currency?: string
           invoice_id: string
           payment_number?: string | null
           received_by?: string | null
@@ -729,6 +731,7 @@ export type Database = {
           description?: string | null
           id?: string
           idempotency_key?: string | null
+          currency?: string
           invoice_id?: string
           payment_number?: string | null
           received_by?: string | null
@@ -1589,6 +1592,7 @@ export type Database = {
           end_date: string
           id: string
           override_rate: number
+          currency: string
           reason: string | null
           room_id: string
           start_date: string
@@ -1600,6 +1604,7 @@ export type Database = {
           end_date: string
           id?: string
           override_rate: number
+          currency?: string
           reason?: string | null
           room_id: string
           start_date: string
@@ -1611,6 +1616,7 @@ export type Database = {
           end_date?: string
           id?: string
           override_rate?: number
+          currency?: string
           reason?: string | null
           room_id?: string
           start_date?: string
@@ -1901,6 +1907,7 @@ export type Database = {
           p_check_out: string
           p_contact_id?: string
           p_created_by?: string
+          p_currency?: string
           p_guest_id?: string
           p_guest_name?: string
           p_room_type_counts: Json
@@ -1919,6 +1926,7 @@ export type Database = {
           p_check_out: string
           p_contact_id?: string
           p_exclude_reservation_id?: string
+          p_currency?: string
           p_room_type_id?: string
         }
         Returns: {

@@ -7,6 +7,7 @@ import { secureReadEndpoint } from '@/shared/secureEndpoint'
 import { prisma } from '@/services/db/prisma'
 import { dbDate, serializeRow, todayDate } from '@/services/db/rows'
 import { getEffectiveRate } from '@/modules/reservations/services/pricingService'
+import { getSystemCurrency } from '@/shared/currency/server'
 
 const INACTIVE_ROOM_STATUSES: reservation_room_status[] = ['cancelled', 'released']
 
@@ -113,10 +114,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       }
     })
 
-    // Tonight's rate from the shared rate hierarchy (rooms have no price column).
+    // Tonight's rate in the system currency from the shared rate hierarchy (rooms have no price column).
     const tonight = new Date().toISOString().slice(0, 10)
     const tomorrow = new Date(Date.now() + 86_400_000).toISOString().slice(0, 10)
-    const { rate: nightlyRate } = await getEffectiveRate(room.id, tonight, tomorrow)
+    const { rate: nightlyRate, currency } = await getEffectiveRate(room.id, tonight, tomorrow, null, null, await getSystemCurrency())
 
     return NextResponse.json({
       ok: true,
@@ -128,6 +129,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
           status: room.status,
           capacity: room.capacity,
           price: nightlyRate,
+          currency,
           amenities: room.amenities,
           roomType: room.room_types,
         },

@@ -1,10 +1,12 @@
 // Static currency catalog, bundled with the app (no API / DB fetch).
-// Add a currency here and it becomes selectable everywhere.
+// Add a currency here and it becomes selectable everywhere (also extend the
+// *_currency_check constraints in prisma/migrations/*_multi_currency).
 
 export const CURRENCIES = [
   { code: 'EGP', symbol: 'EGP', label: 'EGP (ج.م)', decimals: 2 },
   { code: 'USD', symbol: '$', label: 'USD ($)', decimals: 2 },
   { code: 'EUR', symbol: '€', label: 'EUR (€)', decimals: 2 },
+  { code: 'GBP', symbol: '£', label: 'GBP (£)', decimals: 2 },
 ] as const
 
 export type CurrencyCode = (typeof CURRENCIES)[number]['code']

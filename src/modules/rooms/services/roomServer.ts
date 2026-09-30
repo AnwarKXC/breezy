@@ -5,6 +5,7 @@ import type { room_status } from '@/generated/prisma/enums'
 import { prisma } from '@/services/db/prisma'
 import { toRow } from '@/services/db/rows'
 import { setStandingRoomRate, standingRoomRates } from '@/modules/rooms/services/rateStore'
+import { getSystemCurrency } from '@/shared/currency/server'
 import {
   mapRoomRow,
   type HousekeepingStatus,
@@ -34,7 +35,7 @@ export async function listRooms(filter: { status?: RoomStatus } = {}): Promise<R
       where: { deleted_at: null, ...(filter.status ? { status: filter.status as room_status } : {}) },
       orderBy: { number: 'asc' },
     }),
-    standingRoomRates(),
+    getSystemCurrency().then((currency) => standingRoomRates(currency)),
   ])
   return rows.map((row) => mapRoomRow(toRow('rooms', row), rates.get(row.id) ?? 0))
 }
@@ -42,7 +43,7 @@ export async function listRooms(filter: { status?: RoomStatus } = {}): Promise<R
 export async function getRoom(id: string): Promise<Room | null> {
   const [row, rates] = await Promise.all([
     prisma.rooms.findFirst({ where: { id, deleted_at: null } }),
-    standingRoomRates([id]),
+    getSystemCurrency().then((currency) => standingRoomRates(currency, [id])),
   ])
   return row ? mapRoomRow(toRow('rooms', row), rates.get(id) ?? 0) : null
 }
@@ -50,6 +51,7 @@ export async function getRoom(id: string): Promise<Room | null> {
 /** A room priced like its type needs no rate row; only a different price is stored. */
 export async function createRoom(input: RoomInput, actorId: string): Promise<Room> {
   const price = input.price ?? 0
+  const currency = await getSystemCurrency()
   const row = await prisma.$transaction(async (tx) => {
     const created = await tx.rooms.create({
       data: {
@@ -61,7 +63,7 @@ export async function createRoom(input: RoomInput, actorId: string): Promise<Roo
         amenities: (input.amenities ?? []) as Prisma.InputJsonValue,
       },
     })
-    await setStandingRoomRate(tx, created.id, price, actorId)
+    await setStandingRoomRate(tx, created.id, price, currency, actorId)
     return created
   })
   return mapRoomRow(toRow('rooms', row), price)
@@ -79,9 +81,10 @@ export async function updateRoom(id: string, input: Partial<RoomInput>, actorId:
   if (input.capacity !== undefined) data.capacity = input.capacity
   if (input.amenities !== undefined) data.amenities = input.amenities as Prisma.InputJsonValue
 
+  const currency = await getSystemCurrency()
   const count = await prisma.$transaction(async (tx) => {
     const { count } = await tx.rooms.updateMany({ where: { id, deleted_at: null }, data })
-    if (count && input.price !== undefined) await setStandingRoomRate(tx, id, input.price, actorId)
+    if (count && input.price !== undefined) await setStandingRoomRate(tx, id, input.price, currency, actorId)
     return count
   })
   return count ? getRoom(id) : null
@@ -99,6 +102,7 @@ export async function changeRoomStatus(input: {
   reason?: string | null
   actorId: string
 }): Promise<Room | null> {
+  const currency = await getSystemCurrency()
   return prisma.$transaction(async (tx) => {
     const current = await tx.rooms.findFirst({ where: { id: input.roomId, deleted_at: null }, select: { status: true } })
     if (!current) return null
@@ -118,7 +122,7 @@ export async function changeRoomStatus(input: {
         },
       })
     }
-    const rates = await standingRoomRates([input.roomId], tx)
+    const rates = await standingRoomRates(currency, [input.roomId], tx)
     return mapRoomRow(toRow('rooms', row), rates.get(input.roomId) ?? 0)
   })
 }

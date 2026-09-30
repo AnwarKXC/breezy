@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server'
 import { ACTIONS } from '@/config/rbac'
 import { secureReadEndpoint } from '@/shared/secureEndpoint'
 import { getRoomAvailability } from '@/services/db/rpc'
+import { currencyOrDefault } from '@/shared/currency/server'
+import { isCurrencyCode } from '@/shared/static/currencies'
 
 const DATE = /^\d{4}-\d{2}-\d{2}$/
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -23,12 +25,15 @@ export async function GET(request: Request) {
     const roomTypeId = searchParams.get('roomTypeId')
     const contactId = searchParams.get('contactId')
     const capacity = searchParams.get('capacity') ? Number(searchParams.get('capacity')) : null
-    if ((roomTypeId && !UUID.test(roomTypeId)) || (contactId && !UUID.test(contactId)) || (capacity !== null && !Number.isInteger(capacity))) {
+    const requestedCurrency = searchParams.get('currency')
+    if ((roomTypeId && !UUID.test(roomTypeId)) || (contactId && !UUID.test(contactId)) || (capacity !== null && !Number.isInteger(capacity))
+      || (requestedCurrency && !isCurrencyCode(requestedCurrency))) {
       return NextResponse.json({ ok: false, error: { code: 'VALIDATION_ERROR', message: 'Invalid filter' } }, { status: 400 })
     }
 
     try {
-      const data = await getRoomAvailability({ checkIn, checkOut, roomTypeId, capacity, contactId })
+      const currency = await currencyOrDefault(requestedCurrency)
+      const data = await getRoomAvailability({ checkIn, checkOut, roomTypeId, capacity, contactId, currency })
       return NextResponse.json(
         { ok: true, data },
         { headers: { 'Cache-Control': 'private, max-age=10' } },

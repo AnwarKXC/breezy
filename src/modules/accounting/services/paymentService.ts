@@ -67,9 +67,12 @@ export async function createPayment(input: CreatePaymentInput) {
     await lockInvoice(tx, input.invoice_id)
     const invoice = await tx.invoices.findFirst({
       where: { id: input.invoice_id, deleted_at: null },
-      select: { id: true, status: true, amount: true },
+      select: { id: true, status: true, amount: true, currency: true },
     })
     if (!invoice) throw new Error('Invoice not found')
+    if (input.currency && input.currency !== invoice.currency) {
+      throw new Error(`Payment currency must match the invoice currency (${invoice.currency})`)
+    }
     if (invoice.status === 'void' || invoice.status === 'refunded') {
       throw new Error('Cannot record payment for a void or refunded invoice')
     }
@@ -87,6 +90,7 @@ export async function createPayment(input: CreatePaymentInput) {
     const row = await tx.payments.create({
       data: {
         ...(fromRow('payments', input as unknown as Record<string, unknown>) as Prisma.paymentsUncheckedCreateInput),
+        currency: invoice.currency,
         created_by: session.id,
       },
     })
@@ -119,6 +123,7 @@ export async function refundPayment(id: string, reason?: string) {
         invoice_id: original.invoice_id,
         method: original.method,
         amount: -Math.abs(Number(original.amount)),
+        currency: original.currency,
         description: reason ? `Refund: ${reason}` : 'Refund',
         created_by: session.id,
       },
@@ -204,6 +209,7 @@ export async function ensurePaymentLedgerEntry(payment: Payment, actorId: string
       sourceId: payment.id,
       outcomeAmount,
       incomeAmount,
+      currency: payment.currency,
       description: `Payment ${payment.method} - ${payment.amount}`,
       createdBy: actorId,
       invoiceId: payment.invoiceId,

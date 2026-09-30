@@ -245,7 +245,7 @@ export function InvoiceWizardStepBooking({
                           {booking.roomNumber && <span>Room {booking.roomNumber}</span>}
                           <span>{booking.checkIn.slice(0, 10)} - {booking.checkOut.slice(0, 10)}</span>
                           {booking.nights > 0 && <span>{booking.nights} night(s)</span>}
-                          {booking.totalAmount != null && <span>{formatCurrency(booking.totalAmount)}</span>}
+                          {booking.totalAmount != null && <span>{formatCurrency(booking.totalAmount, booking.currency)}</span>}
                         </div>
                       </div>
                       {active && <CheckIcon />}

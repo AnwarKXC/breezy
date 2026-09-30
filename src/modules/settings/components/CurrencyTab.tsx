@@ -10,14 +10,20 @@ export function CurrencyTab() {
   const { t } = useTranslation()
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div className="space-y-4">
+      <div>
+        <h3 className="text-sm font-semibold text-ink">{t('settings.currency.defaultTitle')}</h3>
+        <p className="mt-1 text-sm text-ink-muted">{t('settings.currency.defaultHint')}</p>
+      </div>
+      <div role="radiogroup" aria-label={t('settings.currency.defaultTitle')} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {CURRENCY_CODES.map((code) => {
           const active = currencyCode === code
           return (
             <button
               key={code}
               type="button"
+              role="radio"
+              aria-checked={active}
               disabled={loading}
               onClick={() => void setCurrency(code)}
               className={`

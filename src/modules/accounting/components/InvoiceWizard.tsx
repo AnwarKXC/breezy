@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useMemo } from 'react'
 import { Modal } from '@/shared/components/Modal'
-import { useCurrency } from '@/shared/contexts/CurrencyContext'
+import { CurrencyScope, useCurrency } from '@/shared/contexts/CurrencyContext'
 import { useInvoiceWizard } from '../hooks/useInvoiceWizard'
 import { InvoiceWizardWarnings } from './InvoiceWizardWarnings'
 import { InvoiceWizardStepBooking } from './InvoiceWizardStepBooking'
@@ -27,8 +27,9 @@ const STEP_KEYS: Record<number, string> = {
 }
 
 export function InvoiceWizard({ t, mode, existingInvoicesMap, onClose, onCreated }: Props) {
-  const { formatCurrency } = useCurrency()
+  const { formatCurrency: formatIn } = useCurrency()
   const { state, computed, actions, api } = useInvoiceWizard(mode, existingInvoicesMap)
+  const formatCurrency = (amount: number) => formatIn(amount, state.selectedBooking?.currency)
   const [error, setError] = useState<string | null>(null)
 
   const titleKey = useMemo(() => {
@@ -73,6 +74,8 @@ export function InvoiceWizard({ t, mode, existingInvoicesMap, onClose, onCreated
 
   return (
     <Modal isOpen onClose={onClose} title={t(titleKey)} size="xl">
+      {/* An invoice for a reservation is in the reservation's currency (enforced on the server). */}
+      <CurrencyScope code={state.selectedBooking?.currency}>
       <div className="flex max-h-[min(84vh,860px)] min-w-0 flex-col">
         <div className="flex shrink-0 gap-1 border-b border-[#EAEAEA] pb-4">
           {[0, 1, 2, 3].map((i) => {
@@ -263,6 +266,7 @@ export function InvoiceWizard({ t, mode, existingInvoicesMap, onClose, onCreated
           </div>
         </div>
       </div>
+      </CurrencyScope>
     </Modal>
   )
 }

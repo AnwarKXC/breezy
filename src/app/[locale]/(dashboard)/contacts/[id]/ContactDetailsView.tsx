@@ -256,6 +256,7 @@ export const ContactDetailsView = memo(function ContactDetailsViewComponent({
     confirmDeleteAction: t('common.confirmDeleteAction'),
     whatsapp: t('contacts.whatsapp'),
     call: t('contacts.call'),
+    currency: t('settings.currency.label'),
   }), [labels, t])
 
   const form = useContactForm({

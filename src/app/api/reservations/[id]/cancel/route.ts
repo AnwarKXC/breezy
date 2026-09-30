@@ -31,7 +31,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     }
     const { reason, feeAmount } = parsed.data
 
-    const reservation = await prisma.reservations.findFirst({ where: { id, deleted_at: null }, select: { status: true } })
+    const reservation = await prisma.reservations.findFirst({ where: { id, deleted_at: null }, select: { status: true, currency: true } })
     if (!reservation) {
       return NextResponse.json({ ok: false, error: { code: 'NOT_FOUND', message: 'Reservation not found' } }, { status: 404 })
     }
@@ -98,7 +98,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
                 contact_id: contactId,
                 reservation_id: id,
                 invoice_number: `INV-CXL-${id.slice(0, 8).toUpperCase()}-${Date.now().toString(36).toUpperCase().slice(-4)}`,
-                currency: 'EGP',
+                currency: reservation.currency,
                 guest_name: guestName,
                 created_by: session.id,
               },
@@ -109,7 +109,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
           await tx.invoice_items.create({ data: cancellationItem(invoiceId, totalFee) })
           await tx.payments.create({
-            data: { invoice_id: invoiceId, method: 'other', amount: totalFee, description: 'Cancellation fee', created_by: session.id },
+            data: { invoice_id: invoiceId, method: 'other', amount: totalFee, currency: reservation.currency, description: 'Cancellation fee', created_by: session.id },
           })
           const invoice = await tx.invoices.findUnique({ where: { id: invoiceId } })
           createdInvoice = invoice ? toRow('invoices', invoice) : null

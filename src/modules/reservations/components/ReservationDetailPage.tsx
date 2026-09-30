@@ -31,11 +31,13 @@ export function ReservationDetailPage() {
   const { t } = useTranslation()
   const { id, locale } = useParams<{ id: string; locale: string }>()
   const router = useRouter()
-  const { formatCurrency, vatRate, serviceChargeRate } = useCurrency()
+  const { formatCurrency: formatIn, vatRate, serviceChargeRate } = useCurrency()
   // Cached per reservation: refreshes after actions keep the page on screen
   // instead of flashing the skeleton.
   const reservation = useResource(`/api/reservations/${id}`, () => fetchReservation(id))
   const detail = reservation.data ?? null
+  // Every amount on this page is in the reservation's own currency.
+  const formatCurrency = (amount: number) => formatIn(amount, detail?.currency)
   const loading = reservation.isLoading
   const error = reservation.error ? reservation.error.message || t('reservations.failedToLoadReservation') : null
   const fetchDetail = reservation.refresh
@@ -552,6 +554,7 @@ export function ReservationDetailPage() {
         onClose={() => setCheckoutModalOpen(false)}
         booking={checkoutBooking}
         formatCurrency={formatCurrency}
+        currency={detail?.currency}
         onConfirm={handleCheckoutConfirm}
         savedCharges={allExtraCharges}
         pricingBreakdown={checkoutPricingBreakdown}

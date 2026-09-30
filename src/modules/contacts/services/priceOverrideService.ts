@@ -3,6 +3,7 @@ import 'server-only'
 import type { occupancy_code } from '@/generated/prisma/enums'
 import { prisma } from '@/services/db/prisma'
 import { toRow } from '@/services/db/rows'
+import { currencyOrDefault } from '@/shared/currency/server'
 import type { CompanyPriceOverride, CreatePriceOverrideInput, OccupancyCode } from '../types'
 import { requireContactsRead, requirePriceOverridesUpdate } from './serviceSecurity'
 
@@ -27,18 +28,19 @@ export async function getPriceOverrides(contactId: string): Promise<CompanyPrice
   return rows.map(mapOverrideRow)
 }
 
-/** Insert or revive one override per (contact, room category, occupancy). */
+/** Insert or revive one override per (contact, room category, occupancy, currency). */
 export async function upsertPriceOverrides(
   contactId: string,
   overrides: CreatePriceOverrideInput[],
 ): Promise<CompanyPriceOverride[]> {
   await requirePriceOverridesUpdate()
+  const currencies = await Promise.all(overrides.map((o) => currencyOrDefault(o.currency)))
   const rows = await prisma.$transaction(
-    overrides.map((o) => {
-      const key = { contact_id: contactId, room_category: o.roomCategory, occupancy_code: o.occupancyCode as occupancy_code }
-      const values = { price: o.price, currency: o.currency ?? 'EGP', deleted_at: null }
+    overrides.map((o, i) => {
+      const key = { contact_id: contactId, room_category: o.roomCategory, occupancy_code: o.occupancyCode as occupancy_code, currency: currencies[i] }
+      const values = { price: o.price, deleted_at: null }
       return prisma.company_price_overrides.upsert({
-        where: { contact_id_room_category_occupancy_code: key },
+        where: { contact_id_room_category_occupancy_code_currency: key },
         create: { ...key, ...values },
         update: values,
       })

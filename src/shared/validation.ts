@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { isCountryCode } from '@/shared/static/countries'
+import { CURRENCY_CODES, type CurrencyCode } from '@/shared/static/currencies'
 
 export function zodErrorMessage(error: z.ZodError): string {
   return error.issues.map((issue) => {
@@ -13,6 +14,9 @@ const optionalText = (max = 500) =>
     (value) => (typeof value === 'string' && value.trim() === '' ? null : value),
     z.string().trim().max(max).nullable().optional(),
   )
+
+// Omitted currency = the system currency, resolved on the server (never a hardcoded default).
+const currencyCode = z.enum(CURRENCY_CODES as [CurrencyCode, ...CurrencyCode[]])
 
 const optionalUuid = z.preprocess(
   (value) => (value === '' ? null : value),
@@ -65,7 +69,7 @@ export const PricingCreateSchema = z.object({
   price_single: z.number().min(0).optional(),
   price_double: z.number().min(0).optional(),
   price_triple: z.number().min(0).optional(),
-  currency: z.string().length(3).default('EGP'),
+  currency: currencyCode.optional(),
   effective_from: z.string().datetime().nullable().optional(),
   effective_until: z.string().datetime().nullable().optional(),
 })
@@ -74,7 +78,7 @@ export const PriceOverrideSchema = z.object({
   room_category: z.string().min(1),
   occupancy_code: z.enum(['S', 'D', 'T']),
   price: z.number().min(0),
-  currency: z.string().length(3).default('EGP'),
+  currency: currencyCode.optional(),
 })
 
 export const AccountingInvoiceItemSchema = z.object({
@@ -117,7 +121,7 @@ const AccountingInvoiceBaseSchema = z.object({
   public_notes: optionalText(2000),
   internal_notes: optionalText(2000),
   billing_address: optionalText(500),
-  currency: z.string().trim().length(3).default('EGP'),
+  currency: currencyCode.optional(),
   payment_method: z.enum([
     'instapay', 'vodafone_cash', 'cash', 'bank_transfer',
     'visa', 'card', 'online', 'ota', 'company_credit', 'other',
@@ -146,6 +150,8 @@ export const AccountingPaymentCreateSchema = z.object({
   invoice_id: z.string().uuid(),
   method: z.enum(['instapay', 'vodafone_cash', 'cash', 'bank_transfer', 'visa', 'card', 'online', 'ota', 'company_credit', 'other']),
   amount: z.coerce.number().finite(),
+  // Must equal the invoice currency; omitted = the invoice currency.
+  currency: currencyCode.optional(),
   description: optionalText(500),
 })
 
@@ -247,6 +253,7 @@ export const ReservationCreateWithRoomsSchema = z.object({
   checkIn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Expected YYYY-MM-DD'),
   checkOut: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Expected YYYY-MM-DD'),
   roomTypeCounts: z.array(ReservationRoomTypeCountSchema).min(1),
+  currency: currencyCode.optional(),
 }).superRefine((value, ctx) => {
   if (value.checkOut <= value.checkIn) {
     ctx.addIssue({ code: 'custom', message: 'checkOut must be after checkIn', path: ['checkOut'] })

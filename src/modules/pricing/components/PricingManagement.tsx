@@ -19,13 +19,13 @@ const currencyOptions = (Object.keys(CURRENCY_LABELS) as CurrencyCode[]).map(cod
 
 export function PricingManagement() {
   const { t } = useTranslation()
-  const { formatCurrency } = useCurrency()
+  const { formatCurrency, currencyCode: systemCurrency } = useCurrency()
   const pricing = usePricing()
   const roomTypes = useRoomTypes()
 
   const [showModal, setShowModal] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [form, setForm] = useState({ room_type_id: '', price: 0, price_single: 0, price_double: 0, price_triple: 0, currency: 'EGP' as CurrencyCode, effective_from: '', effective_until: '' })
+  const [form, setForm] = useState({ room_type_id: '', price: 0, price_single: 0, price_double: 0, price_triple: 0, currency: systemCurrency, effective_from: '', effective_until: '' })
   const [formError, setFormError] = useState('')
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [saving, setSaving] = useState(false)
@@ -67,11 +67,11 @@ export function PricingManagement() {
 
   const openCreate = useCallback(() => {
     setEditingId(null)
-    setForm({ room_type_id: '', price: 0, price_single: 0, price_double: 0, price_triple: 0, currency: 'EGP', effective_from: '', effective_until: '' })
+    setForm({ room_type_id: '', price: 0, price_single: 0, price_double: 0, price_triple: 0, currency: systemCurrency, effective_from: '', effective_until: '' })
     setFormError('')
     setFieldErrors({})
     setShowModal(true)
-  }, [])
+  }, [systemCurrency])
 
   const startEdit = useCallback((p: RoomTypePricing) => {
     setEditingId(p.id)
@@ -102,10 +102,10 @@ export function PricingManagement() {
   const closeModal = useCallback(() => {
     setShowModal(false)
     setEditingId(null)
-    setForm({ room_type_id: '', price: 0, price_single: 0, price_double: 0, price_triple: 0, currency: 'EGP', effective_from: '', effective_until: '' })
+    setForm({ room_type_id: '', price: 0, price_single: 0, price_double: 0, price_triple: 0, currency: systemCurrency, effective_from: '', effective_until: '' })
     setFormError('')
     setFieldErrors({})
-  }, [])
+  }, [systemCurrency])
 
   const save = useCallback(async (e: FormEvent) => {
     e.preventDefault()
@@ -143,14 +143,16 @@ export function PricingManagement() {
       setFormError('At least one price is required')
       return
     }
+    // Rates in different currencies are independent (no conversion), so only same-currency periods clash.
     const overlap = pricing.items.find(p =>
       p.roomTypeId === form.room_type_id &&
+      p.currency === form.currency &&
       p.id !== editingId &&
       hasDateOverlap(effectiveFrom, effectiveUntil, p.effectiveFrom, p.effectiveUntil)
     )
     if (overlap) {
       setFormError(
-        `This period overlaps with an existing rate for ${getTypeName(form.room_type_id)}`
+        `This period overlaps with an existing ${form.currency} rate for ${getTypeName(form.room_type_id)}`
       )
       return
     }
@@ -189,27 +191,32 @@ export function PricingManagement() {
       {
         key: 'price',
         label: t('rooms.pricingForm.standard'),
-        render: (_value, row) => <span className="font-mono tabular-nums">{formatCurrency(row.price)}</span>,
+        render: (_value, row) => <span className="font-mono tabular-nums">{formatCurrency(row.price, row.currency)}</span>,
+      },
+      {
+        key: 'currency',
+        label: t('settings.currency.label'),
+        render: (_value, row) => <span className="text-xs font-medium text-[#787774]">{row.currency}</span>,
       },
       {
         key: 'priceSingle',
         label: 'S',
         render: (_value, row) => (
-          <span className="font-mono tabular-nums text-[#787774]">{row.priceSingle != null ? formatCurrency(row.priceSingle) : '—'}</span>
+          <span className="font-mono tabular-nums text-[#787774]">{row.priceSingle != null ? formatCurrency(row.priceSingle, row.currency) : '—'}</span>
         ),
       },
       {
         key: 'priceDouble',
         label: 'D',
         render: (_value, row) => (
-          <span className="font-mono tabular-nums text-[#787774]">{row.priceDouble != null ? formatCurrency(row.priceDouble) : '—'}</span>
+          <span className="font-mono tabular-nums text-[#787774]">{row.priceDouble != null ? formatCurrency(row.priceDouble, row.currency) : '—'}</span>
         ),
       },
       {
         key: 'priceTriple',
         label: 'T',
         render: (_value, row) => (
-          <span className="font-mono tabular-nums text-[#787774]">{row.priceTriple != null ? formatCurrency(row.priceTriple) : '—'}</span>
+          <span className="font-mono tabular-nums text-[#787774]">{row.priceTriple != null ? formatCurrency(row.priceTriple, row.currency) : '—'}</span>
         ),
       },
       {
@@ -421,16 +428,16 @@ export function PricingManagement() {
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div>
                     <span className="text-[#787774]">{t('rooms.pricingForm.standardBadge')}</span>
-                    <p className="font-mono font-semibold text-[#1A1A1A]">{formatCurrency(p.price)}</p>
+                    <p className="font-mono font-semibold text-[#1A1A1A]">{formatCurrency(p.price, p.currency)}</p>
                   </div>
                   <div>
                     <span className="text-[#787774]">{t('rooms.pricingForm.sdtLabel')}</span>
                     <p className="font-mono text-[#1A1A1A]">
-                      <span className={p.priceSingle != null ? '' : 'text-[#D4D4D4]'}>{p.priceSingle != null ? formatCurrency(p.priceSingle) : '—'}</span>
+                      <span className={p.priceSingle != null ? '' : 'text-[#D4D4D4]'}>{p.priceSingle != null ? formatCurrency(p.priceSingle, p.currency) : '—'}</span>
                       {' / '}
-                      <span className={p.priceDouble != null ? '' : 'text-[#D4D4D4]'}>{p.priceDouble != null ? formatCurrency(p.priceDouble) : '—'}</span>
+                      <span className={p.priceDouble != null ? '' : 'text-[#D4D4D4]'}>{p.priceDouble != null ? formatCurrency(p.priceDouble, p.currency) : '—'}</span>
                       {' / '}
-                      <span className={p.priceTriple != null ? '' : 'text-[#D4D4D4]'}>{p.priceTriple != null ? formatCurrency(p.priceTriple) : '—'}</span>
+                      <span className={p.priceTriple != null ? '' : 'text-[#D4D4D4]'}>{p.priceTriple != null ? formatCurrency(p.priceTriple, p.currency) : '—'}</span>
                     </p>
                   </div>
                   <div className="col-span-2">

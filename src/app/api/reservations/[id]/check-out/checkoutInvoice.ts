@@ -263,6 +263,7 @@ export function mapCheckoutInvoiceForPdf(
     invoiceNumber: null,
     method: payment.method,
     amount: money(payment.amount),
+    currency: payment.currency as Payment['currency'],
     description: payment.description ?? null,
     createdBy: payment.created_by ?? null,
     createdAt: payment.created_at ?? null,

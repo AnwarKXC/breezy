@@ -4,6 +4,8 @@ import { useState, type FormEvent } from 'react'
 import { useTranslation } from '@/i18n/hooks/useTranslation'
 import { Modal } from '@/shared/components/Modal'
 import { useCurrency } from '@/shared/contexts/CurrencyContext'
+import { isCurrencyCode } from '@/shared/static/currencies'
+import { CURRENCY_SYMBOLS } from '@/shared/utils/types'
 import type { Booking } from '../types'
 
 const QUICK_CHARGES = [
@@ -64,11 +66,15 @@ interface CheckoutConfirmModalProps {
   savedCharges?: SavedCharge[]
   pricingBreakdown?: PricingBreakdown
   invoiceSummary?: InvoicePaymentSummary | null
+  /** Reservation currency; defaults to the system currency. */
+  currency?: string | null
 }
 
-export function CheckoutConfirmModal({ isOpen, onClose, booking, formatCurrency, onConfirm, savedCharges = [], pricingBreakdown, invoiceSummary }: CheckoutConfirmModalProps) {
+export function CheckoutConfirmModal({ isOpen, onClose, booking, formatCurrency, onConfirm, savedCharges = [], pricingBreakdown, invoiceSummary, currency }: CheckoutConfirmModalProps) {
   const { t } = useTranslation()
-  const { currencySymbol } = useCurrency()
+  const { currencySymbol: systemSymbol } = useCurrency()
+  // The amount is paid in the reservation's currency.
+  const currencySymbol = isCurrencyCode(currency) ? CURRENCY_SYMBOLS[currency] : systemSymbol
   const [extraCharges, setExtraCharges] = useState<ExtraCharge[]>(
     () => savedCharges.map((c) => ({ label: c.label, amount: c.amount }))
   )

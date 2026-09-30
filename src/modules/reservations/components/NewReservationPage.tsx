@@ -5,13 +5,15 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useResource } from '@/shared/data/useResource'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useTranslation } from '@/i18n/hooks/useTranslation'
-import { FloatingInput } from '@/shared/components/FloatingField'
+import { FloatingInput, FloatingSelect } from '@/shared/components/FloatingField'
 import { reservationService } from '@/services/reservationService'
 import { toast } from '@/shared/toast/toastEvents'
 import type { RoomType } from '@/modules/room-types/types'
 import type { RoomTypePricing } from '@/modules/pricing/types'
 import { NewContactModal } from './NewContactModal'
 import { useCurrency } from '@/shared/contexts/CurrencyContext'
+import { CURRENCY_CODES, type CurrencyCode } from '@/shared/static/currencies'
+import { CURRENCY_LABELS } from '@/shared/utils/types'
 
 interface ContactResult {
   id: string
@@ -49,17 +51,19 @@ async function fetchJson<T>(url: string): Promise<T | null> {
   return json?.data ?? null
 }
 
-type PriceOverrides = Record<string, Record<string, number>>
+// currency -> roomCategory -> occupancy -> price
+type PriceOverrides = Record<string, Record<string, Record<string, number>>>
 const NO_OVERRIDES: PriceOverrides = {}
 
 async function fetchCompanyPriceOverrides(contactId: string): Promise<PriceOverrides> {
-  const rows = await fetchJson<Array<{ roomCategory: string; occupancyCode: string; price: number }>>(
+  const rows = await fetchJson<Array<{ roomCategory: string; occupancyCode: string; price: number; currency: string }>>(
     `/api/contacts/${contactId}/price-overrides`,
   )
   const overrides: PriceOverrides = {}
   for (const row of rows ?? []) {
-    overrides[row.roomCategory] ??= {}
-    overrides[row.roomCategory][row.occupancyCode] = Number(row.price)
+    const byCategory = (overrides[row.currency] ??= {})
+    byCategory[row.roomCategory] ??= {}
+    byCategory[row.roomCategory][row.occupancyCode] = Number(row.price)
   }
   return overrides
 }
@@ -72,14 +76,18 @@ export function NewReservationPage() {
   const lockedContact = Boolean(lockedContactId)
   const { locale, t } = useTranslation()
   const searchRef = useRef<HTMLDivElement>(null)
-  const { formatCurrency, vatRate: vatPercent, serviceChargeRate: serviceChargePercent } = useCurrency()
+  const { formatCurrency: formatIn, currencyCode: systemCurrency, vatRate: vatPercent, serviceChargeRate: serviceChargePercent } = useCurrency()
+  // Rates resolve only from rate rows in this currency (no conversion); defaults to the system currency.
+  const [currencyChoice, setCurrencyChoice] = useState<CurrencyCode | null>(null)
+  const currency = currencyChoice ?? systemCurrency
+  const formatCurrency = (amount: number) => formatIn(amount, currency)
 
   const [roomTypes, setRoomTypes] = useState<RoomType[]>([])
   const [roomTypesLoading, setRoomTypesLoading] = useState(true)
   const [roomTypeCounts, setRoomTypeCounts] = useState<Record<string, number>>({})
   const [availability, setAvailability] = useState<Record<string, number>>({})
   const [availabilityLoading, setAvailabilityLoading] = useState(false)
-  const [roomTypePricing, setRoomTypePricing] = useState<Record<string, { price: number; price_single: number | null; price_double: number | null; price_triple: number | null }>>({})
+  const [pricingRows, setPricingRows] = useState<RoomTypePricing[]>([])
   const [lineOverrides, setLineOverrides] = useState<Record<string, string>>({})
 
   const [searchQuery, setSearchQuery] = useState(() => lockedContactName)
@@ -129,16 +137,18 @@ export function NewReservationPage() {
     ? Math.max(0, Math.round((new Date(checkOut + 'T12:00:00').getTime() - new Date(checkIn + 'T12:00:00').getTime()) / 86400000))
     : 0
   function getStandardRoomPrice(rt: RoomType, occ: 'S' | 'D' | 'T'): number {
-    let price = rt.basePrice
-    const pricing = roomTypePricing[rt.id]
+    // basePrice is the system-currency price; other currencies only have their own rows.
+    let price = currency === systemCurrency ? rt.basePrice : 0
+    const pricing = pricingRows.find((row) => row.roomTypeId === rt.id && row.currency === currency && row.effectiveUntil === null)
+      ?? pricingRows.find((row) => row.roomTypeId === rt.id && row.currency === currency)
     if (pricing) {
-      if (occ === 'S' && pricing.price_single != null) price = pricing.price_single
-      else if (occ === 'D' && pricing.price_double != null) price = pricing.price_double
-      else if (occ === 'T' && pricing.price_triple != null) price = pricing.price_triple
+      if (occ === 'S' && pricing.priceSingle != null) price = pricing.priceSingle
+      else if (occ === 'D' && pricing.priceDouble != null) price = pricing.priceDouble
+      else if (occ === 'T' && pricing.priceTriple != null) price = pricing.priceTriple
       else if (pricing.price > 0) price = pricing.price
     }
     if (selectedContact?.type === 'company') {
-      const override = companyPriceOverrides[rt.slug]?.[occ]
+      const override = companyPriceOverrides[currency]?.[rt.slug]?.[occ]
       if (override !== undefined) price = override
     }
     return price
@@ -172,8 +182,11 @@ export function NewReservationPage() {
     [availability, roomTypeCounts],
   )
   const totalMatches = totalSelected === totalRooms
+  // Room types picked with no rate in the chosen currency and no manual price.
+  const unpricedRoomTypes = roomTypes.filter((rt) => (roomOccupancies[rt.id] ?? []).some((occ) => !(getRoomPrice(rt, occ) > 0)))
   const canSubmit = Boolean(
-    selectedContact && datesValid && totalRooms > 0 && totalSelected > 0 && totalMatches && !exceedsAvailability && !availabilityLoading,
+    selectedContact && datesValid && totalRooms > 0 && totalSelected > 0 && totalMatches && !exceedsAvailability && !availabilityLoading
+      && unpricedRoomTypes.length === 0,
   )
 
   useEffect(() => {
@@ -187,19 +200,7 @@ export function NewReservationPage() {
 
       if (!cancelled) {
         setRoomTypes(roomTypeList ?? [])
-        const pricingMap: Record<string, { price: number; price_single: number | null; price_double: number | null; price_triple: number | null }> = {}
-        for (const row of pricingList ?? []) {
-          const rtId = row.roomTypeId
-          if (!pricingMap[rtId]) {
-            pricingMap[rtId] = {
-              price: Number(row.price ?? 0),
-              price_single: row.priceSingle,
-              price_double: row.priceDouble,
-              price_triple: row.priceTriple,
-            }
-          }
-        }
-        setRoomTypePricing(pricingMap)
+        setPricingRows(pricingList ?? [])
         setRoomTypesLoading(false)
       }
 
@@ -374,6 +375,7 @@ export function NewReservationPage() {
           checkIn,
           checkOut,
           roomTypeCounts: requestedRoomTypeCounts,
+          currency,
         }),
       })
       const json = await response.json()
@@ -557,6 +559,19 @@ export function NewReservationPage() {
               {checkIn && checkOut && !datesValid && (
                 <p className="mt-2 text-xs font-medium text-[#9F2F2D]">{t('reservations.new.checkOutAfterCheckIn')}</p>
               )}
+              <FloatingSelect
+                label={t('settings.currency.label')}
+                wrapperClassName="mt-3 block"
+                value={currency}
+                onChange={(event) => {
+                  setCurrencyChoice(event.target.value as CurrencyCode)
+                  setServerError(null)
+                }}
+              >
+                {CURRENCY_CODES.map((code) => (
+                  <option key={code} value={code}>{CURRENCY_LABELS[code]}</option>
+                ))}
+              </FloatingSelect>
             </div>
 
             {/* Room distribution card */}
@@ -819,6 +834,13 @@ export function NewReservationPage() {
                 {totalSelected < 1 && <p className="text-[#9F2F2D]">{t('reservations.new.selectRoom')}</p>}
                 {totalSelected > 0 && !totalMatches && <p className="text-amber-600">{t('reservations.new.typeTotalsMatch')}</p>}
                 {exceedsAvailability && <p className="text-[#9F2F2D]">{t('reservations.new.exceedsAvailability')}</p>}
+                {unpricedRoomTypes.length > 0 && (
+                  <p className="text-[#9F2F2D]">
+                    {t('reservations.new.noRateInCurrency')
+                      .replaceAll('{currency}', currency)
+                      .replace('{roomTypes}', unpricedRoomTypes.map((rt) => rt.name).join(', '))}
+                  </p>
+                )}
               </div>
 
               <button

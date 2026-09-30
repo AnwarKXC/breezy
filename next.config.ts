@@ -6,6 +6,8 @@ validateEnv();
 
 const nextConfig: NextConfig = {
   distDir: process.env.NEXT_DIST_DIR || ".next",
+  // Native-ish Node mail stacks (sockets, streams); load from node_modules at runtime.
+  serverExternalPackages: ["imapflow", "nodemailer", "mailparser"],
   // Security & PWA Configuration
   headers: async () => {
     const isDev = process.env.NODE_ENV === 'development';

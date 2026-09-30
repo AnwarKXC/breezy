@@ -5,24 +5,20 @@ import { createContext, useContext, useCallback, useMemo, useSyncExternalStore, 
 import { loadResource, useResource } from '@/shared/data/useResource'
 import type { CurrencyCode } from '@/shared/utils/types'
 import { CURRENCY_SYMBOLS } from '@/shared/utils/types'
-import { invalidateDisplayCurrency } from '@/shared/currency/client'
 
 interface CurrencyContextType {
+  /** System (default) currency: preselected for new reservations, invoices and rates. */
   currencyCode: CurrencyCode
   currencySymbol: string
-  rates: Record<string, number> | null
   /** Current system VAT rate (%), read live from accounting settings. */
   vatRate: number
   /** Current system service charge rate (%), read live from accounting settings. */
   serviceChargeRate: number
   /**
-   * Format `amount` expressed in `from` currency, converted to the system
-   * currency for display. Until FX rates load, the amount is shown unconverted
-   * with the source symbol so the UI never shows a blank or wrong-value total.
+   * Format `amount` in `code` (the record's own currency; defaults to the
+   * system currency). Amounts are never converted between currencies.
    */
-  formatCurrency: (amount: number, from?: CurrencyCode) => string
-  /** Convert without formatting — used by reports/aggregations. */
-  convert: (amount: number, from?: CurrencyCode) => number
+  formatCurrency: (amount: number, code?: CurrencyCode | string | null) => string
   setCurrency: (code: CurrencyCode) => Promise<void>
   loading: boolean
 }
@@ -50,7 +46,6 @@ function storeCurrency(code: CurrencyCode) {
 type Setting = { key: string; value: Record<string, unknown> }
 
 const SETTINGS_KEY = '/api/accounting/settings'
-const RATES_KEY = '/api/currency'
 
 // Roles without accounting access get 403 here; they simply use the defaults.
 async function fetchSettings(): Promise<Setting[]> {
@@ -60,13 +55,6 @@ async function fetchSettings(): Promise<Setting[]> {
   const code = settings.find((s) => s.key === 'currency')?.value?.code
   if (isCurrencyCode(code)) storeCurrency(code)
   return settings
-}
-
-// Failures are non-fatal: formatCurrency falls back to the source symbol.
-async function fetchRates(): Promise<Record<string, number> | null> {
-  const res = await fetch(RATES_KEY)
-  if (!res.ok) return null
-  return ((await res.json())?.data?.rates ?? null) as Record<string, number> | null
 }
 
 /** Re-reads system settings (currency, VAT, service charge) after they are edited. */
@@ -92,24 +80,19 @@ function withCurrency(settings: Setting[] = [], code: CurrencyCode): Setting[] {
 }
 
 export function CurrencyProvider({ children }: { children: ReactNode }) {
-  // Settings and FX rates are independent (/api/currency resolves the system
-  // currency server-side), so they load in parallel through the shared cache.
   const settings = useResource(SETTINGS_KEY, fetchSettings)
-  const fx = useResource(RATES_KEY, fetchRates)
   // Last known currency: avoids a flash of the default before settings load.
   // The server snapshot is null so hydration always matches.
   const storedCurrency = useSyncExternalStore(subscribeStorage, getStoredCurrency, () => null)
 
   const savedCode = settings.data?.find((s) => s.key === 'currency')?.value?.code
   const currencyCode: CurrencyCode = isCurrencyCode(savedCode) ? savedCode : storedCurrency ?? DEFAULT_CURRENCY
-  const rates = fx.data ?? null
   // Same fallbacks the server prices with (pricingService / currency/server) when a setting is unset.
   const vatRate = readSettingRate(settings.data, 'vat_rate', 14)
   const serviceChargeRate = readSettingRate(settings.data, 'service_charge_rate', 10)
   const loading = settings.isLoading
 
   const { mutate: mutateSettings } = settings
-  const { refresh: refreshRates } = fx
   const setCurrency = useCallback(async (code: CurrencyCode) => {
     const prev = currencyCode
     const revert = () => {
@@ -118,9 +101,6 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
     }
     mutateSettings((current) => withCurrency(current, code))
     storeCurrency(code)
-    // PDF exports resolve the currency through their own cached fetch; drop it
-    // so a download taken right after the switch is not still in `prev`.
-    invalidateDisplayCurrency()
     try {
       const res = await fetch(SETTINGS_KEY, {
         method: 'PATCH',
@@ -130,55 +110,70 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
       if (!res.ok) {
         console.error('Currency save failed:', res.status)
         revert()
-        return
       }
-      // Rates are based on the system currency, so refresh them after a switch.
-      await refreshRates()
     } catch {
       revert()
     }
-  }, [currencyCode, mutateSettings, refreshRates])
-
-  const convert = useCallback(
-    (amount: number, from: CurrencyCode = currencyCode) => {
-      if (from === currencyCode || !rates) return amount
-      const rate = rates[from]
-      if (!rate || !Number.isFinite(rate)) return amount
-      return Number((amount / rate).toFixed(2))
-    },
-    [currencyCode, rates],
-  )
+  }, [currencyCode, mutateSettings])
 
   const formatCurrency = useCallback(
-    (amount: number, from: CurrencyCode = currencyCode) => {
-      const rate = from !== currencyCode ? rates?.[from] : undefined
-      const converted = rate ? convert(amount, from) : amount
-      // Without a rate the amount is shown unconverted with its own symbol.
-      const symbol = CURRENCY_SYMBOLS[rate ? currencyCode : from]
-      const formatted = converted.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })
-      const spacer = symbol.length > 1 ? ' ' : ''
-      return `${symbol}${spacer}${formatted}`
-    },
-    [convert, currencyCode, rates],
+    (amount: number, code?: CurrencyCode | string | null) => formatMoney(amount, isCurrencyCode(code) ? code : currencyCode),
+    [currencyCode],
   )
 
   const value = useMemo<CurrencyContextType>(() => ({
     currencyCode,
     currencySymbol: CURRENCY_SYMBOLS[currencyCode],
-    rates,
     vatRate,
     serviceChargeRate,
     formatCurrency,
-    convert,
     setCurrency,
     loading,
-  }), [currencyCode, rates, vatRate, serviceChargeRate, formatCurrency, convert, setCurrency, loading])
+  }), [currencyCode, vatRate, serviceChargeRate, formatCurrency, setCurrency, loading])
 
   return (
     <CurrencyContext.Provider value={value}>
       {children}
     </CurrencyContext.Provider>
   )
+}
+
+/** `EGP 1,250` / `$1,250.5`: the currency's own symbol, no conversion. */
+export function formatMoney(amount: number, code: CurrencyCode): string {
+  const symbol = CURRENCY_SYMBOLS[code]
+  const formatted = amount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })
+  return `${symbol}${symbol.length > 1 ? ' ' : ''}${formatted}`
+}
+
+/**
+ * Totals of mixed-currency rows, one per currency (`EGP 10,000 · $500`): amounts
+ * in different currencies are never added together.
+ */
+export function formatMoneyTotals(rows: Array<{ amount: number; currency: string }>, fallback: CurrencyCode): string {
+  const totals = new Map<CurrencyCode, number>()
+  for (const row of rows) {
+    const code = isCurrencyCode(row.currency) ? row.currency : fallback
+    totals.set(code, (totals.get(code) ?? 0) + row.amount)
+  }
+  if (totals.size === 0) return formatMoney(0, fallback)
+  return [...totals].map(([code, amount]) => formatMoney(amount, code)).join(' · ')
+}
+
+/**
+ * Shows everything inside in `code` (e.g. one reservation's or invoice's
+ * currency): `formatCurrency(amount)` without an explicit code uses it.
+ */
+export function CurrencyScope({ code, children }: { code: string | null | undefined; children: ReactNode }) {
+  const parent = useCurrency()
+  const scoped = isCurrencyCode(code) ? code : null
+  const value = useMemo<CurrencyContextType>(() => (scoped
+    ? {
+        ...parent,
+        currencySymbol: CURRENCY_SYMBOLS[scoped],
+        formatCurrency: (amount, from) => parent.formatCurrency(amount, from ?? scoped),
+      }
+    : parent), [parent, scoped])
+  return <CurrencyContext.Provider value={value}>{children}</CurrencyContext.Provider>
 }
 
 export function useCurrency(): CurrencyContextType {

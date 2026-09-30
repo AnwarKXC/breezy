@@ -11,7 +11,7 @@ import { logLedgerEntryCreated } from './activityLogService'
 export async function createLedgerEntry(
   input: {
     type: string; sourceType: string; sourceId: string;
-    incomeAmount: number; outcomeAmount: number;
+    incomeAmount: number; outcomeAmount: number; currency: string;
     description: string; createdBy: string;
     invoiceId?: string; contactId?: string; metadata?: Record<string, unknown>
   },
@@ -27,6 +27,7 @@ export async function createLedgerEntry(
       contact_id: input.contactId ?? null,
       income_amount: input.incomeAmount,
       outcome_amount: input.outcomeAmount,
+      currency: input.currency,
       description: input.description,
       created_by: input.createdBy,
       metadata: (input.metadata ?? {}) as Prisma.InputJsonValue,

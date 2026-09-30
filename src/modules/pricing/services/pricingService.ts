@@ -4,6 +4,7 @@ import { prisma } from '@/services/db/prisma'
 import { fromRow, toRow } from '@/services/db/rows'
 import { mapPricingRow, type RoomTypePricing, type CreatePricingInput, type UpdatePricingInput } from '../types'
 import { requireCatalogRead, requireSettingsWrite } from '@/modules/settings/services/serviceSecurity'
+import { currencyOrDefault } from '@/shared/currency/server'
 
 const toPricing = (row: unknown) => mapPricingRow(toRow('room_type_pricing', row))
 
@@ -21,8 +22,9 @@ export async function getPricingByType(roomTypeId: string): Promise<RoomTypePric
 
 export async function createPricing(input: CreatePricingInput): Promise<RoomTypePricing> {
   await requireSettingsWrite()
+  const data = fromRow('room_type_pricing', input) as Prisma.room_type_pricingUncheckedCreateInput
   const row = await prisma.room_type_pricing.create({
-    data: fromRow('room_type_pricing', input) as Prisma.room_type_pricingUncheckedCreateInput,
+    data: { ...data, currency: await currencyOrDefault(data.currency) },
   })
   return toPricing(row)
 }

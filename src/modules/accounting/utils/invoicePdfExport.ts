@@ -1,6 +1,5 @@
 import { applyPdfFonts, buildArabicDocDef, formatCurrency as formatPdfCurrency, formatPdfDate, getPdfMake, getQrCodeDataUrl, injectRTLOptions } from '@/shared/utils/pdfMake'
 import { formatDate } from '@/shared/utils/date'
-import { getCurrencyConverter, isCurrencyCode } from '@/shared/currency/client'
 
 function downloadBuffer(buffer: ArrayBuffer, fileName: string) {
   const blob = new Blob([buffer], { type: 'application/pdf' })
@@ -260,15 +259,9 @@ export async function downloadInvoicePdf(invoice: InvoiceForPdf, locale: string)
     isRTL ? formatPdfDate(value, locale) : formatDate(value, locale)
   const align = isRTL ? 'right' : 'left'
   const invNumber = invoiceNumberLabel(invoice.createdAt)
-  // Amounts are stored in the invoice's own currency. The rest of the app shows
-  // them converted into the system currency, so the PDF has to convert too —
-  // printing invoice.currency verbatim is why switching currency changed every
-  // screen but left the PDF in the old one.
-  const sourceCurrency = isCurrencyCode(invoice.currency) ? invoice.currency : 'EGP'
-  const money = await getCurrencyConverter(sourceCurrency)
-  const currency = money.code
-  const formatInvoiceCurrency = (value: number) =>
-    formatPdfCurrency(money.convert(value), currency, locale)
+  // Printed in the invoice's own currency (amounts are never converted).
+  const currency = invoice.currency
+  const formatInvoiceCurrency = (value: number) => formatPdfCurrency(value, currency, locale)
   const statusLabel = isRTL
     ? AR_INVOICE_STATUS_LABELS[invoice.status] ?? invoice.status
     : INVOICE_STATUS_LABELS[invoice.status] ?? invoice.status

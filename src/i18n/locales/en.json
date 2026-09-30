@@ -1100,6 +1100,7 @@
       "selectRoom": "Select at least one room.",
       "typeTotalsMatch": "Room type totals must equal total rooms.",
       "exceedsAvailability": "One or more room types exceed availability.",
+      "noRateInCurrency": "No {currency} rate for: {roomTypes}. Add a {currency} price or enter a custom price per night.",
       "creating": "Creating...",
       "create": "Create reservation",
       "availabilityVerified": "Availability is verified on submit to prevent overbooking.",

@@ -4,6 +4,8 @@ import { useCallback, useMemo, useState } from 'react'
 import type { CompanyPriceOverride, CreatePriceOverrideInput, OccupancyCode } from '../types'
 import { OCCUPANCY_CODES } from '../constants'
 import { useCurrency } from '@/shared/contexts/CurrencyContext'
+import { CURRENCY_CODES, type CurrencyCode } from '@/shared/static/currencies'
+import { CURRENCY_LABELS } from '@/shared/utils/types'
 
 interface PriceOverridesSectionProps {
   overrides: CompanyPriceOverride[]
@@ -19,10 +21,13 @@ function overrideKey(category: string, occupancy: OccupancyCode) {
 }
 
 export function PriceOverridesSection({ overrides, roomTypes, canEdit, onSave, labels, seasonalPrices }: PriceOverridesSectionProps) {
-  const { formatCurrency } = useCurrency()
+  const { formatCurrency, currencyCode: systemCurrency } = useCurrency()
+  // Company rates are kept per currency; a reservation uses the ones in its own currency.
+  const [currencyChoice, setCurrencyChoice] = useState<CurrencyCode | null>(null)
+  const currency = currencyChoice ?? systemCurrency
   const overrideMap = useMemo(
-    () => new Map(overrides.map((o) => [overrideKey(o.roomCategory, o.occupancyCode), o])),
-    [overrides],
+    () => new Map(overrides.filter((o) => o.currency === currency).map((o) => [overrideKey(o.roomCategory, o.occupancyCode), o])),
+    [overrides, currency],
   )
   const basePriceMap = useMemo(
     () => new Map(roomTypes.map((rt) => [rt.slug, rt.basePrice])),
@@ -47,6 +52,8 @@ export function PriceOverridesSection({ overrides, roomTypes, canEdit, onSave, l
     (category: string, occupancy: OccupancyCode) => {
       const priceStr = getPrice(category, occupancy)
       if (priceStr) return { value: priceStr, isOverride: true }
+      // Standard/seasonal hints are system-currency prices; never show them under another currency.
+      if (currency !== systemCurrency) return null
       const seasonal = seasonalPrices?.[category]
       if (seasonal) {
         switch (occupancy) {
@@ -59,7 +66,7 @@ export function PriceOverridesSection({ overrides, roomTypes, canEdit, onSave, l
       if (base) return { value: String(base), isOverride: false }
       return null
     },
-    [getPrice, seasonalPrices, basePriceMap],
+    [getPrice, seasonalPrices, basePriceMap, currency, systemCurrency],
   )
 
   const updateDraft = useCallback((category: string, occupancy: OccupancyCode, value: string) => {
@@ -85,7 +92,7 @@ export function PriceOverridesSection({ overrides, roomTypes, canEdit, onSave, l
               roomCategory: category,
               occupancyCode: occupancy,
               price: Number(priceStr),
-              currency: 'EGP',
+              currency,
             } as CreatePriceOverrideInput)
           }
         }
@@ -101,15 +108,32 @@ export function PriceOverridesSection({ overrides, roomTypes, canEdit, onSave, l
         setSavingCategory(null)
       }
     },
-    [draft, overrideMap, onSave],
+    [draft, overrideMap, onSave, currency],
   )
 
   return (
     <div className="rounded-xl bg-white p-6 ">
       <h3 className="mb-4 text-base font-bold text-[#1A1A1A]">{labels.priceOverridesTitle}</h3>
-      <p className="mb-4 text-xs text-[#787774]">
-        {labels.priceOverridesDescription}
-      </p>
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <p className="text-xs text-[#787774]">
+          {labels.priceOverridesDescription}
+        </p>
+        <label className="flex shrink-0 items-center gap-2 text-xs font-medium text-[#787774]">
+          {labels.currency}
+          <select
+            value={currency}
+            onChange={(e) => {
+              setCurrencyChoice(e.target.value as CurrencyCode)
+              setDraft({})
+            }}
+            className="h-9 rounded-lg border border-[#EAEAEA] bg-white px-2 text-sm text-[#1A1A1A]"
+          >
+            {CURRENCY_CODES.map((code) => (
+              <option key={code} value={code}>{CURRENCY_LABELS[code]}</option>
+            ))}
+          </select>
+        </label>
+      </div>
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead>
@@ -145,7 +169,7 @@ export function PriceOverridesSection({ overrides, roomTypes, canEdit, onSave, l
                         />
                       ) : (
                         <span className={`text-sm ${display && !display.isOverride ? 'text-[#787774]' : 'text-[#1A1A1A]'}`}>
-                          {display ? formatCurrency(Number(display.value)) : '—'}
+                          {display ? formatCurrency(Number(display.value), currency) : '—'}
                         </span>
                       )}
                     </td>

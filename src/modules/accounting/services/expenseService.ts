@@ -14,6 +14,7 @@ import {
   logExpenseDeleted, logExpenseCategoryCreated,
 } from './activityLogService'
 import { createLedgerEntry } from './ledgerService'
+import { getSystemCurrency } from '@/shared/currency/server'
 
 type ExpenseRowWithCategory = Parameters<typeof mapExpenseRow>[0]
 const toExpense = (row: unknown) => mapExpenseRow(serializeRow('expenses', row) as ExpenseRowWithCategory)
@@ -108,6 +109,8 @@ export async function createExpense(input: CreateExpenseInput) {
         sourceId: created.id,
         incomeAmount: 0,
         outcomeAmount: totalAmount,
+        // Expenses have no currency of their own: they are kept in the system currency.
+        currency: await getSystemCurrency(),
         description: `Expense: ${created.description}`,
         createdBy: session.id,
       },

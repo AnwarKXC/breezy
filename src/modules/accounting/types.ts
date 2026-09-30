@@ -1,4 +1,5 @@
 import type { Tables, TablesInsert, TablesUpdate, Enums } from '@/services/db/rowTypes'
+import type { CurrencyCode } from '@/shared/static/currencies'
 
 export type PaymentMethod = Enums<'payment_method'>
 
@@ -39,6 +40,7 @@ export interface Payment {
   invoiceNumber: string | null
   method: PaymentMethod
   amount: number
+  currency: CurrencyCode
   description: string | null
   createdBy: string | null
   createdAt: string | null
@@ -293,6 +295,8 @@ export interface InvoiceBookingLookup {
   nights: number
   totalAmount: number | null
   paidAmount: number | null
+  /** The reservation's currency; its invoice must use it. */
+  currency: string
 }
 
 export interface InvoiceRoomLookup {
@@ -382,6 +386,7 @@ export function mapPaymentRow(row: PaymentRow): Payment {
     invoiceNumber: joined.invoices?.invoice_number ?? null,
     method: row.method,
     amount: Number(row.amount),
+    currency: row.currency as CurrencyCode,
     description: row.description,
     createdBy: row.created_by,
     createdAt: row.created_at,

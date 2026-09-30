@@ -7,7 +7,7 @@ import { prisma } from '@/services/db/prisma'
 import { dbDate, fromRow, serializeRow, toRow, toRows } from '@/services/db/rows'
 import { buildCheckoutInvoiceDraft, mapCheckoutInvoiceForPdf } from './checkoutInvoice'
 import { CheckoutSchema, zodErrorMessage } from '@/shared/validation'
-import { getSystemCurrency, getServiceChargeTaxRates } from '@/shared/currency/server'
+import { getServiceChargeTaxRates } from '@/shared/currency/server'
 import { recordReservationStatus, releaseRooms } from '@/modules/reservations/services/stayServer'
 
 class CheckoutError extends Error {
@@ -49,7 +49,7 @@ async function loadReservation(id: string) {
     reservation_pricing_items: Array<Record<string, unknown>>
   }
   return {
-    ...(rest as { id: string; status: string; company_id: string | null; booker_name: string | null; booker_phone: string | null; booker_email: string | null }),
+    ...(rest as { id: string; status: string; currency: string; company_id: string | null; booker_name: string | null; booker_phone: string | null; booker_email: string | null }),
     company: contacts,
     reservation_rooms: reservation_rooms.map(({ room_types, rooms, ...room }) => ({
       ...(room as { room_id: string }),
@@ -126,7 +126,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
           paidAmount,
           extraCharges,
           now,
-          currency: await getSystemCurrency(),
+          currency: reservation.currency,
           serviceChargeRate: rates.serviceChargeRate,
           vatRate: rates.vatRate,
         })
@@ -198,6 +198,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
                   invoice_id: invoice.id,
                   method: paymentMethod,
                   amount: paidAmount,
+                  currency: invoice.currency,
                   description: `Checkout payment for reservation ${id}`,
                   created_by: session.id,
                   received_by: session.id,

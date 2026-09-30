@@ -10,7 +10,6 @@ import { isOverlapViolation } from '@/services/db/errors'
 import { getRoomAvailability } from '@/services/db/rpc'
 import { snapshotPricing, applyRoomPriceOverride, getEffectiveRate } from '@/modules/reservations/services/pricingService'
 import { ReservationUpdateSchema, zodErrorMessage } from '@/shared/validation'
-import { getSystemCurrency } from '@/shared/currency/server'
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
@@ -22,16 +21,15 @@ async function syncInvoiceAfterPricing(reservationId: string) {
   })
   if (!invoice) return
 
-  const [pricingItems, reservation, systemCurrency] = await Promise.all([
+  const [pricingItems, reservation] = await Promise.all([
     prisma.reservation_pricing_items.findMany({
       where: { reservation_id: reservationId },
       select: { pricing_level: true, total_amount: true },
     }),
     prisma.reservations.findUnique({
       where: { id: reservationId },
-      select: { total_amount: true, check_in_date: true, check_out_date: true },
+      select: { total_amount: true, check_in_date: true, check_out_date: true, currency: true },
     }),
-    getSystemCurrency(),
   ])
   const sumLevel = (level: string) =>
     pricingItems.filter((i) => i.pricing_level === level).reduce((sum, i) => sum + Number(i.total_amount ?? 0), 0)
@@ -86,7 +84,7 @@ async function syncInvoiceAfterPricing(reservationId: string) {
         service_charge: serviceCharge,
         amount: totalAmount,
         remaining_balance: Math.max(0, totalAmount - alreadyPaid),
-        currency: systemCurrency,
+        ...(reservation ? { currency: reservation.currency } : {}),
         ...(reservation ? { stay_check_in: reservation.check_in_date, stay_check_out: reservation.check_out_date } : {}),
       },
     }),
@@ -123,7 +121,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     const rooms = roomRows.map((row) => {
       const { rooms: room, room_types: roomType, ...rest } = serializeRow('reservation_rooms', row)
       const roomInfo = room as { number: string; capacity: number } | null
-      return { ...rest, room, room_type: roomType, room_number: roomInfo?.number ?? null, room_capacity: roomInfo?.capacity ?? null }
+      // Room rates are in the reservation's currency.
+      return { ...rest, room, room_type: roomType, room_number: roomInfo?.number ?? null, room_capacity: roomInfo?.capacity ?? null, currency: reservation.currency }
     })
     const guests = toRows('reservation_guests', guestRows)
 
@@ -222,7 +221,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       const toAdd = input.roomIds.filter((rid: string) => !currentRoomIds.has(rid)) as string[]
 
       if (toAdd.length > 0) {
-        const availableRooms = await getRoomAvailability({ checkIn, checkOut, excludeReservationId: id })
+        const availableRooms = await getRoomAvailability({ checkIn, checkOut, excludeReservationId: id, currency: existing.currency })
         // get_room_availability returns every room and marks each one
         // available/unavailable — it does NOT filter. Taking the whole result
         // as "available" let booked rooms through this guard and the insert
@@ -283,7 +282,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
         const override = roomOverrides[roomId]
         const rate = override != null
           ? override
-          : (await getEffectiveRate(roomId, checkIn, checkOut, existing.company_id, occ as occupancy_code)).rate
+          : (await getEffectiveRate(roomId, checkIn, checkOut, existing.company_id, occ as occupancy_code, existing.currency)).rate
 
         try {
           await prisma.$transaction(async (tx) => {

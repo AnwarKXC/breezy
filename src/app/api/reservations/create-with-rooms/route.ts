@@ -9,7 +9,7 @@ import { createReservationWithRooms } from '@/services/db/rpc'
 import { auditPermissionLevel, snapshotPricing } from '@/modules/reservations/services/pricingService'
 import { ReservationCreateWithRoomsSchema, zodErrorMessage } from '@/shared/validation'
 import type { CreateReservationWithRoomsInput } from '@/modules/reservations/types'
-import { getSystemCurrency } from '@/shared/currency/server'
+import { currencyOrDefault } from '@/shared/currency/server'
 
 async function createReservationInvoice(
   reservationId: string,
@@ -20,7 +20,7 @@ async function createReservationInvoice(
 
   const reservation = await prisma.reservations.findUnique({
     where: { id: reservationId },
-    select: { reservation_number: true, total_amount: true },
+    select: { reservation_number: true, total_amount: true, currency: true },
   })
   if (!reservation) return
 
@@ -46,7 +46,6 @@ async function createReservationInvoice(
   const totalAmount = Number(reservation.total_amount ?? 0)
   const dueDate = new Date()
   dueDate.setDate(dueDate.getDate() + 30)
-  const systemCurrency = await getSystemCurrency()
 
   const items = pricingItems.map((item, idx) => ({
     type: item.pricing_level === 'nightly_rate' ? 'room_charge'
@@ -78,7 +77,7 @@ async function createReservationInvoice(
           service_charge: serviceCharge,
           amount: totalAmount,
           remaining_balance: totalAmount,
-          currency: systemCurrency,
+          currency: reservation.currency,
           stay_check_in: dbDate(input.checkIn),
           stay_check_out: dbDate(input.checkOut),
           updated_by: userId,
@@ -111,7 +110,7 @@ async function createReservationInvoice(
         due_date: dbDate(dueDate.toISOString()),
         stay_check_in: dbDate(input.checkIn),
         stay_check_out: dbDate(input.checkOut),
-        currency: systemCurrency,
+        currency: reservation.currency,
         notes: `Auto-created for reservation ${reservationId}`,
         created_by: userId,
       },
@@ -134,6 +133,9 @@ export async function POST(request: Request) {
       const normalizedRoomTypeCounts = parsed.data.roomTypeCounts.filter((r) => r.count > 0)
       const input = { ...parsed.data, roomTypeCounts: normalizedRoomTypeCounts } as unknown as CreateReservationWithRoomsInput
 
+      // Priced only from rate rows in this currency; the invoice follows it.
+      const currency = await currencyOrDefault(parsed.data.currency)
+
       let data: unknown
       try {
         data = await createReservationWithRooms(session.id, {
@@ -143,6 +145,7 @@ export async function POST(request: Request) {
           contactId: input.contactId ?? null,
           guestName: input.guestName,
           guestId: input.guestId ?? null,
+          currency,
         })
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error)
@@ -227,14 +230,9 @@ export async function POST(request: Request) {
       // already been created by the RPC — we return its ID plus a clear
       // error so the UI can retry just the invoice step or surface the issue.
       if (resultData?.reservationId) {
-        // Defensive: relabel reservation.currency to the system currency before
-        // snapshotPricing runs. The create_reservation_with_rooms RPC hardcodes
-        // 'EGP' but the pricing snapshot now writes amounts in the system
-        // currency; relabelling the row avoids the header double-converting.
+        // The RPC only snapshots booker_name; copy phone/email off the contact.
         try {
-          const patch: Prisma.reservationsUpdateInput = { currency: await getSystemCurrency() }
-
-          // The RPC only snapshots booker_name; copy phone/email off the contact.
+          const patch: Prisma.reservationsUpdateInput = {}
           if (input.contactId) {
             const contact = await prisma.contacts.findFirst({
               where: { id: input.contactId, deleted_at: null },
@@ -244,9 +242,11 @@ export async function POST(request: Request) {
             if (contact?.email) patch.booker_email = contact.email
           }
 
-          await prisma.reservations.update({ where: { id: resultData.reservationId }, data: patch })
+          if (Object.keys(patch).length > 0) {
+            await prisma.reservations.update({ where: { id: resultData.reservationId }, data: patch })
+          }
         } catch (err) {
-          console.error('reservation.currency relabel failed:', err)
+          console.error('booker contact copy failed:', err)
         }
 
         // Company bookings: record the company on the reservation and drop the

@@ -5,7 +5,7 @@ import { fetchData, useResource } from '@/shared/data/useResource'
 import { Table } from '@/shared/components/Table'
 import type { TableColumn } from '@/shared/table/types'
 import { FloatingInput } from '@/shared/components/FloatingField'
-import { useCurrency } from '@/shared/contexts/CurrencyContext'
+import { formatMoneyTotals, useCurrency } from '@/shared/contexts/CurrencyContext'
 
 import { useLocale } from '@/i18n/components/LocaleContext'
 import { formatDateTime } from '@/shared/utils/date'
@@ -20,7 +20,7 @@ interface Props {
 }
 
 export function PaymentsTab({ t }: Props) {
-  const { formatCurrency } = useCurrency()
+  const { formatCurrency, currencyCode } = useCurrency()
   const locale = useLocale()
   const [fromDate, setFromDate] = useState('')
   const [toDate, setToDate] = useState('')
@@ -50,9 +50,7 @@ export function PaymentsTab({ t }: Props) {
     }
   }, [locale])
 
-  const totals = useMemo(() => {
-    return payments.reduce((sum, p) => sum + Number(p.amount), 0)
-  }, [payments])
+  const totals = formatMoneyTotals(payments.map((p) => ({ amount: Number(p.amount), currency: p.currency })), currencyCode)
 
   const columns: TableColumn<Payment>[] = useMemo(() => [
     {
@@ -64,9 +62,9 @@ export function PaymentsTab({ t }: Props) {
       key: 'amount',
       label: t('accounting.payments.amount'),
       sortable: true,
-      render: (v) => {
+      render: (v, row) => {
         const amt = Number(v)
-        return <span className={amt < 0 ? 'text-[#9F2F2D]' : 'text-green-600'}>{formatCurrency(amt)}</span>
+        return <span className={amt < 0 ? 'text-[#9F2F2D]' : 'text-green-600'}>{formatCurrency(amt, row.currency)}</span>
       },
     },
     {
@@ -145,7 +143,7 @@ export function PaymentsTab({ t }: Props) {
 
       <div className="rounded-xl border border-[#EAEAEA] bg-white p-5 space-y-1">
         <p className="text-xs text-[#787774]">{t('accounting.finance.totalRevenue')}</p>
-        <p className="text-2xl font-bold text-[#1A1A1A]">{formatCurrency(totals)}</p>
+        <p className="text-2xl font-bold text-[#1A1A1A]">{totals}</p>
       </div>
 
       <Table

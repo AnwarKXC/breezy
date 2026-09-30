@@ -6,7 +6,6 @@ import { prisma } from '@/services/db/prisma'
 import { dbDate } from '@/services/db/rows'
 import { logAction } from '@/services/logs'
 import { LOG_ACTIONS, LOG_MODULES } from '@/types/logs'
-import { getSystemCurrency } from '@/shared/currency/server'
 import { ROLES, type UserRole } from '@/config/roles'
 
 // price_override_audit_log.permission_level has a DB check constraint allowing
@@ -67,15 +66,15 @@ export async function getEffectiveRate(
   roomId: string,
   checkIn: string,
   checkOut: string,
-  contactId?: string | null,
-  occupancyCode?: 'S' | 'D' | 'T' | null,
+  contactId: string | null | undefined,
+  occupancyCode: 'S' | 'D' | 'T' | null | undefined,
+  currency: string,
 ): Promise<{ rate: number; currency: string; source: string }> {
-  // Same hierarchy as reservation creation and availability: public.resolve_room_rate.
-  // Amounts are stored in the system currency.
-  const [currency, [row]] = await Promise.all([
-    getSystemCurrency(),
-    prisma.$queryRawTyped(resolveRoomRate(roomId, checkIn.slice(0, 10), checkOut.slice(0, 10), contactId ?? null, occupancyCode ?? null)),
-  ])
+  // Same hierarchy as reservation creation and availability: public.resolve_room_rate,
+  // limited to rate rows in the reservation's currency (amounts are never converted).
+  const [row] = await prisma.$queryRawTyped(
+    resolveRoomRate(roomId, checkIn.slice(0, 10), checkOut.slice(0, 10), contactId ?? null, occupancyCode ?? null, currency),
+  )
   return {
     rate: row?.rate == null ? 0 : Number(row.rate),
     currency,
@@ -185,16 +184,15 @@ export async function calculatePricing(
   contactId?: string | null,
 ): Promise<PriceBreakdown> {
   // Every input is independent: fetch in one parallel round trip.
-  const [reservationRow, rooms, currencyCode, settings] = await Promise.all([
+  const [reservationRow, rooms, settings] = await Promise.all([
     prisma.reservations.findUnique({
       where: { id: reservationId },
-      select: { check_in_date: true, check_out_date: true },
+      select: { check_in_date: true, check_out_date: true, currency: true },
     }),
     prisma.reservation_rooms.findMany({
       where: { reservation_id: reservationId, deleted_at: null, status: { not: 'cancelled' } },
       select: { id: true, room_id: true, rate_per_night: true, occupancy_code: true, price_source: true },
     }),
-    getSystemCurrency(),
     prisma.accounting_settings.findMany({
       where: { key: { in: ['service_charge_rate', 'vat_rate'] } },
       select: { key: true, value: true },
@@ -211,7 +209,7 @@ export async function calculatePricing(
   const checkOut = new Date(reservation.check_out_date)
   const nights = Math.max(1, Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24)))
 
-  const currency = currencyCode as string
+  const currency = reservationRow.currency
   const items: PriceBreakdown['items'] = []
   const roomRates: NonNullable<PriceBreakdown['roomRates']> = []
   let roomCharges = 0
@@ -220,7 +218,7 @@ export async function calculatePricing(
   const effectiveRates = await Promise.all(
     rooms.map((room) =>
       room.price_source !== 'manual_override' && room.room_id
-        ? getEffectiveRate(room.room_id, reservation.check_in_date, reservation.check_out_date, contactId, room.occupancy_code as 'S' | 'D' | 'T' | null)
+        ? getEffectiveRate(room.room_id, reservation.check_in_date, reservation.check_out_date, contactId, room.occupancy_code as 'S' | 'D' | 'T' | null, currency)
         : null,
     ),
   )
@@ -556,7 +554,7 @@ export async function applyRoomPriceOverride(params: {
 
   const reservation = await prisma.reservations.findUnique({
     where: { id: params.reservationId },
-    select: { check_in_date: true, check_out_date: true, company_id: true },
+    select: { check_in_date: true, check_out_date: true, company_id: true, currency: true },
   })
 
   if (!reservation) {
@@ -577,6 +575,7 @@ export async function applyRoomPriceOverride(params: {
       reservation.check_out_date.toISOString().slice(0, 10),
       reservation.company_id,
       roomRow.occupancy_code as 'S' | 'D' | 'T' | null,
+      reservation.currency,
     )
     if (!(effective.rate > 0)) {
       return { ok: false, code: 'RESET_NO_RATE', message: 'No standard rate found for this room and dates' }

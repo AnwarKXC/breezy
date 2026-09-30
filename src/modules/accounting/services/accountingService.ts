@@ -17,7 +17,7 @@ import {
   calculateInvoiceTotals, formatDate, mapInvoiceItemsForInsert, roundMoney,
   type CreateInvoiceDraftInput, type InvoiceItemDraftInput,
 } from './accountingUtils'
-import { getSystemCurrency } from '@/shared/currency/server'
+import { currencyOrDefault } from '@/shared/currency/server'
 import {
   getAccountingOverview, getFinanceTable, getFinancialHealth, getDailyRevenueReport,
   getMonthlyRevenueReport, getAccountsReceivableAging, getAccountingSettings, updateAccountingSetting,
@@ -282,7 +282,14 @@ export async function createInvoice(input: CreateInvoiceDraftInput & { items?: I
   const { subtotal, discount, taxAmount, serviceCharge, total } = calculateInvoiceTotals(input)
   const status = input.status ?? 'draft'
   const isPaid = status === 'paid'
-  const currency = input.currency ?? (await getSystemCurrency())
+  // A reservation's invoice is always in the reservation's currency (no FX).
+  const reservationCurrency = input.reservation_id
+    ? (await prisma.reservations.findUnique({ where: { id: input.reservation_id }, select: { currency: true } }))?.currency
+    : undefined
+  if (reservationCurrency && input.currency && input.currency !== reservationCurrency) {
+    throw new Error(`Invoice currency must match the reservation currency (${reservationCurrency})`)
+  }
+  const currency = reservationCurrency ?? (await currencyOrDefault(input.currency))
   const invoiceNumber = input.invoice_number ?? await getNextInvoiceNumber()
 
   // Fields shared by the "reuse existing" and "create new" paths.
@@ -361,8 +368,15 @@ export async function updateInvoice(id: string, input: UpdateInvoiceInput & { it
 
   const existingInvoice = await prisma.invoices.findUnique({
     where: { id },
-    select: { status: true, subtotal: true, discount: true, tax_amount: true, service_charge: true, amount: true },
+    select: { status: true, subtotal: true, discount: true, tax_amount: true, service_charge: true, amount: true, reservation_id: true },
   })
+
+  if (input.currency && existingInvoice?.reservation_id) {
+    const reservation = await prisma.reservations.findUnique({ where: { id: existingInvoice.reservation_id }, select: { currency: true } })
+    if (reservation && reservation.currency !== input.currency) {
+      throw new Error(`Invoice currency must match the reservation currency (${reservation.currency})`)
+    }
+  }
 
   if (existingInvoice && existingInvoice.status !== 'draft') {
     const allowedFields: (keyof typeof input)[] = [
@@ -578,7 +592,7 @@ export async function refundInvoice(id: string, amount: number, reason: string) 
 
   const invoice = await prisma.$transaction(async (tx) => {
     await lockInvoice(tx, id)
-    const current = await tx.invoices.findFirst({ where: { id, deleted_at: null }, select: { status: true } })
+    const current = await tx.invoices.findFirst({ where: { id, deleted_at: null }, select: { status: true, currency: true } })
     if (!current) throw new Error('Invoice not found')
     if (current.status === 'void') {
       throw new Error('Cannot refund a voided invoice.')
@@ -593,7 +607,7 @@ export async function refundInvoice(id: string, amount: number, reason: string) 
 
     // One negative payment row records the refund ('cash' mirrors prior behaviour).
     const refundRow = await tx.payments.create({
-      data: { invoice_id: id, method: 'cash', amount: -refundAmount, description: reason ? `Refund: ${reason}` : 'Refund', created_by: session.id },
+      data: { invoice_id: id, method: 'cash', amount: -refundAmount, currency: current.currency, description: reason ? `Refund: ${reason}` : 'Refund', created_by: session.id },
     })
 
     // Recompute derived columns (partially_refunded / refunded) from payment rows.
@@ -751,7 +765,7 @@ export async function getInvoiceFormLookups(): Promise<InvoiceFormLookups> {
       where: { deleted_at: null, status: { notIn: ['cancelled', 'expired'] } },
       select: {
         id: true, status: true, company_id: true, booker_name: true, check_in_date: true, check_out_date: true,
-        nights: true, total_amount: true, paid_amount: true,
+        nights: true, total_amount: true, paid_amount: true, currency: true,
         reservation_rooms: {
           where: { deleted_at: null },
           select: { room_id: true, rooms: { select: { number: true } }, room_types: { select: { name: true } } },
@@ -795,6 +809,7 @@ export async function getInvoiceFormLookups(): Promise<InvoiceFormLookups> {
         nights: Math.max(1, reservation.nights ?? 1),
         totalAmount: Number(reservation.total_amount ?? 0),
         paidAmount: Number(reservation.paid_amount ?? 0),
+        currency: reservation.currency,
       }
     })
 
