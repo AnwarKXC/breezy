@@ -3,3 +3,5 @@
 export { useRegisterSW } from './register-sw'
 export { useForceUpdate } from './use-force-update'
 export { InstallPrompt } from './components/InstallPrompt'
+export { useInstallPrompt } from './use-install-prompt'
+export { InstallAppButton } from './components/InstallAppButton'

@@ -4,60 +4,23 @@
 // Visual: STEP 5 â€” PWA UI spec
 // Role: Show install prompt when app is installable
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useTranslation } from '@/i18n/hooks/useTranslation'
-
-// Type for beforeinstallprompt event - MUST be declared before use
-interface BeforeInstallPromptEvent extends Event {
-  prompt(): Promise<void>
-  userChoice(): Promise<{ outcome: 'accepted' | 'dismissed' }>
-}
+import { useInstallPrompt } from '../use-install-prompt'
 
 interface InstallPromptProps {
   onInstall?: () => void
   onDismiss?: () => void
 }
 
-/**
- * InstallPrompt component
- * Per spec:
- * - fixed bottom-4 left-1/2 -translate-x-1/2
- * - bg-white rounded-2xl px-6 py-4 shadow-[0_4px_24px_rgba(0,0,0,0.12)]
- * - flex items-center gap-4
- */
+/** Floating install banner for browsers that expose a native install prompt. */
 export function InstallPrompt({ onInstall, onDismiss }: InstallPromptProps) {
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
+  const { mode, install } = useInstallPrompt()
   const [isVisible, setIsVisible] = useState(true)
   const { t } = useTranslation()
 
-  useEffect(() => {
-    // Listen for beforeinstallprompt event
-    const handleBeforeInstall = (e: Event) => {
-      e.preventDefault()
-      setDeferredPrompt(e as BeforeInstallPromptEvent)
-    }
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstall)
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstall)
-    }
-  }, [])
-
   const handleInstall = async () => {
-    if (!deferredPrompt) return
-
-    // Show the install prompt (MUST be awaited)
-    await deferredPrompt.prompt()
-
-    // Wait for user response
-    const { outcome } = await deferredPrompt.userChoice()
-    if (outcome === 'accepted') {
-      onInstall?.()
-    }
-
-    // Clear the deferred prompt
-    setDeferredPrompt(null)
+    if (await install()) onInstall?.()
     setIsVisible(false)
   }
 
@@ -66,8 +29,7 @@ export function InstallPrompt({ onInstall, onDismiss }: InstallPromptProps) {
     onDismiss?.()
   }
 
-  // Don't render if no install prompt available or hidden
-  if (!deferredPrompt || !isVisible) {
+  if (mode !== 'prompt' || !isVisible) {
     return null
   }
 

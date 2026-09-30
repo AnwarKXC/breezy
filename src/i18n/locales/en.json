@@ -1656,6 +1656,8 @@
     "ar": "Arabic"
   },
   "pwa": {
+    "installApp": "Install App",
+    "iosInstructions": "Tap the Share button in Safari, then choose \"Add to Home Screen\".",
     "installTitle": "Install Hotel System",
     "installDescription": "Add to home screen for quick access",
     "install": "Install"

@@ -10,7 +10,7 @@ import {
 
 const locales = ['en', 'ar'] as const
 const PASS_THROUGH_PATHS = ['/api/', '/_next/', '/static/', '/sw.js', '/offline']
-const PASS_THROUGH_FILES = ['/favicon.ico', '/robots.txt', '/manifest.json']
+const PASS_THROUGH_FILES = ['/favicon.ico', '/robots.txt', '/manifest.webmanifest']
 
 function getLocale(pathname: string) {
   const segment = pathname.split('/')[1]

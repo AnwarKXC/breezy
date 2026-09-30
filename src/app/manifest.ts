@@ -2,43 +2,24 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Hotel System",
-    short_name: "HotelMS",
+    id: "/",
+    name: "Breezy System",
+    short_name: "Breezy",
     description: "Hotel Management System for staff dashboard",
-    start_url: "/",
+    start_url: "/en/reservations",
+    scope: "/",
     display: "standalone",
-    background_color: "#F4F5F7",
-    theme_color: "#111111",
-    orientation: "portrait-primary",
+    background_color: "#FFFFFF",
+    theme_color: "#1A1A1A",
     icons: [
-      {
-        src: "/icon-192x192.png",
-        sizes: "192x192",
-        type: "image/png",
-        purpose: "maskable",
-      },
-      {
-        src: "/icon-512x512.png",
-        sizes: "512x512",
-        type: "image/png",
-        purpose: "maskable",
-      },
+      { src: "/icon-192x192.png", sizes: "192x192", type: "image/png", purpose: "any" },
+      { src: "/icon-512x512.png", sizes: "512x512", type: "image/png", purpose: "any" },
+      { src: "/icon-512x512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
     ],
     categories: ["business", "productivity"],
-    lang: "en",
-    dir: "ltr",
     prefer_related_applications: false,
     shortcuts: [
-      {
-        name: "Dashboard",
-        url: "/",
-        description: "View hotel dashboard",
-      },
-      {
-        name: "Reservations",
-        url: "/en",
-        description: "View localized dashboard",
-      },
+      { name: "Reservations", url: "/en/reservations", description: "Open reservations" },
     ],
   };
 }

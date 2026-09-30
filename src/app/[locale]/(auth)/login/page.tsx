@@ -7,6 +7,7 @@ import { useParams, useRouter } from "next/navigation";
 
 import { useTranslation } from "@/i18n/hooks/useTranslation";
 import { useAuth } from "@/modules/auth";
+import { InstallAppButton, useRegisterSW } from "@/pwa";
 import { FloatingInput } from "@/shared/components/FloatingField";
 import { selectBlockedUntil } from "@/store/authSlice";
 import { useAppSelector } from "@/store/hooks";
@@ -38,6 +39,7 @@ export default function LoginPage() {
   const router = useRouter();
   const params = useParams<{ locale?: string | string[] }>();
   const { t } = useTranslation();
+  useRegisterSW();
   const { login, loading, error, clearError } = useAuth();
   const blockedUntil = useAppSelector(selectBlockedUntil);
   const [email, setEmail] = useState("");
@@ -153,6 +155,8 @@ export default function LoginPage() {
                 {t("auth.login.forgotPassword")}
               </Link>
             </form>
+
+            <InstallAppButton />
           </div>
 
           <div className="mt-8 flex flex-col items-center gap-2 lg:hidden">

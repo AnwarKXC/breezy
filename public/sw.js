@@ -1,13 +1,13 @@
 // public/sw.js - Service Worker with caching strategies (registered in production only)
 
 // Bump the version to drop every previously cached response on activate.
-const STATIC_CACHE = 'hotel-ms-static-v2'
-const DYNAMIC_CACHE = 'hotel-ms-dynamic-v2'
+const STATIC_CACHE = 'hotel-ms-static-v3'
+const DYNAMIC_CACHE = 'hotel-ms-dynamic-v3'
 
 const PRECACHE_URLS = [
   '/',
   '/offline',
-  '/manifest.json',
+  '/manifest.webmanifest',
 ]
 
 self.addEventListener('install', (event) => {

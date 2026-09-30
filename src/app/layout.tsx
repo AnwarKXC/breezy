@@ -15,8 +15,6 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "Breezy System",
   description: "Hotel Management System for staff dashboard",
-  // PWA metadata
-  manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
