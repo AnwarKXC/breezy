@@ -6,21 +6,43 @@ export interface RateLimitStore {
 
 const legacyStore = new Map<string, { count: number; resetAt: number }>()
 
+const MAX_TRACKED_KEYS = 10_000
+
 export const RateLimitTier = {
-  AUTH: { maxRequests: 5, windowMs: 60_000 },
-  MUTATION: { maxRequests: 30, windowMs: 60_000 },
-  READ: { maxRequests: 100, windowMs: 60_000 },
-  ANALYTICS: { maxRequests: 20, windowMs: 60_000 },
+  AUTH: { name: 'auth', maxRequests: 5, windowMs: 60_000 },
+  MUTATION: { name: 'mutation', maxRequests: 30, windowMs: 60_000 },
+  READ: { name: 'read', maxRequests: 100, windowMs: 60_000 },
+  ANALYTICS: { name: 'analytics', maxRequests: 20, windowMs: 60_000 },
 } as const
 
-export function rateLimit(request: Request, tier: { maxRequests: number; windowMs: number }): { error?: NextResponse } {
-  const forwarded = request.headers.get('x-forwarded-for')
-  const ip = forwarded?.split(',')[0]?.trim() ?? request.headers.get('x-real-ip') ?? 'unknown'
-  const key = `rl:${ip}`
+type Tier = { name: string; maxRequests: number; windowMs: number }
+
+/**
+ * x-real-ip is set by the hosting proxy. Otherwise the LAST x-forwarded-for hop is
+ * the one appended by our nearest proxy; earlier entries are client-supplied and
+ * would let callers pick a fresh bucket per request.
+ */
+function clientIp(request: Request) {
+  const realIp = request.headers.get('x-real-ip')?.trim()
+  if (realIp) return realIp
+  const hops = request.headers.get('x-forwarded-for')?.split(',').map((hop) => hop.trim()).filter(Boolean)
+  return hops?.at(-1) ?? 'unknown'
+}
+
+function pruneExpired(now: number) {
+  for (const [key, entry] of legacyStore) {
+    if (now >= entry.resetAt) legacyStore.delete(key)
+  }
+}
+
+export function rateLimit(request: Request, tier: Tier): { error?: NextResponse } {
+  // Separate bucket per tier: dashboard reads must not use up the login allowance.
+  const key = `rl:${tier.name}:${clientIp(request)}`
   const now = Date.now()
   const entry = legacyStore.get(key)
 
   if (!entry || now >= entry.resetAt) {
+    if (legacyStore.size >= MAX_TRACKED_KEYS) pruneExpired(now)
     legacyStore.set(key, { count: 1, resetAt: now + tier.windowMs })
     return {}
   }
@@ -40,13 +62,10 @@ export function rateLimit(request: Request, tier: { maxRequests: number; windowM
 
 export async function rateLimitWithStore(
   request: Request,
-  tier: { maxRequests: number; windowMs: number },
+  tier: Tier,
   store: RateLimitStore,
 ): Promise<{ error?: NextResponse }> {
-  const forwarded = request.headers.get('x-forwarded-for')
-  const ip = forwarded?.split(',')[0]?.trim() ?? request.headers.get('x-real-ip') ?? 'unknown'
-
-  const { count, resetAt } = await store.increment(`rl:${ip}`, tier.windowMs)
+  const { count, resetAt } = await store.increment(`rl:${tier.name}:${clientIp(request)}`, tier.windowMs)
 
   if (count > tier.maxRequests) {
     const retryAfter = Math.ceil((resetAt - Date.now()) / 1000)

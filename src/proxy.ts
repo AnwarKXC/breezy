@@ -33,7 +33,7 @@ function isPublicPath(pathname: string) {
   const stripped = hasLocalePrefix(pathname) ? stripLocale(pathname) : pathname
   if (PASS_THROUGH_PATHS.some((p) => stripped.startsWith(p))) return true
   if (PASS_THROUGH_FILES.includes(stripped)) return true
-  return ['/login', '/signup', '/auth/', '/unauthorized'].some((p) => stripped === p || stripped.startsWith(p))
+  return ['/login', '/forgot-password', '/reset-password', '/signup', '/auth/', '/unauthorized'].some((p) => stripped === p || stripped.startsWith(p))
 }
 
 function getRouteKey(pathname: string) {

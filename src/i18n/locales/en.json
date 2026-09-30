@@ -1585,12 +1585,36 @@
       "logoutFailed": "Unable to sign out. Try again.",
       "roleFetchFailed": "Unable to load your account role. Try again.",
       "sessionFailed": "Unable to start your secure session. Try again.",
-      "userNotFound": "No staff profile was found for this account."
+      "userNotFound": "No staff profile was found for this account.",
+      "passwordTooShort": "Password must be at least 8 characters.",
+      "passwordMismatch": "Passwords do not match.",
+      "invalidResetLink": "This reset link is invalid or has expired.",
+      "rateLimited": "Too many attempts. Wait a minute and try again.",
+      "requestFailed": "Something went wrong. Try again."
     },
     "unauthorized": {
       "eyebrow": "Restricted access",
       "title": "You cannot access this area",
-      "description": "Your account role does not include permission for this section."
+      "description": "Your account role does not include permission for this section.",
+      "back": "Go to reservations"
+    },
+    "forgot": {
+      "title": "Forgot password",
+      "subtitle": "Admins can reset their password by email.",
+      "submit": "Send reset link",
+      "sending": "Sending...",
+      "sent": "If an admin account uses this email, a reset link is on its way. It expires in 30 minutes. Other staff: ask an admin to reset your password.",
+      "backToLogin": "Back to sign in"
+    },
+    "reset": {
+      "title": "Choose a new password",
+      "subtitle": "Use at least 8 characters.",
+      "password": "New password",
+      "confirmPassword": "Confirm new password",
+      "submit": "Save password",
+      "saving": "Saving...",
+      "done": "Your password was changed and all other sessions were signed out.",
+      "requestNewLink": "Request a new link"
     }
   },
   "settings": {

@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { ROLES } from '@/config/rbac'
 import { prisma } from '@/services/db/prisma'
 import { invalidateUserSessionCache } from '@/services/auth/sessionStore'
 import type { UpdateUserInput, User } from '../types'
@@ -14,6 +15,14 @@ import { guarded } from './userStore'
 
 export { getUsers, getUsersMetrics, getUsersPage } from './userQueryService'
 
+// Only admins may grant the admin role or change/delete an admin account;
+// otherwise any role with users:* permissions could escalate to admin.
+function assertCanManageAdmins(actor: { role: string }, ...roles: (string | undefined)[]) {
+  if (actor.role !== ROLES.ADMIN && roles.includes(ROLES.ADMIN)) {
+    throw new AuthServiceError('auth/permission_denied')
+  }
+}
+
 async function findActiveProfile(id: string) {
   const profile = await prisma.profiles.findFirst({ where: { id, deleted_at: null } })
   if (!profile) throw new AuthServiceError('auth/user_not_found')
@@ -22,6 +31,7 @@ async function findActiveProfile(id: string) {
 
 export async function createUser(input: CreateStaffUserInput): Promise<User> {
   const actor = await requireUsersCreate()
+  assertCanManageAdmins(actor, input.role)
   return guarded('auth/create_staff_failed', async () => {
     const user = await createAuthUserDocument(input).catch((error) => {
       throw toAuthServiceError(error, 'auth/create_staff_failed')
@@ -45,9 +55,12 @@ export async function updateUser(input: UpdateUserInput): Promise<User> {
       throw new AuthServiceError('auth/cannot_modify_own_account')
     }
 
-    if (password && password.length < 6) {
+    if (password && password.length < 8) {
       throw new AuthServiceError('auth/invalid_form')
     }
+
+    const target = await findActiveProfile(id)
+    assertCanManageAdmins(actor, role, target.role)
 
     await syncAuthUser(id, { name, phone, role, password })
 
@@ -64,6 +77,7 @@ export async function deleteUser(id: string) {
   }
   await guarded('auth/user_delete_failed', async () => {
     const user = await findActiveProfile(id)
+    assertCanManageAdmins(actor, user.role)
 
     // Soft delete: keep the rows for audit history, block sign-in, end sessions.
     await prisma.$transaction([

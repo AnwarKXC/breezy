@@ -5,6 +5,8 @@ import { getUserById } from '@/modules/users/services/userService'
 import { logUserViewed } from '@/modules/users/services/activityLogService'
 import { getCurrentSession } from '@/modules/users/services/authSession'
 import { checkLocale } from '@/i18n/config'
+import { ACTIONS } from '@/config/rbac'
+import { enforceActionAccess } from '@/shared/rbac/requireModuleAccess'
 import { prisma } from '@/services/db/prisma'
 import ar from '@/i18n/locales/ar.json'
 import en from '@/i18n/locales/en.json'
@@ -42,6 +44,9 @@ export default async function UserDetailsRoutePage({
   const { locale: rawLocale, id } = await params
   const locale = checkLocale(rawLocale)
   const labels = translations[locale].users
+  // Redirects to login/unauthorized instead of letting getUserById's permission
+  // error fall through as "user not found".
+  await enforceActionAccess(ACTIONS.USERS_READ, locale, `/${locale}/users/${id}`)
   let user = null
   let errorMessage: string | null = null
 

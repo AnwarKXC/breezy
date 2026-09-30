@@ -92,6 +92,9 @@ export function validateCsrf(
       if (!allowed) {
         return { error: NextResponse.json({ error: 'csrf/origin_not_allowed' }, { status: 403 }), response: maybeUpdatedResponse }
       }
+    } else if (host !== (request.headers.get('host') ?? new URL(request.url).host)) {
+      // No allow-list configured: only same-origin requests may mutate.
+      return { error: NextResponse.json({ error: 'csrf/origin_not_allowed' }, { status: 403 }), response: maybeUpdatedResponse }
     }
 
     return { response: maybeUpdatedResponse }

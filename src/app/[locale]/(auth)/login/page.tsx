@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 
@@ -21,6 +22,13 @@ const authErrorKeys: Record<AuthServiceErrorCode, string> = {
   "auth/session_failed": "auth.errors.sessionFailed",
   "auth/user_not_found": "auth.errors.userNotFound",
 };
+
+// Only same-app paths: rejects absolute URLs, protocol-relative "//host" and "/\host".
+function getSafeNext(locale: Locale): string {
+  const next = new URLSearchParams(window.location.search).get("next");
+  if (next && next.startsWith(`/${locale}/`) && !next.startsWith("//") && !next.includes("\\")) return next;
+  return `/${locale}/reservations`;
+}
 
 function getLocaleParam(locale: string | string[] | undefined): Locale {
   return locale === "ar" ? "ar" : "en";
@@ -63,7 +71,7 @@ export default function LoginPage() {
 
     try {
       await login({ email, password });
-      router.replace(`/${locale}/reservations`);
+      router.replace(getSafeNext(locale));
     } catch {
       // Error is surfaced via the `error` state from useAuth.
     } finally {
@@ -137,6 +145,13 @@ export default function LoginPage() {
                     ? `${t("auth.login.blocked")} ${remaining}s`
                     : t("auth.login.submit")}
               </button>
+
+              <Link
+                className="block py-2 text-center text-xs font-bold text-[#787774] hover:text-[#1A1A1A]"
+                href={`/${locale}/forgot-password`}
+              >
+                {t("auth.login.forgotPassword")}
+              </Link>
             </form>
           </div>
 

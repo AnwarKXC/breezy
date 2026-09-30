@@ -1,4 +1,6 @@
-﻿import { checkLocale, type Locale } from '@/i18n/config'
+﻿import Link from 'next/link'
+
+import { checkLocale, type Locale } from '@/i18n/config'
 import ar from '@/i18n/locales/ar.json'
 import en from '@/i18n/locales/en.json'
 
@@ -14,7 +16,8 @@ export default async function UnauthorizedPage({
   params: Promise<{ locale: string }>
 }) {
   const { locale: rawLocale } = await params
-  const labels = getLabels(checkLocale(rawLocale))
+  const locale = checkLocale(rawLocale)
+  const labels = getLabels(locale)
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#F4F5F7] px-4 py-10">
@@ -26,6 +29,12 @@ export default async function UnauthorizedPage({
           {labels.title}
         </h1>
         <p className="mt-2 text-sm text-[#787774]">{labels.description}</p>
+        <Link
+          className="mt-5 inline-flex h-10 items-center justify-center rounded-lg bg-[#1A1A1A] px-4 text-xs font-bold text-white transition hover:bg-[#333333]"
+          href={`/${locale}/reservations`}
+        >
+          {labels.back}
+        </Link>
       </section>
     </main>
   )

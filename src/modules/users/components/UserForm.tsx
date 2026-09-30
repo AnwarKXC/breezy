@@ -8,6 +8,7 @@ import { USER_ROLES } from '../utils/userUi'
 import type { UserFormDraft, UserFormMode } from '../hooks/useUserForm'
 import { EyeIcon, EyeOffIcon } from './UserIcons'
 import { useEscapeKey } from '@/shared/hooks/useEscapeKey'
+import { useAuth } from '@/modules/auth'
 
 interface UserFormProps {
   draft: UserFormDraft
@@ -30,13 +31,15 @@ export function UserForm(props: UserFormProps) {
   useEscapeKey(props.onClose, !props.saving)
   const emailError = props.error === 'auth/email_already_exists' ? props.errorDescription : null
   const formError = props.error && props.error !== 'auth/email_already_exists' ? props.errorDescription : null
+  const { role: actorRole } = useAuth()
+  // Only admins can grant the admin role (enforced on the server too).
   const roleOptions = useMemo(
     () =>
-      USER_ROLES.map((role) => ({
+      USER_ROLES.filter((role) => actorRole === 'admin' || role !== 'admin' || props.draft.role === 'admin').map((role) => ({
         label: props.roleLabels[role],
         value: role,
       })),
-    [props.roleLabels],
+    [actorRole, props.draft.role, props.roleLabels],
   )
 
   return (
@@ -107,7 +110,7 @@ export function UserForm(props: UserFormProps) {
                 required={isCreate}
                 label={props.labels.password}
                 autoComplete="new-password"
-                minLength={6}
+                minLength={8}
                 type={showPassword ? 'text' : 'password'}
                 value={props.draft.password}
                 onChange={(event) => props.onUpdate('password', event.target.value)}

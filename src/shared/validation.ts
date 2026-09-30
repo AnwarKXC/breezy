@@ -395,7 +395,7 @@ export const ContactUpdateSchema = z.object({
 export const UserCreateSchema = z.object({
   name: z.string().trim().min(1, 'Name is required').max(200),
   email: z.string().email().max(300),
-  password: z.string().min(6, 'Password must be at least 6 characters').max(100),
+  password: z.string().min(8, 'Password must be at least 8 characters').max(100),
   phone: z.string().trim().min(1).max(30),
   role: z.enum(['admin', 'accountant', 'front_desk']),
 })
@@ -403,7 +403,7 @@ export const UserCreateSchema = z.object({
 export const UserUpdateSchema = z.object({
   name: z.string().trim().min(1).max(200).optional(),
   email: z.string().email().max(300).optional(),
-  password: z.string().min(6).max(100).optional(),
+  password: z.string().min(8).max(100).optional(),
   phone: z.string().trim().min(1).max(30).optional(),
   role: z.enum(['admin', 'accountant', 'front_desk']).optional(),
 })
