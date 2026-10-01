@@ -10,8 +10,9 @@ import { toast } from '@/shared/toast/toastEvents'
 import { buildAndDownloadPdf } from '@/shared/utils/pdfMake'
 import { roomService } from '@/services/roomService'
 import { useTranslation } from '@/i18n/hooks/useTranslation'
-import { useCurrency } from '@/shared/contexts/CurrencyContext'
 import type { Money } from '@/shared/currency/money'
+import { MoneyTotals } from '@/shared/components/MoneyTotals'
+import { MoneyAmount } from '@/shared/components/MoneyTotals'
 
 type RoomStatus = 'available' | 'occupied' | 'maintenance' | 'cleaning' | 'dirty'
 
@@ -124,7 +125,6 @@ export function RoomDetailPage() {
   const { t } = useTranslation()
   const { id, locale } = useParams<{ id: string; locale: string }>()
   const router = useRouter()
-  const { formatCurrency, formatTotals } = useCurrency()
   const roomDetail = useResource(`/api/rooms/${id}/history`, () => fetchRoomDetail(id))
   const data = roomDetail.data ?? null
   const history = data?.statusHistory ?? EMPTY_HISTORY
@@ -317,7 +317,7 @@ export function RoomDetailPage() {
 
           <div className="mt-8 grid gap-px overflow-hidden rounded-lg border border-[#EAEAEA] bg-[#EAEAEA] sm:grid-cols-4">
             {[
-              { label: t('rooms.detail.nightlyRate'), value: formatCurrency(Number(room.price)) },
+              { label: t('rooms.detail.nightlyRate'), value: <MoneyAmount inline amount={Number(room.price)} /> },
               { label: t('rooms.detail.capacity'), value: `${room.capacity} ${room.capacity === 1 ? t('rooms.detail.guest') : t('rooms.detail.guests')}` },
               { label: t('rooms.detail.floor'), value: `${room.floor}` },
               { label: t('rooms.detail.status'), value: t('bookings.roomStatus.' + room.status) },
@@ -345,8 +345,8 @@ export function RoomDetailPage() {
 
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            { label: t('rooms.detail.totalRevenue'), value: formatTotals(data.revenue?.total ?? []), tint: 'bg-[#EDF3EC]' },
-            { label: t('rooms.detail.nightlyRate'), value: formatCurrency(Number(room.price)), tint: 'bg-indigo-50' },
+            { label: t('rooms.detail.totalRevenue'), value: <MoneyTotals value={data.revenue?.total} />, tint: 'bg-[#EDF3EC]' },
+            { label: t('rooms.detail.nightlyRate'), value: <MoneyAmount amount={Number(room.price)} />, tint: 'bg-indigo-50' },
             { label: t('rooms.detail.roomType'), value: room.roomType?.name ?? '—', tint: 'bg-[#FBF3DB]' },
             { label: t('rooms.detail.upcoming'), value: data.upcomingReservations.length, tint: 'bg-violet-50' },
           ].map((card) => (

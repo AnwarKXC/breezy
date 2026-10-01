@@ -14,6 +14,7 @@ import { downloadInvoicePdf } from '../utils/invoicePdfExport'
 import { formatDate, formatDateTime } from '@/shared/utils/date'
 import type { Invoice, Payment } from '../types'
 import { INVOICE_STATUS_LABELS, INVOICE_ITEM_TYPE_LABELS, PAYMENT_METHOD_LABELS, LEDGER_TYPE_LABELS } from '../types'
+import { MoneyAmount } from '@/shared/components/MoneyTotals'
 
 interface Props {
   invoiceId: string
@@ -168,7 +169,7 @@ export function InvoiceDetailModal({ invoiceId, t, onClose, onEdit }: Props) {
                 {issuing ? t('accounting.invoices.issuing') : t('accounting.invoices.issue')}
               </button>
             )}
-            {(invoice.status === 'draft' || invoice.status === 'issued') && (
+            {invoice.status === 'draft' && (
               <button
                 onClick={() => onEdit(invoice)}
                 className="h-8 rounded-lg border border-[#D4D4D4] px-3 text-xs font-medium text-[#333333] hover:bg-[#F9F9F8]"
@@ -236,10 +237,10 @@ export function InvoiceDetailModal({ invoiceId, t, onClose, onEdit }: Props) {
             <div className="space-y-4">
               <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                 {[
-                  { label: t('accounting.invoices.total'), value: fmt(invoice.amount), tone: 'text-[#1A1A1A]' },
-                  { label: t('accounting.invoices.paid'), value: fmt(invoice.paidAmount), tone: 'text-[#346538]' },
-                  { label: t('accounting.invoices.balance'), value: fmt(invoice.remainingBalance), tone: invoice.remainingBalance > 0 ? 'text-amber-600' : 'text-[#1A1A1A]' },
-                  { label: t('accounting.invoices.refund'), value: fmt(invoice.refundedAmount), tone: 'text-[#9F2F2D]' },
+                  { label: t('accounting.invoices.total'), value: <MoneyAmount amount={invoice.amount} currency={currentInvoice?.currency} />, tone: 'text-[#1A1A1A]' },
+                  { label: t('accounting.invoices.paid'), value: <MoneyAmount amount={invoice.paidAmount} currency={currentInvoice?.currency} />, tone: 'text-[#346538]' },
+                  { label: t('accounting.invoices.balance'), value: <MoneyAmount amount={invoice.remainingBalance} currency={currentInvoice?.currency} />, tone: invoice.remainingBalance > 0 ? 'text-amber-600' : 'text-[#1A1A1A]' },
+                  { label: t('accounting.invoices.refund'), value: <MoneyAmount amount={invoice.refundedAmount} currency={currentInvoice?.currency} />, tone: 'text-[#9F2F2D]' },
                 ].map((item) => (
                   <div key={item.label} className="rounded-xl border border-[#EAEAEA] bg-white p-3">
                     <p className="text-xs font-medium text-[#787774]">{item.label}</p>
@@ -373,7 +374,7 @@ export function InvoiceDetailModal({ invoiceId, t, onClose, onEdit }: Props) {
                   )}
                   <div className="flex justify-between border-t pt-2 text-base font-semibold">
                     <span>{t('accounting.invoices.total')}</span>
-                    <span>{fmt(invoice.amount)}</span>
+                    <MoneyAmount inline amount={invoice.amount} currency={currentInvoice?.currency} />
                   </div>
                   <div className="flex justify-between">
                     <span className="text-[#346538]">{t('accounting.invoices.paid')}</span>
@@ -390,7 +391,7 @@ export function InvoiceDetailModal({ invoiceId, t, onClose, onEdit }: Props) {
                       {t('accounting.invoices.detail.outstandingBalance')}
                     </span>
                     <span className={invoice.remainingBalance > 0 ? 'font-medium text-amber-600' : ''}>
-                      {fmt(invoice.remainingBalance)}
+                      <MoneyAmount inline amount={invoice.remainingBalance} currency={currentInvoice?.currency} />
                     </span>
                   </div>
                 </div>

@@ -13,6 +13,7 @@ import { InvoiceWizardStepCharges } from './InvoiceWizardStepCharges'
 import { InvoiceWizardStepPayment } from './InvoiceWizardStepPayment'
 import { InvoiceWizardStepConfirm } from './InvoiceWizardStepConfirm'
 import type { Invoice, InvoiceItem, WizardMode } from '../types'
+import { MoneyAmount } from '@/shared/components/MoneyTotals'
 
 interface Props {
   t: (key: string) => string
@@ -319,7 +320,7 @@ export function InvoiceComposerModal({
         <div className="mt-4 flex shrink-0 flex-col gap-3 border-t border-[#EAEAEA] bg-white pt-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="text-sm">
             <span className="text-[#787774]">{t('accounting.invoices.wizard.amountDue')}</span>
-            <span className="ml-2 font-bold text-[#1A1A1A]">{formatCurrency(computed.balanceDue)}</span>
+            <span className="ml-2 font-bold text-[#1A1A1A]"><MoneyAmount inline amount={computed.balanceDue} /></span>
           </div>
           <div className="flex flex-wrap justify-end gap-2">
             <button

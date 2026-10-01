@@ -5,13 +5,14 @@ import { fetchData, useResource } from '@/shared/data/useResource'
 import { Table } from '@/shared/components/Table'
 import type { TableColumn } from '@/shared/table/types'
 import { FloatingInput } from '@/shared/components/FloatingField'
-import { useCurrency } from '@/shared/contexts/CurrencyContext'
 
 import { useLocale } from '@/i18n/components/LocaleContext'
 import { formatDateTime } from '@/shared/utils/date'
 import type { Payment, PaymentMethod, Invoice } from '../types'
 import { PAYMENT_METHOD_LABELS } from '../types'
 import { downloadInvoicePdf } from '../utils/invoicePdfExport'
+import { MoneyTotals } from '@/shared/components/MoneyTotals'
+import { MoneyAmount } from '@/shared/components/MoneyTotals'
 
 const EMPTY_PAYMENTS: Payment[] = []
 
@@ -20,7 +21,6 @@ interface Props {
 }
 
 export function PaymentsTab({ t }: Props) {
-  const { formatCurrency, formatTotals } = useCurrency()
   const locale = useLocale()
   const [fromDate, setFromDate] = useState('')
   const [toDate, setToDate] = useState('')
@@ -50,7 +50,7 @@ export function PaymentsTab({ t }: Props) {
     }
   }, [locale])
 
-  const totals = formatTotals(payments.map((p) => ({ amount: Number(p.amount), currency: p.currency })))
+  const totals = payments.map((p) => ({ amount: Number(p.amount), currency: p.currency }))
 
   const columns: TableColumn<Payment>[] = useMemo(() => [
     {
@@ -64,7 +64,7 @@ export function PaymentsTab({ t }: Props) {
       sortable: true,
       render: (v, row) => {
         const amt = Number(v)
-        return <span className={amt < 0 ? 'text-[#9F2F2D]' : 'text-green-600'}>{formatCurrency(amt, row.currency)}</span>
+        return <span className={amt < 0 ? 'text-[#9F2F2D]' : 'text-green-600'}><MoneyAmount amount={amt} currency={row.currency} /></span>
       },
     },
     {
@@ -102,7 +102,7 @@ export function PaymentsTab({ t }: Props) {
       label: t('common.date'),
       render: (v) => v ? formatDateTime(v as string, locale) : '',
     },
-  ], [t, formatCurrency, printingId, handlePrintPdf, locale])
+  ], [t, printingId, handlePrintPdf, locale])
 
   return (
     <div className="space-y-6">
@@ -143,7 +143,7 @@ export function PaymentsTab({ t }: Props) {
 
       <div className="rounded-xl border border-[#EAEAEA] bg-white p-5 space-y-1">
         <p className="text-xs text-[#787774]">{t('accounting.finance.totalRevenue')}</p>
-        <p className="text-2xl font-bold text-[#1A1A1A]">{totals}</p>
+        <p className="text-2xl font-bold text-[#1A1A1A]"><MoneyTotals value={totals} /></p>
       </div>
 
       <Table

@@ -10,7 +10,7 @@ import { ExpenseReportSection } from './ExpenseReportSection'
 import { ExpenseFormModal } from './ExpenseFormModal'
 import { ToolbarViewToggle } from '@/shared/components/toolbar'
 import { DeleteConfirmationDialog } from '@/shared/components/DeleteConfirmationDialog'
-import { useCurrency } from '@/shared/contexts/CurrencyContext'
+import { expenseTotals, formatExpenseTotals } from '../utils/expenseMoney'
 import { useLocale } from '@/i18n/components/LocaleContext'
 import type { CreateExpenseInput, CreateExpenseCategoryInput } from '../types'
 import {
@@ -25,7 +25,6 @@ interface ExpenseManagerProps {
 }
 
 export function ExpenseManager({ t }: ExpenseManagerProps) {
-  const { formatCurrency } = useCurrency()
   const locale = useLocale()
   const [period, setPeriod] = useState<ExpensePeriodType | null>('month')
   const [periodValue, setPeriodValue] = useState(() => defaultPeriodValue('month'))
@@ -105,14 +104,14 @@ export function ExpenseManager({ t }: ExpenseManagerProps) {
   )
 
   const totalForMonth = useMemo(
-    () => filteredExpenses.reduce((sum, e) => sum + Number(e.amount), 0),
+    () => expenseTotals(filteredExpenses),
     [filteredExpenses],
   )
 
   const categorySummaries = useMemo(() => {
     return expenseCategories.map((cat) => {
       const catExpenses = filteredExpenses.filter((e) => e.categoryId === cat.id)
-      const total = catExpenses.reduce((sum, e) => sum + Number(e.amount), 0)
+      const total = expenseTotals(catExpenses)
       return { id: cat.id, name: cat.name, nameAr: cat.nameAr, entries: catExpenses.length, total }
     })
   }, [expenseCategories, filteredExpenses])
@@ -219,7 +218,7 @@ export function ExpenseManager({ t }: ExpenseManagerProps) {
 
   // ─── Category detail view ────────────────────────────
   if (selectedCategoryId && selectedCategory) {
-    const catTotal = categoryExpenses.reduce((sum, e) => sum + Number(e.amount), 0)
+    const catTotal = expenseTotals(categoryExpenses)
     const displayExpenses = selectedCategoryId ? categoryExpenses : filteredExpenses
 
     return (
@@ -247,7 +246,7 @@ export function ExpenseManager({ t }: ExpenseManagerProps) {
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5 rounded-lg border border-[#EAEAEA] bg-white px-4 py-2">
               <span className="text-xs text-[#787774]">{t('accounting.expenses.analyticsTotal')}:</span>
-              <span className="text-sm font-bold">{formatCurrency(catTotal)}</span>
+              <span className="text-sm font-bold">{formatExpenseTotals(catTotal)}</span>
             </div>
             <button
               type="button"
@@ -370,6 +369,7 @@ export function ExpenseManager({ t }: ExpenseManagerProps) {
 
       <ExpenseAnalyticsCards
         total={totalForMonth}
+        averages={totalForMonth.map((total) => ({ ...total, amount: total.amount / filteredExpenses.filter((expense) => (expense.currency ?? 'UNKNOWN') === total.currency).length }))}
         entriesCount={filteredExpenses.length}
         categoriesCount={categoriesCount}
         t={t}
@@ -421,7 +421,7 @@ export function ExpenseManager({ t }: ExpenseManagerProps) {
                       )}
                     </td>
                     <td className="px-4 py-3 text-right text-sm text-[#555555]">{cat.entries}</td>
-                    <td className="px-4 py-3 text-right text-sm font-medium text-[#1A1A1A]">{formatCurrency(cat.total)}</td>
+                    <td className="px-4 py-3 text-right text-sm font-medium text-[#1A1A1A]">{formatExpenseTotals(cat.total)}</td>
                     <td className="px-4 py-3 text-right">
                       <button
                         type="button"
@@ -465,7 +465,7 @@ export function ExpenseManager({ t }: ExpenseManagerProps) {
                   {cat.nameAr ? (
                     <p className="mt-1 text-xs text-[#787774]" dir="rtl">{cat.nameAr}</p>
                   ) : null}
-                  <p className="mt-3 text-lg font-bold text-[#1A1A1A]">{formatCurrency(cat.total)}</p>
+                  <p className="mt-3 text-lg font-bold text-[#1A1A1A]">{formatExpenseTotals(cat.total)}</p>
                 </div>
                 <button
                   type="button"

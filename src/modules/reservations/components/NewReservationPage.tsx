@@ -14,6 +14,7 @@ import { NewContactModal } from './NewContactModal'
 import { useCurrency } from '@/shared/contexts/CurrencyContext'
 import { CURRENCY_CODES, type CurrencyCode } from '@/shared/static/currencies'
 import { CURRENCY_LABELS } from '@/shared/utils/types'
+import { MoneyAmount } from '@/shared/components/MoneyTotals'
 
 interface ContactResult {
   id: string
@@ -823,7 +824,7 @@ export function NewReservationPage() {
                   {/* Total */}
                   <div className="flex items-center justify-between border-t border-[#EAEAEA] pt-2">
                     <span className="text-xs font-semibold uppercase tracking-widest text-[#787774]">{t('common.total')}</span>
-                    <span className="text-sm font-semibold text-[#1A1A1A]">{formatCurrency(estimatedTotal)}</span>
+                    <span className="text-sm font-semibold text-[#1A1A1A]"><MoneyAmount inline amount={estimatedTotal} /></span>
                   </div>
                 </div>
               )}

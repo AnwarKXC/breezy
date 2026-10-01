@@ -2,9 +2,9 @@
 
 import { useEffect, useRef } from 'react'
 import type { Invoice } from '../types/invoiceTypes'
-import { useCurrency } from '@/shared/contexts/CurrencyContext'
 import { useLocale } from '@/i18n/components/LocaleContext'
 import { formatDate, formatDateTime } from '@/shared/utils/date'
+import { MoneyAmount } from '@/shared/components/MoneyTotals'
 
 interface InvoiceModalProps {
   invoice: Invoice
@@ -23,7 +23,6 @@ function statusColor(status: string): string {
 }
 
 export function InvoiceModal({ invoice, labels, onClose }: InvoiceModalProps) {
-  const { formatCurrency } = useCurrency()
   const locale = useLocale()
   const overlayRef = useRef<HTMLDivElement>(null)
 
@@ -66,7 +65,7 @@ export function InvoiceModal({ invoice, labels, onClose }: InvoiceModalProps) {
           </div>
           <div className="flex justify-between">
             <dt className="text-sm font-medium text-[#787774]">{labels.amount}</dt>
-            <dd className="text-sm font-semibold text-[#1A1A1A]">{formatCurrency(Number(invoice.amount), invoice.currency)}</dd>
+            <dd className="text-sm font-semibold text-[#1A1A1A]"><MoneyAmount inline amount={Number(invoice.amount)} currency={invoice.currency} /></dd>
           </div>
           <div className="flex justify-between items-center">
             <dt className="text-sm font-medium text-[#787774]">{labels.status}</dt>

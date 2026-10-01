@@ -5,7 +5,7 @@ import { Table } from '@/shared/table'
 import type { TableColumn } from '@/shared/table'
 import type { FinanceRow } from '../types'
 import type { Money } from '@/shared/currency/money'
-import { useCurrency } from '@/shared/contexts/CurrencyContext'
+import { MoneyTotals } from '@/shared/components/MoneyTotals'
 
 interface FinanceTableProps {
   rows: FinanceRow[]
@@ -15,7 +15,6 @@ interface FinanceTableProps {
 }
 
 export function FinanceTable({ rows, loading, onRowClick, t }: FinanceTableProps) {
-  const { formatTotals } = useCurrency()
   const columns: TableColumn[] = useMemo(
     () => [
       { key: 'contactName', label: t('accounting.finance.contact'), sortable: true },
@@ -24,13 +23,13 @@ export function FinanceTable({ rows, loading, onRowClick, t }: FinanceTableProps
         key: 'totalInvoiced',
         label: t('accounting.finance.invoiced'),
         sortable: false,
-        render: (v) => formatTotals(v as Money),
+        render: (v) => <MoneyTotals value={v as Money} />,
       },
       {
         key: 'totalPaid',
         label: t('accounting.finance.paid'),
         sortable: false,
-        render: (v) => formatTotals(v as Money),
+        render: (v) => <MoneyTotals value={v as Money} />,
       },
       {
         key: 'balance',
@@ -40,13 +39,13 @@ export function FinanceTable({ rows, loading, onRowClick, t }: FinanceTableProps
           const balance = v as Money
           return (
             <span className={balance.some((m) => m.amount > 0) ? 'text-[#9F2F2D] font-medium' : 'text-green-600 font-medium'}>
-              {formatTotals(balance)}
+              <MoneyTotals value={balance} />
             </span>
           )
         },
       },
     ],
-    [t, formatTotals],
+    [t],
   )
 
   return (

@@ -42,7 +42,7 @@ const LIST_PAGE_SIZES = [20, 50, 100] as const
 export function BookingsPage() {
   const router = useRouter()
   const { t, locale } = useTranslation()
-  const { formatCurrency, formatTotals } = useCurrency()
+  const { formatCurrency } = useCurrency()
   const canCreateReservation = useCan(ACTIONS.RESERVATIONS_CREATE)
   // Active stays feed the room grid and stats; the table pages through the server.
   const { bookings, loading: bookingsLoading, fetchBookings: refreshActiveBookings } = useBookings()
@@ -488,7 +488,6 @@ export function BookingsPage() {
           />
           <BookingStatsCards
             bookings={displayAllBookings}
-            formatTotals={formatTotals}
             loading={bookingsLoading}
           />
         </div>

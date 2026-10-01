@@ -61,6 +61,15 @@ export function LogsIcon() {
   );
 }
 
+export function AssistantIcon() {
+  return (
+    <svg className={iconClass} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M21 12a8 8 0 0 1-11.8 7.04L4 20l1.1-4.4A8 8 0 1 1 21 12Z" />
+      <path d="M9.5 9.5 12 8l2.5 1.5M9 13.5h6" />
+    </svg>
+  );
+}
+
 export function SettingsIcon() {
   return (
     <svg className={iconClass} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

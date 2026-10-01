@@ -55,6 +55,7 @@ export const ACTIONS = {
   RESERVATIONS_RECORD_PAYMENT: 'reservations:record_payment',
   RESERVATIONS_REFUND: 'reservations:refund',
   RESERVATIONS_VIEW_AUDIT: 'reservations:view_audit',
+  AI_CHAT: 'ai:chat',
 } as const
 
 export type ActionPermission = (typeof ACTIONS)[keyof typeof ACTIONS]
@@ -65,7 +66,9 @@ export const ACTION_PERMISSIONS = Object.values(ACTIONS) as readonly ActionPermi
 // Accountant has the full reservation lifecycle like admin (DB RLS matches:
 // can_write_reservations() includes accountant since migration
 // 20260822000001, and rooms status updates since 20260822000002).
-const ACCOUNTANT_ACTIONS: readonly ActionPermission[] = ACTION_PERMISSIONS
+// The AI data assistant is admin-only for now.
+const ADMIN_ONLY_ACTIONS: readonly ActionPermission[] = [ACTIONS.AI_CHAT]
+const ACCOUNTANT_ACTIONS: readonly ActionPermission[] = ACTION_PERMISSIONS.filter((action) => !ADMIN_ONLY_ACTIONS.includes(action))
 
 const FRONT_DESK_ACTIONS: readonly ActionPermission[] = [
   ACTIONS.DASHBOARD_READ,

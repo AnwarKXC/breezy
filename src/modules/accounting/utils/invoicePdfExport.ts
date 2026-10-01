@@ -1,4 +1,4 @@
-import { applyPdfFonts, buildArabicDocDef, formatCurrency as formatPdfCurrency, formatPdfDate, getPdfMake, getQrCodeDataUrl, injectRTLOptions } from '@/shared/utils/pdfMake'
+import { applyPdfFonts, buildArabicDocDef, formatCurrency as formatPdfCurrency, formatPdfDate, getPdfMake, injectRTLOptions } from '@/shared/utils/pdfMake'
 import { formatDate } from '@/shared/utils/date'
 
 function downloadBuffer(buffer: ArrayBuffer, fileName: string) {
@@ -12,7 +12,7 @@ function downloadBuffer(buffer: ArrayBuffer, fileName: string) {
 }
 import type { Invoice, InvoiceItem, Payment } from '../types'
 import { INVOICE_ITEM_TYPE_LABELS, INVOICE_STATUS_LABELS, PAYMENT_METHOD_LABELS } from '../types'
-import type { PublicBranding } from '@/shared/branding/branding'
+import { loadPdfBranding, pdfQrNode } from '@/shared/branding/pdfBranding'
 
 type InvoiceForPdf = Invoice & { payments?: Payment[] }
 
@@ -35,44 +35,188 @@ export function getInvoicePdfTotals(invoice: Pick<Invoice, 'amount' | 'subtotal'
   return { subtotal, tax, vat }
 }
 
-export async function enrichInvoiceItemsForPdf(
-  invoice: Pick<Invoice, 'notes'>,
-  items: InvoiceItem[],
+export type PdfInvoiceItem = InvoiceItem & {
+  roomNumber?: string
+  occupancyCode?: string
+  nights?: number
+  ratePerNight?: number
+  checkIn?: string
+  checkOut?: string
+}
+
+export type PdfReservationRoom = {
+  id?: string
+  room_number?: string | null
+  occupancy_code?: string | null
+  adults?: number | null
+  children?: number | null
+  nights?: number | null
+  rate_per_night?: number | string | null
+  check_in_date?: string | null
+  check_out_date?: string | null
+  status?: string | null
+  room_type?: { name?: string | null } | null
+}
+
+export type PdfReservation = {
+  reservation_number?: string | null
+  rooms: PdfReservationRoom[]
+  guests: Array<{ reservation_room_id?: string | null; full_name?: string | null; is_primary?: boolean | null }>
+}
+
+/** The reservation behind an invoice (rooms + guests), or null when unlinked/unavailable. */
+export async function fetchReservationForPdf(
+  invoice: Pick<Invoice, 'notes'> & { reservationId?: string | null },
   fetcher: typeof fetch = fetch,
-): Promise<InvoiceItem[]> {
-  if (items.every((item) => item.type !== 'room_charge' || (item.roomTypeName && item.occupancy != null))) {
-    return items
-  }
-
-  const reservationId = invoice.notes?.match(/reservation\s+([0-9a-f-]{36})/i)?.[1]
-  if (!reservationId) return items
-
+): Promise<PdfReservation | null> {
+  const reservationId = invoice.reservationId ?? invoice.notes?.match(/reservation\s+([0-9a-f-]{36})/i)?.[1]
+  if (!reservationId) return null
   try {
     const response = await fetcher(`/api/reservations/${reservationId}`)
-    if (!response.ok) return items
-    const json = await response.json()
-    const rooms = (json.data?.rooms ?? []) as Array<{
-      adults?: number | null
-      children?: number | null
-      room?: { number?: string | null } | null
-      room_type?: { name?: string | null } | null
-    }>
-    const byNumber = new Map(rooms.map((room) => [room.room?.number, room]))
-
-    return items.map((item) => {
-      if (item.type !== 'room_charge') return item
-      const roomNumber = item.description.match(/Room\s+(\S+)/)?.[1]
-      const room = roomNumber ? byNumber.get(roomNumber) : undefined
-      if (!room) return item
-      return {
-        ...item,
-        roomTypeName: room.room_type?.name ?? item.roomTypeName,
-        occupancy: Number(room.adults ?? 0) + Number(room.children ?? 0),
-      }
-    })
+    if (!response.ok) return null
+    const data = (await response.json()).data
+    if (!data) return null
+    return {
+      reservation_number: data.reservation_number ?? null,
+      rooms: ((data.rooms ?? []) as PdfReservationRoom[]).filter((r) => r.status !== 'cancelled'),
+      guests: data.guests ?? [],
+    }
   } catch {
-    return items
+    return null
   }
+}
+
+/**
+ * Attach room number / type / occupancy / nights / rate to room-charge lines.
+ * Lines are matched by the room number in their description, and otherwise
+ * (generic "Room charge" lines) to the first unused room with the same total.
+ */
+export function matchItemsToRooms(items: InvoiceItem[], rooms: PdfReservationRoom[]): PdfInvoiceItem[] {
+  const unused = new Set(rooms)
+  const roomTotal = (r: PdfReservationRoom) => Number(r.rate_per_night ?? 0) * Math.max(1, Number(r.nights ?? 1))
+
+  return items.map((item) => {
+    if (item.type !== 'room_charge') return item
+    const number = item.description.match(/^Room\s+(\S+)\s+-/)?.[1]
+    const room = [...unused].find((r) => (number ? r.room_number === number : Math.abs(roomTotal(r) - item.totalPrice) < 0.01))
+    if (!room) return item
+    unused.delete(room)
+    return {
+      ...item,
+      roomNumber: room.room_number ?? undefined,
+      roomTypeName: room.room_type?.name ?? item.roomTypeName,
+      occupancyCode: room.occupancy_code ?? undefined,
+      occupancy: Number(room.adults ?? 0) + Number(room.children ?? 0),
+      nights: Math.max(1, Number(room.nights ?? 1)),
+      ratePerNight: Number(room.rate_per_night ?? 0),
+      checkIn: room.check_in_date?.slice(0, 10),
+      checkOut: room.check_out_date?.slice(0, 10),
+    }
+  })
+}
+
+export async function enrichInvoiceItemsForPdf(
+  invoice: Pick<Invoice, 'notes'> & { reservationId?: string | null },
+  items: InvoiceItem[],
+  fetcher: typeof fetch = fetch,
+): Promise<PdfInvoiceItem[]> {
+  if (!items.some((item) => item.type === 'room_charge')) return items
+  const reservation = await fetchReservationForPdf(invoice, fetcher)
+  return reservation ? matchItemsToRooms(items, reservation.rooms) : items
+}
+
+type LineRow = {
+  title: string
+  details: string[]
+  qty: number
+  nights: number | null
+  unitPrice: number
+  total: number
+}
+
+const OCCUPANCY_NAMES = {
+  en: { S: 'Single', D: 'Double', T: 'Triple' },
+  ar: { S: 'فردية', D: 'مزدوجة', T: 'ثلاثية' },
+} as const
+
+/**
+ * Turn raw invoice lines into printable rows: identical room charges collapse
+ * into one "N rooms" row, and service/tax lines are dropped (they print in the
+ * totals block instead of being counted twice).
+ */
+export function buildInvoiceLineRows(
+  items: PdfInvoiceItem[],
+  opts: {
+    stayNights: number | null
+    itemLabel: (type: string) => string
+    isRTL: boolean
+    /** Reservation stay; rooms whose own dates differ (extended/shortened) print them. */
+    stay?: { checkIn: string | null; checkOut: string | null }
+    formatDate?: (value: string) => string
+  },
+): LineRow[] {
+  const rows: LineRow[] = []
+  const roomGroups = new Map<string, { row: LineRow; rooms: string[]; ownDates: string }>()
+  const w = opts.isRTL
+    ? { room: 'غرفة', rooms: 'غرف', night: 'ليلة', nights: 'ليالٍ' }
+    : { room: 'Room', rooms: 'rooms', night: 'night', nights: 'nights' }
+  const day = (d: string | null | undefined) => d?.slice(0, 10) ?? ''
+  const fmt = opts.formatDate ?? ((d: string) => d)
+  const occNames = OCCUPANCY_NAMES[opts.isRTL ? 'ar' : 'en']
+
+  for (const item of items) {
+    if (item.type === 'service_charge' || item.type === 'tax') continue
+    const label = opts.itemLabel(item.type)
+    const genericDescription = !item.description || item.description.trim().toLowerCase() === label.toLowerCase()
+
+    if (item.type !== 'room_charge') {
+      rows.push({
+        title: label,
+        details: genericDescription ? [] : [item.description],
+        qty: item.quantity,
+        nights: null,
+        unitPrice: item.unitPrice,
+        total: item.totalPrice,
+      })
+      continue
+    }
+
+    const nights = item.nights ?? opts.stayNights ?? (item.quantity > 1 ? item.quantity : null)
+    const rate = item.ratePerNight ?? (nights ? item.totalPrice / nights : item.totalPrice)
+    const occ = item.occupancyCode && item.occupancyCode in occNames ? occNames[item.occupancyCode as keyof typeof occNames] : null
+    const title = [item.roomTypeName, occ].filter(Boolean).join(' · ') || label
+    const ownDates =
+      item.checkIn && item.checkOut && opts.stay
+      && (item.checkIn !== day(opts.stay.checkIn) || item.checkOut !== day(opts.stay.checkOut))
+        ? `${fmt(item.checkIn)} – ${fmt(item.checkOut)}`
+        : ''
+    const key = [title, nights, rate.toFixed(2), item.totalPrice.toFixed(2), ownDates].join('|')
+
+    let group = roomGroups.get(key)
+    if (!group) {
+      group = { row: { title, details: [], qty: 0, nights, unitPrice: rate, total: 0 }, rooms: [], ownDates }
+      roomGroups.set(key, group)
+      rows.push(group.row)
+    }
+    group.row.qty += 1
+    group.row.total += item.totalPrice
+    if (item.roomNumber) group.rooms.push(item.roomNumber)
+  }
+
+  for (const { row, rooms, ownDates } of roomGroups.values()) {
+    const sorted = [...rooms].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+    const count = row.qty > 1 ? `${row.qty} ${w.rooms}` : `1 ${w.room.toLowerCase()}`
+    const nightsText = row.nights ? ` × ${row.nights} ${row.nights === 1 ? w.night : w.nights}` : ''
+    row.details.push(`${count}${nightsText}${ownDates ? ` · ${ownDates}` : ''}`)
+    if (sorted.length) row.details.push(sorted.join(', '))
+  }
+  return rows
+}
+
+/** "VAT (14%)" style label from the invoice's own service/tax line, if any. */
+function percentLabel(items: InvoiceItem[], type: string, fallback: string): string {
+  const pct = items.find((i) => i.type === type)?.description.match(/\(([\d.]+%)\)/)?.[1]
+  return pct ? `${fallback} (${pct})` : fallback
 }
 
 
@@ -96,11 +240,6 @@ function computeNights(checkIn: string | null | undefined, checkOut: string | nu
   return Math.max(1, Math.round(diff / 86_400_000))
 }
 
-function computePerNightPrice(total: number, nights: number | null): number | null {
-  if (!nights || nights <= 0) return null
-  return total / nights
-}
-
 // ── Brand palette from logo (sage green #5E6B57 refined) ──
 const C = {
   green: '#4A5B48',
@@ -115,43 +254,6 @@ const C = {
   warning: '#D97706',
   danger: '#DC2626',
 } as const
-
-// ── Organization branding (name, logo, contacts from Settings > Organization) ──
-async function loadBranding(): Promise<PublicBranding | null> {
-  try {
-    const res = await fetch('/api/branding')
-    if (!res.ok) return null
-    return ((await res.json()) as { data?: PublicBranding }).data ?? null
-  } catch {
-    return null
-  }
-}
-
-// ── Logo loading (cached per URL within page lifecycle) ──
-const logoDataUriPromises = new Map<string, Promise<string>>()
-
-function arrayBufferToBase64(buf: ArrayBuffer): string {
-  const bytes = new Uint8Array(buf)
-  let binary = ''
-  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i])
-  return btoa(binary)
-}
-
-// pdfmake only embeds PNG and JPEG.
-async function loadLogoDataUri(url: string): Promise<string> {
-  let promise = logoDataUriPromises.get(url)
-  if (!promise) {
-    promise = fetch(url).then(async (r) => {
-      if (!r.ok) throw new Error('Logo not found')
-      const type = r.headers.get('content-type') ?? ''
-      if (type !== 'image/png' && type !== 'image/jpeg') throw new Error('Unsupported logo type: ' + type)
-      return `data:${type};base64,${arrayBufferToBase64(await r.arrayBuffer())}`
-    })
-    promise.catch(() => logoDataUriPromises.delete(url))
-    logoDataUriPromises.set(url, promise)
-  }
-  return promise
-}
 
 const EN_INVOICE_PDF_LABELS = {
   taxInvoice: "Invoice",
@@ -175,7 +277,11 @@ const EN_INVOICE_PDF_LABELS = {
   subtotal: "Subtotal",
   discount: "Discount",
   tax: "Tax",
+  serviceCharge: "Service charge",
   vat: "VAT",
+  nightsHeader: "Nights",
+  ratePerNight: "Rate / Night",
+  confirmationNo: "Confirmation No.",
   paid: "Paid",
   refunded: "Refunded",
   balanceDue: "Balance Due",
@@ -186,6 +292,7 @@ const EN_INVOICE_PDF_LABELS = {
   notes: "NOTES",
   internal: "Internal",
   thankYou: "Thank you for your stay",
+  taxId: "Tax Reg. No.",
   page: "Page",
   of: "of",
 } as const
@@ -213,6 +320,10 @@ const AR_INVOICE_PDF_LABELS: Record<keyof typeof EN_INVOICE_PDF_LABELS, string> 
   discount: "\u0627\u0644\u062e\u0635\u0645",
   tax: "\u0627\u0644\u0636\u0631\u064a\u0628\u0629",
   vat: "\u0636\u0631\u064a\u0628\u0629 \u0627\u0644\u0642\u064a\u0645\u0629 \u0627\u0644\u0645\u0636\u0627\u0641\u0629",
+  serviceCharge: "رسوم الخدمة",
+  nightsHeader: "الليالي",
+  ratePerNight: "سعر الليلة",
+  confirmationNo: "رقم التأكيد",
   paid: "\u0627\u0644\u0645\u062f\u0641\u0648\u0639",
   refunded: "\u0627\u0644\u0645\u0633\u062a\u0631\u062f",
   balanceDue: "\u0627\u0644\u0631\u0635\u064a\u062f \u0627\u0644\u0645\u0633\u062a\u062d\u0642",
@@ -223,6 +334,7 @@ const AR_INVOICE_PDF_LABELS: Record<keyof typeof EN_INVOICE_PDF_LABELS, string> 
   notes: "\u0645\u0644\u0627\u062d\u0638\u0627\u062a",
   internal: "\u062f\u0627\u062e\u0644\u064a",
   thankYou: "\u0634\u0643\u0631\u064b\u0627 \u0644\u0625\u0642\u0627\u0645\u062a\u0643",
+  taxId: "رقم التسجيل الضريبي",
   page: "\u0635\u0641\u062d\u0629",
   of: "\u0645\u0646",
 }
@@ -280,29 +392,23 @@ export async function downloadInvoicePdf(invoice: InvoiceForPdf, locale: string)
   const statusLabel = isRTL
     ? AR_INVOICE_STATUS_LABELS[invoice.status] ?? invoice.status
     : INVOICE_STATUS_LABELS[invoice.status] ?? invoice.status
-  let items = invoice.items ?? []
+  const rawItems = invoice.items ?? []
   const payments = invoice.payments ?? []
   const pdfTotals = getInvoicePdfTotals(invoice)
-  items = await enrichInvoiceItemsForPdf(invoice, items)
+  const reservation = await fetchReservationForPdf(invoice)
+  const resRooms = reservation?.rooms ?? []
+  const items = reservation ? matchItemsToRooms(rawItems, resRooms) : rawItems
 
   // ── Stay details ──
   const stayCheckIn = invoice.stayCheckIn ?? invoice.booking?.check_in ?? null
   const stayCheckOut = invoice.stayCheckOut ?? invoice.booking?.check_out ?? null
   const stayNights = computeNights(stayCheckIn, stayCheckOut)
 
-  // ── Load logo ──
-  const branding = await loadBranding()
-  let logoDataUri = ''
-  try {
-    logoDataUri = await loadLogoDataUri(branding?.hasCustomLogo ? branding.logoUrl : '/Profile_Picture_White.png')
-  } catch {
-    // Proceed without logo image
-  }
-  const brandName = (branding?.name || 'Breezy Hotel').toUpperCase()
-  // Until the organization is configured, keep the original hotel contact line.
-  const contactLines = branding && (branding.name || branding.email || branding.phones.length || branding.address)
-    ? [branding.email, branding.phones.join('  ·  '), branding.address].filter(Boolean)
-    : ['breezyislandresort@gmail.com']
+  // ── Organization identity (Settings > Organization) ──
+  const branding = await loadPdfBranding()
+  const { logoDataUri } = branding
+  const brandName = branding.name.toUpperCase()
+  const contactLines = [...branding.contactLines, ...(branding.taxId ? [`${labels.taxId} ${branding.taxId}`] : [])]
 
   // ── Cell helper ──
   function cell(
@@ -351,13 +457,7 @@ export async function downloadInvoicePdf(invoice: InvoiceForPdf, locale: string)
     width: '42%',
     stack: [
       { text: labels.taxInvoice, fontSize: 22, bold: true, color: C.green, alignment: titleAlignment },
-      {
-        text: invNumber,
-        fontSize: 8,
-        color: C.textMuted,
-        alignment: titleAlignment,
-        margin: [0, 4, 0, 0],
-      },
+      ...(branding.qr ? [{ ...pdfQrNode(branding.qr, titleAlignment, C.green), margin: [0, 6, 0, 0] }] : []),
     ],
   }
 
@@ -436,6 +536,14 @@ export async function downloadInvoicePdf(invoice: InvoiceForPdf, locale: string)
       { text: `${stayNights ?? '-'} ${labels.nights}`, fontSize: 8, color: C.textMuted, margin: [0, 2, 0, 0] },
     )
   }
+  if (reservation?.reservation_number) {
+    stayLines.push({
+      text: `${labels.confirmationNo} ${reservation.reservation_number}`,
+      fontSize: 8,
+      color: C.textMuted,
+      margin: [0, 4, 0, 0],
+    })
+  }
 
   const billToBlock = billToLines.length > 0 || stayLines.length > 0
     ? {
@@ -465,25 +573,36 @@ export async function downloadInvoicePdf(invoice: InvoiceForPdf, locale: string)
     : null
 
   // ── Line items table ──
-  const hasStayData = Boolean(stayCheckIn && stayCheckOut && stayNights)
-  const lineItemHeaderLabels = hasStayData
-    ? ['#', labels.description, labels.roomType, labels.occupancy, labels.nights, labels.perNight, labels.total]
-    : ['#', labels.description, labels.roomType, labels.occupancy, labels.quantity, labels.unitPrice, labels.total]
+  const lineRows = buildInvoiceLineRows(items, {
+    stayNights,
+    stay: { checkIn: stayCheckIn, checkOut: stayCheckOut },
+    formatDate: (d) => formatInvoiceDate(d),
+    isRTL,
+    itemLabel: (type) => (isRTL ? AR_INVOICE_ITEM_TYPE_LABELS[type] : INVOICE_ITEM_TYPE_LABELS[type]) ?? type,
+  })
+  const showNights = lineRows.some((r) => r.nights != null)
+  const lineItemHeaderLabels = [
+    '#',
+    labels.description,
+    labels.quantity,
+    showNights ? labels.nightsHeader : '',
+    showNights ? labels.ratePerNight : labels.unitPrice,
+    labels.total,
+  ]
 
   const lineItemHeaderRow = (isRTL ? [...lineItemHeaderLabels].reverse() : lineItemHeaderLabels).map((h) => ({
     text: h,
     fontSize: 8,
     color: C.white,
     bold: true,
-    alignment: h === labels.description || h === labels.roomType ? align : ('right' as const),
+    alignment: h === labels.description ? align : ('right' as const),
   }))
 
   const lineItemRows =
-    items.length === 0
+    lineRows.length === 0
       ? [
           [
-            { text: labels.noLineItems, colSpan: 7, alignment: align, fontSize: 9, color: C.textMuted, margin: [0, 4, 0, 4] },
-            {},
+            { text: labels.noLineItems, colSpan: 6, alignment: align, fontSize: 9, color: C.textMuted, margin: [0, 4, 0, 4] },
             {},
             {},
             {},
@@ -491,29 +610,20 @@ export async function downloadInvoicePdf(invoice: InvoiceForPdf, locale: string)
             {},
           ],
         ]
-      : items.map((item, i) => {
-          const isRoomCharge = item.type === 'room_charge'
-          const itemLabel = isRTL
-            ? AR_INVOICE_ITEM_TYPE_LABELS[item.type] ?? item.type
-            : INVOICE_ITEM_TYPE_LABELS[item.type] ?? item.type
-          const displayQuantity = isRoomCharge && hasStayData ? stayNights : item.quantity
-          const perNightPrice = isRoomCharge && hasStayData ? computePerNightPrice(item.totalPrice, stayNights) : null
-          const displayUnitPrice =
-            perNightPrice !== null
-              ? formatInvoiceCurrency(perNightPrice)
-              : formatInvoiceCurrency(item.unitPrice)
-          const displayDescription = item.description ? `${itemLabel}\n${item.description}` : itemLabel
-          const roomType = isRoomCharge && item.roomTypeName ? item.roomTypeName : (isRoomCharge ? '—' : '')
-          const occ = isRoomCharge && item.occupancy != null ? String(item.occupancy) : (isRoomCharge ? '—' : '')
-
+      : lineRows.map((r, i) => {
+          const description = {
+            stack: [
+              { text: r.title, fontSize: 9, bold: true, color: C.text, alignment: align },
+              ...r.details.map((d) => ({ text: d, fontSize: 8, color: C.textMuted, alignment: align, margin: [0, 2, 0, 0] })),
+            ],
+          }
           const row = [
             cell(String(i + 1), { alignment: 'right', color: C.textMuted }),
-            cell(displayDescription),
-            cell(roomType, { alignment: 'left', color: C.textMuted }),
-            cell(occ, { alignment: 'center', color: C.textMuted }),
-            cell(String(displayQuantity), { alignment: 'right' }),
-            cell(displayUnitPrice, { alignment: 'right' }),
-            cell(formatInvoiceCurrency(item.totalPrice), { alignment: 'right', bold: true }),
+            description,
+            cell(String(r.qty), { alignment: 'right' }),
+            cell(r.nights != null ? String(r.nights) : '', { alignment: 'right' }),
+            cell(formatInvoiceCurrency(r.unitPrice), { alignment: 'right' }),
+            cell(formatInvoiceCurrency(r.total), { alignment: 'right', bold: true }),
           ]
           return isRTL ? row.reverse() : row
         })
@@ -523,8 +633,8 @@ export async function downloadInvoicePdf(invoice: InvoiceForPdf, locale: string)
     table: {
       headerRows: 1,
       widths: isRTL
-        ? ['16%', '14%', '10%', '10%', '14%', '32%', '4%']
-        : ['4%', '32%', '14%', '10%', '10%', '14%', '16%'],
+        ? ['17%', '17%', '9%', '8%', '44%', '5%']
+        : ['5%', '44%', '8%', '9%', '17%', '17%'],
       body: [lineItemHeaderRow, ...lineItemRows],
     },
     layout: {
@@ -537,8 +647,8 @@ export async function downloadInvoicePdf(invoice: InvoiceForPdf, locale: string)
       vLineWidth: () => 0,
       paddingLeft: () => 8,
       paddingRight: () => 8,
-      paddingTop: () => 4,
-      paddingBottom: () => 4,
+      paddingTop: () => 6,
+      paddingBottom: () => 6,
     },
     margin: [0, 0, 0, 8],
   }
@@ -554,8 +664,8 @@ export async function downloadInvoicePdf(invoice: InvoiceForPdf, locale: string)
   const subRows = [
     totalRow(labels.subtotal, formatInvoiceCurrency(pdfTotals.subtotal)),
     ...(invoice.discount ? [totalRow(labels.discount, `-${formatInvoiceCurrency(invoice.discount)}`, { color: C.danger })] : []),
-    totalRow(labels.tax, formatInvoiceCurrency(pdfTotals.tax)),
-    totalRow(labels.vat, formatInvoiceCurrency(pdfTotals.vat)),
+    ...(pdfTotals.tax ? [totalRow(percentLabel(rawItems, 'service_charge', labels.serviceCharge), formatInvoiceCurrency(pdfTotals.tax))] : []),
+    ...(pdfTotals.vat ? [totalRow(percentLabel(rawItems, 'tax', labels.vat), formatInvoiceCurrency(pdfTotals.vat))] : []),
   ]
 
   const totalsBody = [
@@ -699,17 +809,7 @@ export async function downloadInvoicePdf(invoice: InvoiceForPdf, locale: string)
   }
 
   // ── Assemble content array ──
-  const qrCodeDataUrl = await getQrCodeDataUrl()
   const content: Record<string, unknown>[] = []
-  if (qrCodeDataUrl) {
-    // QR pinned to the top-right corner (top-left in RTL), above the header.
-    content.push({
-      image: qrCodeDataUrl,
-      width: 64,
-      alignment: isRTL ? 'left' : 'right',
-      margin: [0, 0, 0, 8],
-    })
-  }
   content.push(
     headerBlock,
     infoBlock,
@@ -726,7 +826,7 @@ export async function downloadInvoicePdf(invoice: InvoiceForPdf, locale: string)
   const footerParts = [`${labels.invoice} ${invNumber}`]
   if (contactName) footerParts.push(contactName)
   if (stayNights) footerParts.push(`${stayNights} ${labels.nights}`)
-  footerParts.push(labels.thankYou)
+  footerParts.push(branding.footer || labels.thankYou)
   const footerText = footerParts.join(' | ')
 
   // ── Assemble doc definition ──

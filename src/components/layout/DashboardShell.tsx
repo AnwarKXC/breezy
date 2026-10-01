@@ -10,6 +10,7 @@ import { AuthStateSync } from "@/modules/auth";
 import { PWAClient } from "@/app/pwa-client";
 import { CurrencyProvider } from "@/shared/contexts/CurrencyContext";
 import { TooltipLayer } from "@/shared/components/TooltipLayer";
+import { AssistantWidget } from "@/modules/assistant";
 
 interface DashboardShellProps {
   children: ReactNode;
@@ -33,6 +34,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
               </Suspense>
             </main>
             <BottomNav />
+            <AssistantWidget />
           </div>
         </div>
       </CurrencyProvider>

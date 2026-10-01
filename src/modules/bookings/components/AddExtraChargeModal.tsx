@@ -4,6 +4,7 @@ import { useState, useMemo, type FormEvent } from 'react'
 import { Modal } from '@/shared/components/Modal'
 import { useTranslation } from '@/i18n/hooks/useTranslation'
 import type { Booking } from '../types'
+import { MoneyAmount } from '@/shared/components/MoneyTotals'
 
 interface SavedCharge {
   id: string
@@ -259,7 +260,7 @@ export function AddExtraChargeModal({ isOpen, onClose, booking, formatCurrency, 
           )}
           <div className="mt-1 flex items-center justify-between border-t border-[#EAEAEA] pt-1 text-base font-bold">
             <span className="text-[#1A1A1A]">{t('common.total')}</span>
-            <span className="text-[#1A1A1A]">{formatCurrency(booking.totalAmount + totalCharges)}</span>
+            <span className="text-[#1A1A1A]"><MoneyAmount inline amount={booking.totalAmount + totalCharges} /></span>
           </div>
         </div>
 

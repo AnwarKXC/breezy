@@ -3,6 +3,7 @@ import { secureReadEndpoint, secureMutationEndpoint } from '@/shared/secureEndpo
 import { ACTIONS } from '@/config/rbac'
 import { getExpenseCategories, createExpenseCategory, deleteExpenseCategory } from '@/modules/accounting/services'
 import { AccountingExpenseCategoryCreateSchema, AccountingIdQuerySchema, zodErrorMessage } from '@/shared/validation'
+import { ExpenseConflictError } from '@/modules/accounting/services/expenseErrors'
 
 export async function GET(request: Request) {
   return secureReadEndpoint(request, ACTIONS.ACCOUNTING_READ, async () => {
@@ -30,7 +31,12 @@ export async function DELETE(request: Request) {
     if (!parsed.success) {
       return NextResponse.json({ error: zodErrorMessage(parsed.error) }, { status: 400 })
     }
-    await deleteExpenseCategory(parsed.data.id)
-    return NextResponse.json({ message: 'Expense category deleted' })
+    try {
+      await deleteExpenseCategory(parsed.data.id)
+      return NextResponse.json({ message: 'Expense category deleted' })
+    } catch (error) {
+      if (error instanceof ExpenseConflictError) return NextResponse.json({ error: error.message }, { status: 409 })
+      throw error
+    }
   })
 }

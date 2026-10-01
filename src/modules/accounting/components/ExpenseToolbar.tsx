@@ -4,7 +4,6 @@ import { useCallback } from 'react'
 import { FloatingInput } from '@/shared/components/FloatingField'
 import { ToolbarSearch, ToolbarExportGroup } from '@/shared/components/toolbar'
 import { useLocale } from '@/i18n/components/LocaleContext'
-import { useCurrency } from '@/shared/contexts/CurrencyContext'
 import type { Expense } from '../types'
 import type { ExpensePeriodType } from '../utils/expensePeriod'
 import { exportExpensesCsv } from '../utils/expenseCsvExport'
@@ -42,15 +41,14 @@ export function ExpenseToolbar({
   onQueryChange,
 }: ExpenseToolbarProps) {
   const locale = useLocale()
-  const { currencyCode } = useCurrency()
 
   const handleExportCsv = useCallback(() => {
     void exportExpensesCsv(expenses, categoryNames, `expenses-${new Date().toISOString().slice(0, 10)}.xlsx`)
   }, [expenses, categoryNames])
 
   const handleExportPdf = useCallback(() => {
-    void exportExpensesListPdf(expenses, categoryNames, locale as 'en' | 'ar', `expenses-${new Date().toISOString().slice(0, 10)}.pdf`, currencyCode)
-  }, [expenses, categoryNames, locale, currencyCode])
+    void exportExpensesListPdf(expenses, categoryNames, locale as 'en' | 'ar', `expenses-${new Date().toISOString().slice(0, 10)}.pdf`)
+  }, [expenses, categoryNames, locale])
 
   return (
     <div className="flex flex-col gap-3 border-y border-[#EAEAEA] py-4 lg:flex-row lg:items-center lg:justify-between">

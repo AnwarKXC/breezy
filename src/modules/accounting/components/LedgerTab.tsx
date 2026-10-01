@@ -6,24 +6,28 @@ import { Table } from '@/shared/components/Table'
 import type { TableColumn } from '@/shared/table/types'
 import { FloatingInput } from '@/shared/components/FloatingField'
 import { StatusBadge } from '@/shared/components/StatusBadge'
-import { useCurrency } from '@/shared/contexts/CurrencyContext'
 import { useLocale } from '@/i18n/components/LocaleContext'
 import { formatDate, formatDateTime } from '@/shared/utils/date'
 import type { LedgerEntry, Invoice } from '../types'
 import { LEDGER_TYPE_LABELS } from '../types'
 import { downloadInvoicePdf } from '../utils/invoicePdfExport'
+import { fetchData, useResource } from '@/shared/data/useResource'
+import type { Money } from '@/shared/currency/money'
+import { buttonSecondary } from '../utils/buttonStyles'
+import { MoneyTotals } from '@/shared/components/MoneyTotals'
+import { MoneyAmount } from '@/shared/components/MoneyTotals'
 
 interface Props {
   t: (key: string) => string
 }
 
 export function LedgerTab({ t }: Props) {
-  const { formatCurrency, formatTotals } = useCurrency()
   const locale = useLocale()
   const [typeFilter, setTypeFilter] = useState('')
   const [fromDate, setFromDate] = useState('')
   const [toDate, setToDate] = useState('')
   const [printingId, setPrintingId] = useState<string | null>(null)
+  const [page, setPage] = useState(0)
 
   const filters = useMemo(() => {
     const f: Record<string, string> = {}
@@ -33,7 +37,7 @@ export function LedgerTab({ t }: Props) {
     return f
   }, [typeFilter, fromDate, toDate])
 
-  const { ledgerEntries, loading } = useLedger(filters)
+  const { ledgerEntries, loading } = useLedger({ ...filters, limit: '100', offset: String(page * 100) })
 
   const handlePrintPdf = useCallback(async (invoiceId: string | null, invoiceNumber: string | null) => {
     if (!invoiceId || !invoiceNumber) return
@@ -50,10 +54,13 @@ export function LedgerTab({ t }: Props) {
     }
   }, [locale])
 
-  // Cash-basis: every ledger row is a real money movement; totals stay per currency.
+  const summaryUrl = `/api/accounting/ledger?${new URLSearchParams({ ...filters, summary: '1' })}`
+  const { data: summary, error: summaryError } = useResource<{ income: Money; outcome: Money; count: number }>(summaryUrl, () => fetchData(summaryUrl))
+  // All matching rows contribute, including rows beyond the visible page.
+  // Operational ledger income includes invoice postings; it is not a cash-flow statement.
   const totals = {
-    income: formatTotals(ledgerEntries.filter((e) => Number(e.incomeAmount) > 0).map((e) => ({ amount: Number(e.incomeAmount), currency: e.currency }))),
-    outcome: formatTotals(ledgerEntries.filter((e) => Number(e.outcomeAmount) > 0).map((e) => ({ amount: Number(e.outcomeAmount), currency: e.currency }))),
+    income: summary ? <MoneyTotals value={summary.income} /> : '—',
+    outcome: summary ? <MoneyTotals value={summary.outcome} /> : '—',
   }
 
   const columns: TableColumn<LedgerEntry>[] = useMemo(() => [
@@ -104,12 +111,12 @@ export function LedgerTab({ t }: Props) {
     {
       key: 'incomeAmount',
       label: t('accounting.ledger.income'),
-      render: (v, row) => Number(v) > 0 ? formatCurrency(Number(v), row.currency) : '-',
+      render: (v, row) => Number(v) > 0 ? <MoneyAmount amount={Number(v)} currency={row.currency} /> : '-',
     },
     {
       key: 'outcomeAmount',
       label: t('accounting.ledger.outcome'),
-      render: (v, row) => Number(v) > 0 ? formatCurrency(Number(v), row.currency) : '-',
+      render: (v, row) => Number(v) > 0 ? <MoneyAmount amount={Number(v)} currency={row.currency} /> : '-',
     },
     {
       key: 'transactionDate',
@@ -121,7 +128,7 @@ export function LedgerTab({ t }: Props) {
       label: t('common.createdAt'),
       render: (v) => v ? formatDateTime(v as string, locale) : '',
     },
-  ], [t, printingId, handlePrintPdf, formatCurrency, locale])
+  ], [t, printingId, handlePrintPdf, locale])
 
   return (
     <div className="space-y-6">
@@ -129,7 +136,7 @@ export function LedgerTab({ t }: Props) {
         <select
           className="rounded-lg border border-[#D4D4D4] px-3 py-2 text-sm"
           value={typeFilter}
-          onChange={(e) => setTypeFilter(e.target.value)}
+          onChange={(e) => { setTypeFilter(e.target.value); setPage(0) }}
         >
           <option value="">{t('common.all')}</option>
           {Object.entries(LEDGER_TYPE_LABELS).map(([key, label]) => (
@@ -140,18 +147,20 @@ export function LedgerTab({ t }: Props) {
           type="date" max={toDate || undefined}
           label={t('accounting.finance.fromDate')}
           value={fromDate}
-          onChange={(e) => setFromDate(e.target.value)}
+          onChange={(e) => { setFromDate(e.target.value); setPage(0) }}
           wrapperClassName="sm:max-w-40"
         />
         <FloatingInput
           type="date" min={fromDate || undefined}
           label={t('accounting.finance.toDate')}
           value={toDate}
-          onChange={(e) => setToDate(e.target.value)}
+          onChange={(e) => { setToDate(e.target.value); setPage(0) }}
           wrapperClassName="sm:max-w-40"
         />
       </div>
 
+      {summaryError && <p role="alert" className="text-sm text-red-700">{summaryError.message}</p>}
+      <p className="text-xs text-stone-500">{t('accounting.journal.operationalLedgerHint')}</p>
       <div className="grid grid-cols-2 gap-4">
         <div className="rounded-xl border border-[#EAEAEA] bg-white p-5 space-y-1">
           <p className="text-sm text-[#787774]">{t('accounting.ledger.totalIncome')}</p>
@@ -170,6 +179,11 @@ export function LedgerTab({ t }: Props) {
         pageSize={15}
         pageSizeOptions={[10, 20, 50, 100]}
       />
+      <div className="flex flex-wrap items-center gap-3 text-sm">
+        <button className={buttonSecondary} disabled={loading || page === 0} onClick={() => setPage(page - 1)}>{t('accounting.journal.previous')}</button>
+        <span>{page * 100 + (ledgerEntries.length ? 1 : 0)}–{page * 100 + ledgerEntries.length} / {summary?.count ?? '—'}</span>
+        <button className={buttonSecondary} disabled={loading || !summary || (page + 1) * 100 >= summary.count} onClick={() => setPage(page + 1)}>{t('accounting.journal.next')}</button>
+      </div>
     </div>
   )
 }

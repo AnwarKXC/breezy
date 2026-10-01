@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { FloatingInput, FloatingSelect } from '@/shared/components/FloatingField'
 import type { ExpenseCategory, CreateExpenseInput, CreateExpenseCategoryInput } from '../types'
+import { CURRENCIES } from '@/shared/static/currencies'
+import { useCurrency } from '@/shared/contexts/CurrencyContext'
 
 const NEW_CATEGORY_VALUE = '__new__'
 
@@ -124,6 +126,9 @@ function CreateCategoryModal({
 }
 
 export function ExpenseFormModal({ categories, saving, t, initialCategoryId, onClose, onSubmit, onCreateCategory }: ExpenseFormModalProps) {
+  const { currencyCode } = useCurrency()
+  const [currency, setCurrency] = useState<string>(currencyCode)
+  const [status, setStatus] = useState<'draft' | 'paid'>('draft')
   const now = new Date()
   const [categoryId, setCategoryId] = useState(initialCategoryId ?? '')
   const [amount, setAmount] = useState('')
@@ -168,6 +173,8 @@ export function ExpenseFormModal({ categories, saving, t, initialCategoryId, onC
     if (saving || !categoryId || !amount) return
     await onSubmit({
       category_id: categoryId,
+      currency,
+      status,
       amount: Number(amount),
       description,
       date,
@@ -204,6 +211,13 @@ export function ExpenseFormModal({ categories, saving, t, initialCategoryId, onC
           </div>
 
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            <FloatingSelect label={t('accounting.invoices.currency')} value={currency} onChange={(e) => setCurrency(e.target.value)}>
+              {CURRENCIES.map((entry) => <option key={entry.code} value={entry.code}>{entry.label}</option>)}
+            </FloatingSelect>
+            <FloatingSelect label={t('accounting.invoices.status')} value={status} onChange={(e) => setStatus(e.target.value as 'draft' | 'paid')}>
+              <option value="draft">{t('accounting.invoices.draft')}</option>
+              <option value="paid">{t('accounting.invoices.paid')}</option>
+            </FloatingSelect>
             {initialCategoryId ? (
               <div className="sm:col-span-2 rounded-lg border border-[#EAEAEA] bg-[#F9F9F8] px-4 py-3 text-sm text-[#333333]">
                 <span className="text-xs font-medium text-[#787774]">{t('accounting.expenses.category')}: </span>

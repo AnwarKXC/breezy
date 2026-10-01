@@ -13,7 +13,7 @@ export async function createLedgerEntry(
     type: string; sourceType: string; sourceId: string;
     incomeAmount: number; outcomeAmount: number; currency: string;
     description: string; createdBy: string;
-    invoiceId?: string; contactId?: string; metadata?: Record<string, unknown>
+    invoiceId?: string; contactId?: string; metadata?: Record<string, unknown>; transactionDate?: string
   },
   tx: DbTransaction | typeof prisma = prisma,
 ) {
@@ -30,6 +30,7 @@ export async function createLedgerEntry(
       currency: input.currency,
       description: input.description,
       created_by: input.createdBy,
+      ...(input.transactionDate ? { transaction_date: dbDate(input.transactionDate) } : {}),
       metadata: (input.metadata ?? {}) as Prisma.InputJsonValue,
     },
   })
@@ -37,11 +38,12 @@ export async function createLedgerEntry(
   return mapLedgerEntryRow(toRow('accounting_ledger_entries', row))
 }
 
-export async function getLedgerEntries(params?: {
+type LedgerFilters = {
   fromDate?: string; toDate?: string; type?: string; sourceType?: string;
   sourceId?: string; limit?: number; offset?: number
-}) {
-  await requireLedgerRead()
+}
+
+function ledgerWhere(params?: LedgerFilters) {
   const where: Prisma.accounting_ledger_entriesWhereInput = {}
   if (params?.fromDate || params?.toDate) {
     where.transaction_date = {
@@ -52,10 +54,28 @@ export async function getLedgerEntries(params?: {
   if (params?.type) where.type = params.type
   if (params?.sourceType) where.source_type = params.sourceType
   if (params?.sourceId) where.source_id = params.sourceId
+  return where
+}
+
+export async function getLedgerSummary(params?: LedgerFilters) {
+  await requireLedgerRead()
+  const rows = await prisma.accounting_ledger_entries.groupBy({
+    by: ['currency'], where: ledgerWhere(params), _sum: { income_amount: true, outcome_amount: true }, _count: { _all: true },
+  })
+  return {
+    income: rows.map((row) => ({ currency: row.currency, amount: Number(row._sum.income_amount ?? 0) })),
+    outcome: rows.map((row) => ({ currency: row.currency, amount: Number(row._sum.outcome_amount ?? 0) })),
+    count: rows.reduce((sum, row) => sum + row._count._all, 0),
+  }
+}
+
+export async function getLedgerEntries(params?: LedgerFilters) {
+  await requireLedgerRead()
+  const where = ledgerWhere(params)
 
   const rows = await prisma.accounting_ledger_entries.findMany({
     where,
-    orderBy: { created_at: 'desc' },
+    orderBy: [{ created_at: 'desc' }, { id: 'desc' }],
     skip: Number(params?.offset ?? 0),
     take: Math.min(Number(params?.limit ?? 100), 1000),
   })

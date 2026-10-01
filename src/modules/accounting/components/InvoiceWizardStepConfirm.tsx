@@ -1,7 +1,9 @@
 ﻿'use client'
 
+import type { ReactNode } from 'react'
 import { useCurrency } from '@/shared/contexts/CurrencyContext'
 import type { WizardItem, WizardPayment, InvoiceBookingLookup } from '../types'
+import { MoneyAmount } from '@/shared/components/MoneyTotals'
 
 interface Props {
   t: (key: string) => string
@@ -80,7 +82,7 @@ export function InvoiceWizardStepConfirm({
           {taxAmount > 0 && (
             <SummaryRow label={t('accounting.invoices.tax')} value={formatCurrency(taxAmount)} />
           )}
-          <SummaryRow label={t('accounting.invoices.wizard.totalAmount')} value={formatCurrency(total)} bold />
+          <SummaryRow label={t('accounting.invoices.wizard.totalAmount')} value={<MoneyAmount inline amount={total} />} bold />
 
           {depositApplied > 0 && (
             <SummaryRow label={t('accounting.invoices.wizard.depositApplied')} value={formatCurrency(depositApplied)} valueClass="text-[#346538]" />
@@ -90,7 +92,7 @@ export function InvoiceWizardStepConfirm({
           )}
           <SummaryRow
             label={t('accounting.invoices.wizard.amountDue')}
-            value={formatCurrency(balanceDue)}
+            value={<MoneyAmount inline amount={balanceDue} />}
             bold
             valueClass={balanceDue > 0 ? 'text-amber-600' : 'text-[#346538]'}
           />
@@ -110,7 +112,7 @@ function SummaryRow({
   label, value, valueClass, bold,
 }: {
   label: string
-  value: string
+  value: ReactNode
   valueClass?: string
   bold?: boolean
 }) {

@@ -12,6 +12,7 @@ import type { RoomType } from '@/modules/room-types/types'
 import type { RoomTypePricing } from '@/modules/pricing/types'
 import type { ReservationDetail, OccupancyCode } from '@/modules/reservations/types'
 import { useCurrency } from '@/shared/contexts/CurrencyContext'
+import { MoneyAmount } from '@/shared/components/MoneyTotals'
 
 interface FormData {
   check_in_date: string
@@ -697,7 +698,7 @@ export function ReservationEditPage() {
                     </div>
                     <div className="flex items-center justify-between border-t border-[#EAEAEA] pt-2">
                       <span className="text-xs font-semibold uppercase tracking-widest text-[#787774]">{t('common.total')}</span>
-                      <span className="text-sm font-semibold text-[#1A1A1A]">{formatCurrency(pricing.total)}</span>
+                      <span className="text-sm font-semibold text-[#1A1A1A]"><MoneyAmount inline amount={pricing.total} /></span>
                     </div>
                   </div>
                 )

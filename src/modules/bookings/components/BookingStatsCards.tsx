@@ -2,27 +2,25 @@
 
 import { useTranslation } from '@/i18n/hooks/useTranslation'
 import { InfoHint } from '@/shared/components/InfoHint'
-import { ViewInCurrencyToggle } from '@/shared/components/ViewInCurrencyToggle'
+import { MoneyTotals } from '@/shared/components/MoneyTotals'
 import type { Booking } from '../types'
-import type { MoneyRow } from '@/shared/contexts/CurrencyContext'
+import type { ReactNode } from 'react'
 
 interface BookingStatsCardsProps {
   bookings: Booking[]
-  /** Per-currency (or on-demand converted) total of mixed-currency rows. */
-  formatTotals: (rows: MoneyRow[]) => string
   loading?: boolean
 }
 
 interface StatCard {
   label: string
   hint: string
-  value: string | number
+  value: ReactNode
   accent: string
   icon: string
   bg: string
 }
 
-function calculateStats(bookings: Booking[], formatTotals: (rows: MoneyRow[]) => string, now: Date): StatCard[] {
+function calculateStats(bookings: Booking[], now: Date): StatCard[] {
   const weekAgo = new Date(now)
   weekAgo.setDate(weekAgo.getDate() - 7)
 
@@ -32,7 +30,7 @@ function calculateStats(bookings: Booking[], formatTotals: (rows: MoneyRow[]) =>
   const occupied = thisWeek.filter((b) => b.status === 'confirmed' || b.status === 'checked-in').length
   const cancelled = thisWeek.filter((b) => b.status === 'cancelled').length
   // Reservations can be in different currencies: never add them into one number.
-  const revenue = formatTotals(thisWeek.map((b) => ({ amount: b.totalAmount, currency: b.currency })))
+  const revenue = <MoneyTotals value={thisWeek.map((b) => ({ amount: b.totalAmount, currency: b.currency }))} />
 
   return [
     {
@@ -70,9 +68,9 @@ function calculateStats(bookings: Booking[], formatTotals: (rows: MoneyRow[]) =>
   ]
 }
 
-export function BookingStatsCards({ bookings, formatTotals, loading }: BookingStatsCardsProps) {
+export function BookingStatsCards({ bookings, loading }: BookingStatsCardsProps) {
   const { t } = useTranslation()
-  const stats = calculateStats(bookings, formatTotals, new Date())
+  const stats = calculateStats(bookings, new Date())
 
   return (
     <section aria-label={t('bookings.stats.periodLabel')} className="flex flex-col gap-3">
@@ -103,7 +101,6 @@ export function BookingStatsCards({ bookings, formatTotals, loading }: BookingSt
         </div>
       ))}
       </div>
-      <ViewInCurrencyToggle />
     </section>
   )
 }

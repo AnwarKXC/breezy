@@ -16,8 +16,13 @@ export async function secureReadEndpoint(request: Request, action: ActionPermiss
   return handler(auth.session)
 }
 
-export async function secureMutationEndpoint(request: Request, action: ActionPermission, handler: SecureHandler) {
-  const rateLimited = rateLimit(request, RateLimitTier.MUTATION)
+export async function secureMutationEndpoint(
+  request: Request,
+  action: ActionPermission,
+  handler: SecureHandler,
+  tier: (typeof RateLimitTier)[keyof typeof RateLimitTier] = RateLimitTier.MUTATION,
+) {
+  const rateLimited = rateLimit(request, tier)
   if (rateLimited.error) return rateLimited.error
 
   const draftResponse = NextResponse.next()

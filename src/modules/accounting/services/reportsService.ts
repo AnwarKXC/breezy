@@ -2,9 +2,8 @@ import 'server-only'
 
 import { MS_PER_DAY } from '@/shared/constants'
 import type { Prisma } from '@/generated/prisma/client'
-import { heldDeposits, paidByContact } from '@/generated/prisma/sql'
 import { prisma } from '@/services/db/prisma'
-import { getSystemCurrency, invalidateSystemCurrencyCache } from '@/shared/currency/server'
+import { invalidateSystemCurrencyCache } from '@/shared/currency/server'
 import { toMoney, subtractMoney, negateMoney, type Money, type MoneyRow } from '@/shared/currency/money'
 import { dbDate, serializeRow, toRows } from '@/services/db/rows'
 import type {
@@ -19,6 +18,11 @@ import { logSettingUpdated } from './activityLogService'
 import { formatDate } from './accountingUtils'
 
 const num = (value: Prisma.Decimal | number | null | undefined) => Number(value ?? 0)
+const postedInvoice: Prisma.invoicesWhereInput = { deleted_at: null, status: { notIn: ['draft', 'void'] } }
+const openInvoice: Prisma.invoicesWhereInput = { deleted_at: null, status: { in: ['issued', 'partially_paid', 'partially_refunded', 'overdue'] } }
+// Historical expenses without a recorded currency remain visibly unclassified.
+const expenseMoney = (rows: Array<{ total_amount: Prisma.Decimal | number | null; currency: string | null }>) =>
+  toMoney(rows.map((row) => ({ amount: num(row.total_amount), currency: row.currency ?? 'UNKNOWN' })))
 
 /** Per-currency totals from a `groupBy(['currency'])` result. */
 function grouped<K extends string>(groups: Array<{ currency: string; _sum: Partial<Record<K, Prisma.Decimal | null>> }>, key: K): Money {
@@ -62,6 +66,7 @@ function mapReportExpense(exp: Record<string, unknown>): ReportExpenseDetail {
     paymentMethod: exp.payment_method as string | null,
     status: exp.status as string,
     date: exp.date as string,
+    currency: exp.currency as string | null,
   } as ReportExpenseDetail
 }
 
@@ -70,29 +75,27 @@ export async function getAccountingOverview(): Promise<AccountingOverview> {
   const today = formatDate(new Date())
   const now = new Date()
   const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1))
-  const liveInvoice = { deleted_at: null } as const
+  const liveInvoice = postedInvoice
 
-  const [todayInvoices, monthInvoices, outstanding, paidInvoices, unpaidInvoices, monthExpenses, todayPayments, refunds, deposits, systemCurrency] = await Promise.all([
-    prisma.invoices.groupBy({ by: ['currency'], where: { ...liveInvoice, created_at: dayRange(today) }, _sum: { amount: true } }),
-    prisma.invoices.groupBy({ by: ['currency'], where: { ...liveInvoice, created_at: { gte: monthStart } }, _sum: { amount: true } }),
-    prisma.invoices.groupBy({ by: ['currency'], where: liveInvoice, _sum: { remaining_balance: true } }),
+  const [todayInvoices, monthInvoices, outstanding, paidInvoices, unpaidInvoices, monthExpenses, todayPayments, refunds] = await Promise.all([
+    prisma.invoices.groupBy({ by: ['currency'], where: { ...liveInvoice, issue_date: dbDate(today) }, _sum: { amount: true, tax_amount: true } }),
+    prisma.invoices.groupBy({ by: ['currency'], where: { ...liveInvoice, issue_date: { gte: monthStart } }, _sum: { amount: true, tax_amount: true } }),
+    prisma.invoices.groupBy({ by: ['currency'], where: openInvoice, _sum: { remaining_balance: true } }),
     prisma.invoices.count({ where: { ...liveInvoice, status: { in: ['paid', 'partially_paid'] } } }),
-    prisma.invoices.count({ where: { ...liveInvoice, status: { in: ['issued', 'overdue', 'draft'] } } }),
-    prisma.expenses.aggregate({ where: { deleted_at: null, date: { gte: monthStart } }, _sum: { total_amount: true } }),
+    prisma.invoices.count({ where: { ...openInvoice, remaining_balance: { gt: 0 } } }),
+    prisma.expenses.findMany({ where: { deleted_at: null, status: { in: ['approved', 'paid'] }, date: { gte: monthStart } }, select: { total_amount: true, currency: true } }),
     prisma.payments.groupBy({ by: ['method', 'currency'], where: { deleted_at: null, created_at: dayRange(today) }, _sum: { amount: true } }),
     prisma.payments.groupBy({ by: ['currency'], where: { deleted_at: null, amount: { lt: 0 } }, _sum: { amount: true } }),
-    prisma.$queryRawTyped(heldDeposits()),
-    getSystemCurrency(),
   ])
 
   const paidToday = (types: string[]) =>
     toMoney(todayPayments.filter((p) => types.includes(p.method)).map((p) => ({ amount: num(p._sum.amount), currency: p.currency })))
-  const monthToDateRevenue = grouped(monthInvoices, 'amount')
+  const monthToDateRevenue = subtractMoney(grouped(monthInvoices, 'amount'), grouped(monthInvoices, 'tax_amount'))
   // Expenses have no currency of their own: they are in the system currency.
-  const totalExpenses = toMoney([{ amount: num(monthExpenses._sum.total_amount), currency: systemCurrency }])
+  const totalExpenses = expenseMoney(monthExpenses)
 
   return {
-    todayRevenue: grouped(todayInvoices, 'amount'),
+    todayRevenue: subtractMoney(grouped(todayInvoices, 'amount'), grouped(todayInvoices, 'tax_amount')),
     monthToDateRevenue,
     outstandingBalance: grouped(outstanding, 'remaining_balance'),
     paidInvoices,
@@ -103,7 +106,8 @@ export async function getAccountingOverview(): Promise<AccountingOverview> {
     cardPaymentsToday: paidToday(['visa']),
     bankPaymentsToday: paidToday(['bank_transfer']),
     onlinePaymentsToday: paidToday(['instapay', 'vodafone_cash']),
-    depositsHeld: toMoney(deposits.map((d) => ({ amount: num(d.held), currency: d.currency }))),
+    // No deposit-liability register exists. Paid invoices are not deposits.
+    depositsHeld: [],
     totalRefunds: negateMoney(grouped(refunds, 'amount')),
     occupancyRate: null,
     averageDailyRate: null,
@@ -114,16 +118,15 @@ export async function getAccountingOverview(): Promise<AccountingOverview> {
 /** Per-contact invoiced / paid totals per currency (two grouped queries instead of two per contact). */
 export async function getFinanceTable(): Promise<FinanceRow[]> {
   await requireAccountingRead()
-  const [contacts, invoiceTotals, paymentTotals] = await Promise.all([
+  const [contacts, invoiceTotals] = await Promise.all([
     prisma.contacts.findMany({ where: { deleted_at: null }, select: { id: true, name: true, type: true }, orderBy: { name: 'asc' } }),
-    prisma.invoices.groupBy({ by: ['contact_id', 'currency'], where: { deleted_at: null }, _sum: { amount: true }, _count: { _all: true } }),
-    prisma.$queryRawTyped(paidByContact()),
+    prisma.invoices.groupBy({ by: ['contact_id', 'currency'], where: postedInvoice, _sum: { amount: true, paid_amount: true, remaining_balance: true }, _count: { _all: true } }),
   ])
 
   return contacts.map((contact) => {
     const invoiced = invoiceTotals.filter((g) => g.contact_id === contact.id)
     const totalInvoiced = toMoney(invoiced.map((g) => ({ amount: num(g._sum.amount), currency: g.currency })))
-    const totalPaid = toMoney(paymentTotals.filter((p) => p.contact_id === contact.id).map((p) => ({ amount: num(p.paid), currency: p.currency })))
+    const totalPaid = toMoney(invoiced.map((g) => ({ amount: num(g._sum.paid_amount), currency: g.currency })))
     return {
       contactId: contact.id,
       contactName: contact.name,
@@ -131,7 +134,7 @@ export async function getFinanceTable(): Promise<FinanceRow[]> {
       invoiceCount: invoiced.reduce((n, g) => n + g._count._all, 0),
       totalInvoiced,
       totalPaid,
-      balance: subtractMoney(totalInvoiced, totalPaid),
+      balance: toMoney(invoiced.map((g) => ({ amount: num(g._sum.remaining_balance), currency: g.currency }))),
     }
   })
 }
@@ -145,20 +148,19 @@ export async function getFinancialHealth(dateParams?: { fromDate?: string; toDat
   if (dateParams?.fromDate) expenseDate.gte = dbDate(dateParams.fromDate)
   if (dateParams?.toDate) expenseDate.lte = dbDate(dateParams.toDate)
 
-  const [invoices, payments, expenses, systemCurrency] = await Promise.all([
-    prisma.invoices.groupBy({ by: ['currency'], where: { deleted_at: null, created_at: createdAt }, _sum: { amount: true } }),
-    prisma.payments.groupBy({ by: ['currency'], where: { deleted_at: null, created_at: createdAt }, _sum: { amount: true } }),
-    prisma.expenses.aggregate({ where: { deleted_at: null, date: expenseDate }, _sum: { total_amount: true } }),
-    getSystemCurrency(),
+  const [invoices, outstanding, expenses] = await Promise.all([
+    prisma.invoices.groupBy({ by: ['currency'], where: { ...postedInvoice, created_at: createdAt }, _sum: { amount: true, tax_amount: true } }),
+    prisma.invoices.groupBy({ by: ['currency'], where: { ...openInvoice, created_at: createdAt }, _sum: { remaining_balance: true } }),
+    prisma.expenses.findMany({ where: { deleted_at: null, status: { in: ['approved', 'paid'] }, date: expenseDate }, select: { total_amount: true, currency: true } }),
   ])
 
-  const totalRevenue = grouped(invoices, 'amount')
-  const totalExpenses = toMoney([{ amount: num(expenses._sum.total_amount), currency: systemCurrency }])
+  const totalRevenue = subtractMoney(grouped(invoices, 'amount'), grouped(invoices, 'tax_amount'))
+  const totalExpenses = expenseMoney(expenses)
   return {
     totalRevenue,
     totalExpenses,
     netBalance: subtractMoney(totalRevenue, totalExpenses),
-    outstanding: subtractMoney(totalRevenue, grouped(payments, 'amount')),
+    outstanding: grouped(outstanding, 'remaining_balance'),
   }
 }
 
@@ -167,28 +169,27 @@ export async function getDailyRevenueReport(date: string): Promise<DailyRevenueR
   const range = dayRange(date)
   const day = dbDate(date)
 
-  const [payments, invoiceRows, expenseRows, occupancyCount, systemCurrency] = await Promise.all([
+  const [payments, invoiceRows, expenseRows, occupancyCount] = await Promise.all([
     prisma.payments.findMany({ where: { deleted_at: null, created_at: range }, select: { amount: true, method: true, currency: true } }),
-    prisma.invoices.findMany({ where: { deleted_at: null, created_at: range } }),
-    prisma.expenses.findMany({ where: { deleted_at: null, date: day }, include: { expense_categories: { select: { name: true } } } }),
+    prisma.invoices.findMany({ where: { ...postedInvoice, issue_date: day }, include: { invoice_items: true } }),
+    prisma.expenses.findMany({ where: { deleted_at: null, status: { in: ['approved', 'paid'] }, date: day }, include: { expense_categories: { select: { name: true } } } }),
     // Rooms in house that night: stays spanning the date that were actually occupied.
     prisma.reservation_rooms.count({
       where: { deleted_at: null, check_in_date: { lte: day }, check_out_date: { gt: day }, status: { in: ['occupied', 'checked_out'] } },
     }),
-    getSystemCurrency(),
   ])
 
   const invoices = toRows('invoices', invoiceRows)
   const expenses = expenseRows.map((row) => serializeRow('expenses', row))
 
   const byInvoice = (value: (i: (typeof invoices)[number]) => number) => toMoney(invoices.map((i) => ({ amount: value(i), currency: i.currency })))
-  const roomRevenue = byInvoice((i) => Number(i.subtotal ?? 0))
-  const extraServices = byInvoice((i) => Math.max(0, Number(i.amount ?? 0) - Number(i.subtotal ?? 0) - Number(i.tax_amount ?? 0)))
+  const roomRevenue = toMoney(invoiceRows.map((i) => ({ currency: i.currency, amount: i.invoice_items.filter((item) => item.type === 'room_charge').reduce((sum, item) => sum + num(item.total_price) - num(item.tax_amount), 0) })))
   const taxCollected = byInvoice((i) => Number(i.tax_amount ?? 0))
-  const totalRevenue = byInvoice((i) => Number(i.amount ?? 0))
-  const totalExpenses = toMoney(expenses.map((e) => ({ amount: Number(e.total_amount ?? 0), currency: systemCurrency })))
+  const totalRevenue = byInvoice((i) => Number(i.amount ?? 0) - Number(i.tax_amount ?? 0))
+  const extraServices = subtractMoney(totalRevenue, roomRevenue)
+  const totalExpenses = expenseMoney(expenseRows)
 
-  const received = payments.filter((p) => num(p.amount) > 0)
+  const received = payments
   const methods = [...new Set(received.map((p) => p.method))]
 
   return {
@@ -215,22 +216,21 @@ export async function getMonthlyRevenueReport(month: string): Promise<MonthlyRev
   const end = new Date(start)
   end.setUTCMonth(end.getUTCMonth() + 1)
 
-  const [invoiceRows, expenseRows, systemCurrency] = await Promise.all([
-    prisma.invoices.findMany({ where: { deleted_at: null, issue_date: { gte: start, lt: end } } }),
+  const [invoiceRows, expenseRows] = await Promise.all([
+    prisma.invoices.findMany({ where: { ...postedInvoice, issue_date: { gte: start, lt: end } }, include: { invoice_items: true } }),
     prisma.expenses.findMany({
-      where: { deleted_at: null, date: { gte: start, lt: end } },
+      where: { deleted_at: null, status: { in: ['approved', 'paid'] }, date: { gte: start, lt: end } },
       include: { expense_categories: { select: { name: true } } },
     }),
-    getSystemCurrency(),
   ])
 
   const invoices = toRows('invoices', invoiceRows)
   const expenses = expenseRows.map((row) => serializeRow('expenses', row))
   const byInvoice = (value: (i: (typeof invoices)[number]) => number) => toMoney(invoices.map((i) => ({ amount: value(i), currency: i.currency })))
-  const roomRevenue = byInvoice((i) => Number(i.subtotal ?? 0))
-  const otherRevenue = byInvoice((i) => Math.max(0, Number(i.amount ?? 0) - Number(i.subtotal ?? 0)))
-  const totalRevenue = byInvoice((i) => Number(i.amount ?? 0))
-  const totalExpenses = toMoney(expenses.map((e) => ({ amount: Number(e.total_amount ?? 0), currency: systemCurrency })))
+  const roomRevenue = toMoney(invoiceRows.map((i) => ({ currency: i.currency, amount: i.invoice_items.filter((item) => item.type === 'room_charge').reduce((sum, item) => sum + num(item.total_price) - num(item.tax_amount), 0) })))
+  const totalRevenue = byInvoice((i) => Number(i.amount ?? 0) - Number(i.tax_amount ?? 0))
+  const otherRevenue = subtractMoney(totalRevenue, roomRevenue)
+  const totalExpenses = expenseMoney(expenseRows)
 
   return {
     month,

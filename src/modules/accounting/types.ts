@@ -11,8 +11,8 @@ export type UpdatePaymentInput = TablesUpdate<'payments'>
 export type ExpenseCategoryRow = Tables<'expense_categories'>
 export type CreateExpenseCategoryInput = TablesInsert<'expense_categories'>
 
-export type ExpenseRow = Tables<'expenses'>
-export type CreateExpenseInput = TablesInsert<'expenses'>
+export type ExpenseRow = Tables<'expenses'> & { currency?: string | null }
+export type CreateExpenseInput = TablesInsert<'expenses'> & { currency?: string }
 export type UpdateExpenseInput = TablesUpdate<'expenses'>
 
 export type InvoiceRow = Tables<'invoices'>
@@ -59,6 +59,7 @@ export interface ExpenseCategory {
 }
 
 export interface Expense {
+  currency: string | null
   id: string
   categoryId: string
   amount: number
@@ -226,6 +227,7 @@ export interface ReportInvoiceDetail {
 }
 
 export interface ReportExpenseDetail {
+  currency: string | null
   id: string
   description: string
   categoryName: string | null
@@ -409,6 +411,7 @@ export function mapExpenseCategoryRow(row: ExpenseCategoryRow): ExpenseCategory 
 
 export function mapExpenseRow(row: ExpenseRow): Expense {
   return {
+    currency: row.currency ?? null,
     id: row.id,
     categoryId: row.category_id,
     amount: Number(row.amount),

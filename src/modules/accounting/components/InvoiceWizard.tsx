@@ -49,14 +49,14 @@ export function InvoiceWizard({ t, mode, existingInvoicesMap, onClose, onCreated
     setError(null)
     actions.setSaving(true)
     try {
-      const invoiceResult = await api.createInvoice()
+      const invoiceResult = await api.createInvoice(saveAsDraft)
       const invoiceId = invoiceResult.id
 
       if (!saveAsDraft && state.status === 'issued') {
         await api.issueInvoice(invoiceId)
       }
 
-      if (state.recordPayment && state.payments.some((p) => p.amount > 0)) {
+      if (!saveAsDraft && state.recordPayment && state.payments.some((p) => p.amount > 0)) {
         await api.recordPaymentApi(invoiceId, invoiceResult.id)
       }
 

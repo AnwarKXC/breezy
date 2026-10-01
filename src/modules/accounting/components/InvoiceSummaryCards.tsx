@@ -1,7 +1,7 @@
 ﻿'use client'
 
 import { useMemo, useState, useEffect } from 'react'
-import { useCurrency } from '@/shared/contexts/CurrencyContext'
+import { MoneyTotals } from '@/shared/components/MoneyTotals'
 import type { Invoice, Payment } from '../types'
 
 interface Props {
@@ -18,7 +18,6 @@ function getNowMs(): number {
 }
 
 export function InvoiceSummaryCards({ invoices, t }: Props) {
-  const { formatTotals } = useCurrency()
   const [now, setNow] = useState(() => getNowMs())
   const [todaysPayments, setTodaysPayments] = useState<Payment[]>([])
 
@@ -82,11 +81,11 @@ export function InvoiceSummaryCards({ invoices, t }: Props) {
       </div>
       <div className="rounded-xl border border-[#EAEAEA] bg-white p-4">
         <p className="text-xs font-medium text-[#787774]">{t('accounting.invoices.summary.outstandingBalance')}</p>
-        <p className="mt-1 break-words text-2xl font-semibold text-amber-600">{formatTotals(stats.outstandingBalance)}</p>
+        <p className="mt-1 break-words text-2xl font-semibold text-amber-600"><MoneyTotals value={stats.outstandingBalance} /></p>
       </div>
       <div className="rounded-xl border border-[#EAEAEA] bg-white p-4">
         <p className="text-xs font-medium text-[#787774]">{t('accounting.invoices.summary.paidToday')}</p>
-        <p className="mt-1 break-words text-2xl font-semibold text-[#346538]">{formatTotals(stats.paidToday)}</p>
+        <p className="mt-1 break-words text-2xl font-semibold text-[#346538]"><MoneyTotals value={stats.paidToday} /></p>
       </div>
       <div className="rounded-xl border border-[#EAEAEA] bg-white p-4">
         <p className="text-xs font-medium text-[#787774]">{t('accounting.invoices.summary.dueSoon')}</p>
@@ -98,7 +97,7 @@ export function InvoiceSummaryCards({ invoices, t }: Props) {
       </div>
       <div className="rounded-xl border border-[#EAEAEA] bg-white p-4">
         <p className="text-xs font-medium text-[#787774]">{t('accounting.invoices.summary.refundedAmount')}</p>
-        <p className="mt-1 break-words text-2xl font-semibold text-[#9F2F2D]">{formatTotals(stats.refundedTotal)}</p>
+        <p className="mt-1 break-words text-2xl font-semibold text-[#9F2F2D]"><MoneyTotals value={stats.refundedTotal} /></p>
       </div>
       <div className="rounded-xl border border-[#EAEAEA] bg-white p-4">
         <p className="text-xs font-medium text-[#787774]">{t('accounting.invoices.summary.paid')}</p>

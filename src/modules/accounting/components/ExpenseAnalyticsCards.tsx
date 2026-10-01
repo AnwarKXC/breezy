@@ -1,9 +1,11 @@
 ﻿'use client'
 
-import { useCurrency } from '@/shared/contexts/CurrencyContext'
+import type { Money } from '@/shared/currency/money'
+import { formatExpenseTotals } from '../utils/expenseMoney'
 
 interface ExpenseAnalyticsCardsProps {
-  total: number
+  total: Money
+  averages: Money
   entriesCount: number
   categoriesCount: number
   t: (key: string) => string
@@ -11,15 +13,13 @@ interface ExpenseAnalyticsCardsProps {
 
 const cardClass = 'rounded-xl border border-[#EAEAEA] bg-white p-5 space-y-1'
 
-export function ExpenseAnalyticsCards({ total, entriesCount, categoriesCount, t }: ExpenseAnalyticsCardsProps) {
-  const { formatCurrency } = useCurrency()
-  const average = entriesCount > 0 ? total / entriesCount : 0
+export function ExpenseAnalyticsCards({ total, averages, entriesCount, categoriesCount, t }: ExpenseAnalyticsCardsProps) {
 
   const cards = [
     { label: t('accounting.expenses.analyticsTotal'), value: total, color: 'text-[#9F2F2D]', monetary: true },
     { label: t('accounting.expenses.analyticsEntries'), value: entriesCount, color: 'text-[#1A1A1A]' },
     { label: t('accounting.expenses.analyticsCategories'), value: categoriesCount, color: 'text-purple-600' },
-    { label: t('accounting.expenses.analyticsAverage'), value: average, color: 'text-orange-600', monetary: true },
+    { label: t('accounting.expenses.analyticsAverage'), value: averages, color: 'text-orange-600', monetary: true },
   ]
 
   return (
@@ -29,7 +29,7 @@ export function ExpenseAnalyticsCards({ total, entriesCount, categoriesCount, t 
           <p className="text-sm text-[#787774]">{card.label}</p>
           <p className={`text-2xl font-bold ${card.color}`}>
             {card.monetary
-              ? formatCurrency(Number(card.value))
+              ? formatExpenseTotals(card.value as Money)
               : Number(card.value).toLocaleString()}
           </p>
         </div>

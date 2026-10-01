@@ -31,8 +31,8 @@ export function calculateInvoiceTotals(input: {
     0,
   )
   const subtotal = roundMoney(itemSubtotal !== undefined ? itemSubtotal : Number(input.subtotal ?? input.amount ?? 0))
-  const discount = roundMoney(Number(input.discount ?? 0))
-  const taxAmount = roundMoney(Number(input.tax_amount ?? 0))
+  const discount = roundMoney(Number(input.discount ?? 0) + (input.items?.reduce((sum, item) => sum + Number(item.discount_amount ?? 0), 0) ?? 0))
+  const taxAmount = roundMoney(Number(input.tax_amount ?? 0) + (input.items?.reduce((sum, item) => sum + Number(item.tax_amount ?? 0), 0) ?? 0))
   const serviceCharge = roundMoney(Number(input.service_charge ?? 0))
   const total = roundMoney(Math.max(0, subtotal - discount + taxAmount + serviceCharge))
 

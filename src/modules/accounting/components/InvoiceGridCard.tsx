@@ -9,6 +9,7 @@ import { useLocale } from '@/i18n/components/LocaleContext'
 import { formatDate } from '@/shared/utils/date'
 import type { Invoice } from '../types'
 import { INVOICE_STATUS_LABELS, PAYMENT_METHOD_LABELS } from '../types'
+import { MoneyAmount } from '@/shared/components/MoneyTotals'
 
 interface InvoiceGridCardProps {
   invoice: Invoice
@@ -64,8 +65,8 @@ export const InvoiceGridCard = memo(function InvoiceGridCard({
   const actions = [
     { label: t('accounting.invoices.actions.viewDetail'), onSelect: () => onView?.(invoice) },
     ...(onPrintPdf ? [{ label: t('accounting.invoices.actions.printPdf') || 'Print PDF', onSelect: () => onPrintPdf(invoice) }] : []),
-    ...(invoice.status === 'draft' || invoice.status === 'issued'
-      ? [{ label: invoice.status === 'draft' ? t('accounting.invoices.actions.editDraft') : 'Edit', onSelect: () => onEdit?.(invoice) }]
+    ...(invoice.status === 'draft'
+      ? [{ label: t('accounting.invoices.actions.editDraft'), onSelect: () => onEdit?.(invoice) }]
       : []),
     ...(invoice.status === 'draft'
       ? [{ label: t('accounting.invoices.actions.issueInvoice'), onSelect: () => onIssue?.(invoice) }]
@@ -83,7 +84,7 @@ export const InvoiceGridCard = memo(function InvoiceGridCard({
       ? [{ label: t('accounting.invoices.actions.refundInvoice'), onSelect: () => onRefund?.(invoice), destructive: true as const }]
       : []),
     ...(invoice.status === 'draft' || invoice.status === 'issued'
-      ? [{ label: t('common.delete'), onSelect: () => onDelete?.(invoice), destructive: true as const }]
+      ? (invoice.status === 'draft' && invoice.paidAmount === 0 ? [{ label: t('common.delete'), onSelect: () => onDelete?.(invoice), destructive: true as const }] : [])
       : []),
   ]
 
@@ -148,7 +149,7 @@ export const InvoiceGridCard = memo(function InvoiceGridCard({
             {t('accounting.invoices.amount')}
           </dt>
           <dd className="text-sm font-semibold text-[#1A1A1A]">
-            {fmt(Number(invoice.amount))}
+            <MoneyAmount inline amount={Number(invoice.amount)} currency={from} />
           </dd>
         </div>
         <div className="flex items-center justify-between">
@@ -170,7 +171,7 @@ export const InvoiceGridCard = memo(function InvoiceGridCard({
             {t('accounting.invoices.balance')}
           </dt>
           <dd className={`text-sm font-medium ${bal > 0 ? 'text-amber-600' : 'text-[#787774]'}`}>
-            {fmt(bal)}
+            <MoneyAmount inline amount={bal} currency={from} />
           </dd>
         </div>
         <div className="flex items-center justify-between">

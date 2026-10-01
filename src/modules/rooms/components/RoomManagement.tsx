@@ -15,6 +15,7 @@ import type { CreateRoomTypeInput, UpdateRoomTypeInput } from '@/modules/room-ty
 import type { RoomType } from '@/modules/room-types/types'
 import { useCurrency } from '@/shared/contexts/CurrencyContext'
 import { toast } from '@/shared/toast/toastEvents'
+import { MoneyAmount } from '@/shared/components/MoneyTotals'
 
 type Section = 'overview' | 'types' | 'pricing'
 
@@ -470,7 +471,7 @@ export function RoomManagement({ canDeleteRooms }: { canDeleteRooms?: boolean })
         { label: t('rooms.totalRooms'), value: metrics.totalRooms },
         { label: t('rooms.roomTypes'), value: metrics.totalTypes },
         { label: t('rooms.availableRooms'), value: metrics.available },
-        { label: t('rooms.avgPrice'), value: formatCurrency(metrics.avgPrice) },
+        { label: t('rooms.avgPrice'), value: <MoneyAmount amount={metrics.avgPrice} /> },
       ].map(m => (
         <div key={m.label} className="bg-white rounded-xl border border-[#EAEAEA] p-3 sm:p-4 ">
           <div className="text-[10px] sm:text-xs font-medium text-[#787774] uppercase tracking-wide">{m.label}</div>

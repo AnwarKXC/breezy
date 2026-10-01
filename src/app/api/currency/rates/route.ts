@@ -6,7 +6,7 @@ import { isCurrencyCode } from '@/shared/static/currencies'
 
 // Live FX rates, fetched only when a user asks to view totals in one currency.
 // Nothing is stored or converted server-side: records keep their own currency.
-const TTL_MS = 30 * 60 * 1000
+const TTL_MS = 2 * 60 * 60 * 1000
 const cache = new Map<string, { rates: Record<string, number>; fetchedAt: number }>()
 
 export async function GET(request: Request) {

@@ -1,4 +1,5 @@
 import type { Locale } from "@/i18n/config";
+import { loadPdfBranding, pdfQrNode } from "@/shared/branding/pdfBranding";
 
 function diagLog(...args: unknown[]) {
   console.log("[PDFMAKE]", ...args);
@@ -122,34 +123,6 @@ export async function getPdfMake(includeArabicFonts = false) {
   if (includeArabicFonts) await loadArabicFonts(instance);
   diagLog("getPdfMake: success, has createPdf:", typeof instance.createPdf);
   return instance;
-}
-
-let qrCodeDataUrlCache: string | null = null;
-
-/**
- * Loads /qr-code.jpeg as a data URL so it can be embedded in pdfMake
- * documents. Cached after the first successful load; resolves to null when
- * the asset is missing (PDF is generated without the QR).
- */
-export async function getQrCodeDataUrl(): Promise<string | null> {
-  if (qrCodeDataUrlCache !== null) return qrCodeDataUrlCache;
-  try {
-    const res = await fetch("/qr-code.jpeg");
-    if (!res.ok) return null;
-    if (!(res.headers.get("content-type") ?? "").startsWith("image/")) return null;
-    const blob = await res.blob();
-    const dataUrl = await new Promise<string | null>((resolve) => {
-      const reader = new FileReader();
-      reader.onload = () =>
-        resolve(typeof reader.result === "string" ? reader.result : null);
-      reader.onerror = () => resolve(null);
-      reader.readAsDataURL(blob);
-    });
-    qrCodeDataUrlCache = dataUrl;
-    return dataUrl;
-  } catch {
-    return null;
-  }
 }
 
 /**
@@ -473,7 +446,7 @@ async function buildAndDownloadPdfImpl(params: {
   const isRTL = locale === "ar";
   // Arabic record data can appear even in LTR docs, so always load the font.
   const pdfMake = await getPdfMake(true);
-  const qrCodeDataUrl = await getQrCodeDataUrl();
+  const { qr } = await loadPdfBranding();
 
   const al = isRTL ? "right" : "left";
   const wrapTitle = isRTL ? preserveArabicWordSpacing : (text: string) => text;
@@ -610,14 +583,9 @@ async function buildAndDownloadPdfImpl(params: {
     info: { title },
     content: (() => {
       const content = buildContent();
-      if (qrCodeDataUrl) {
-        // QR pinned to the top-right corner (top-left in RTL), above the title.
-        content.unshift({
-          image: qrCodeDataUrl,
-          width: 64,
-          alignment: isRTL ? "left" : "right",
-          margin: [0, 0, 0, 8],
-        });
+      if (qr) {
+        // QR (from Settings > Organization) pinned to the top-right corner (top-left in RTL), above the title.
+        content.unshift(pdfQrNode(qr, isRTL ? "left" : "right", C.green));
       }
       return content;
     })(),

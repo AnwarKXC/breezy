@@ -7,6 +7,7 @@ import { useCurrency } from '@/shared/contexts/CurrencyContext'
 import { isCurrencyCode } from '@/shared/static/currencies'
 import { CURRENCY_SYMBOLS } from '@/shared/utils/types'
 import type { Booking } from '../types'
+import { MoneyAmount } from '@/shared/components/MoneyTotals'
 
 const QUICK_CHARGES = [
   { label: 'Minibar', amount: 200 },
@@ -342,7 +343,7 @@ export function CheckoutConfirmModal({ isOpen, onClose, booking, formatCurrency,
           </div>
           <div className="mt-3 flex items-center justify-between border-t border-[#E5E7EB] pt-3">
             <span className="text-base font-semibold text-[#111]">{t('bookings.totalBreakdown')}</span>
-            <span className="text-base font-semibold text-[#111]">{formatCurrency(amountDue)}</span>
+            <span className="text-base font-semibold text-[#111]"><MoneyAmount inline amount={amountDue} /></span>
           </div>
         </div>
 

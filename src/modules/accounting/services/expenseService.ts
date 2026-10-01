@@ -1,7 +1,7 @@
 import 'server-only'
 
 import type { Prisma } from '@/generated/prisma/client'
-import { prisma } from '@/services/db/prisma'
+import { prisma, type DbTransaction } from '@/services/db/prisma'
 import { dbDate, fromRow, serializeRow, toRow } from '@/services/db/rows'
 import type { CreateExpenseInput, CreateExpenseCategoryInput } from '../types'
 import { mapExpenseCategoryRow, mapExpenseRow } from '../types'
@@ -15,18 +15,26 @@ import {
 } from './activityLogService'
 import { createLedgerEntry } from './ledgerService'
 import { getSystemCurrency } from '@/shared/currency/server'
+import { AccountingExpenseCreateSchema } from '@/shared/validation'
+import { ExpenseConflictError } from './expenseErrors'
 
 type ExpenseRowWithCategory = Parameters<typeof mapExpenseRow>[0]
 const toExpense = (row: unknown) => mapExpenseRow(serializeRow('expenses', row) as ExpenseRowWithCategory)
 
 function expenseAmounts(input: CreateExpenseInput) {
-  const totalAmount = Number(input.total_amount ?? input.amount ?? 0)
-  const taxAmount = Number(input.tax_amount ?? 0)
-  const netAmount = Number(input.amount ?? totalAmount - taxAmount)
+  const validated = AccountingExpenseCreateSchema.parse(input)
+  const totalAmount = validated.total_amount
+  const taxAmount = validated.tax_amount
+  const netAmount = validated.amount
   return { totalAmount, taxAmount, netAmount }
 }
 
 const expenseLedgerWhere = (id: string): Prisma.accounting_ledger_entriesWhereInput => ({ source_type: 'expense', source_id: id })
+
+async function requireActiveCategory(tx: DbTransaction, id: string) {
+  const categories = await tx.$queryRaw<{ id: string }[]>`SELECT id FROM public.expense_categories WHERE id = ${id}::uuid AND deleted_at IS NULL FOR SHARE`
+  if (!categories.length) throw new ExpenseConflictError('Expense category is archived or does not exist')
+}
 
 export async function getExpenseCategories() {
   await requireAccountingRead()
@@ -48,11 +56,17 @@ export async function deleteExpenseCategory(id: string) {
   await requireAccountingWrite()
   const now = new Date()
   await prisma.$transaction(async (tx) => {
+    await tx.$queryRaw`SELECT id FROM public.expense_categories WHERE id = ${id}::uuid FOR UPDATE`
+    await tx.$queryRaw`SELECT id FROM public.expenses WHERE category_id = ${id}::uuid ORDER BY id FOR UPDATE`
     const expenses = await tx.expenses.findMany({ where: { category_id: id, deleted_at: null }, select: { id: true } })
     const expenseIds = expenses.map((e) => e.id)
+    if (await tx.expenses.count({ where: { id: { in: expenseIds }, status: 'paid' } })) {
+      throw new ExpenseConflictError('This category contains paid expenses and cannot be deleted')
+    }
     await tx.expenses.updateMany({ where: { id: { in: expenseIds } }, data: { deleted_at: now } })
     await tx.accounting_ledger_entries.deleteMany({ where: { source_type: 'expense', source_id: { in: expenseIds } } })
-    await tx.expense_categories.delete({ where: { id } })
+    const { count } = await tx.expense_categories.updateMany({ where: { id, deleted_at: null }, data: { deleted_at: now } })
+    if (!count) throw new ExpenseConflictError('Expense category not found')
   })
 }
 
@@ -89,28 +103,34 @@ export async function getExpenses(params?: {
 
 export async function createExpense(input: CreateExpenseInput) {
   const session = await requireExpensesCreate()
+  input = AccountingExpenseCreateSchema.parse(input)
+  if (input.status === 'approved') await requireExpensesApprove()
+  if (input.status === 'void') throw new ExpenseConflictError('New expenses must be draft, approved or paid')
   const { totalAmount, taxAmount, netAmount } = expenseAmounts(input)
+  const currency = input.currency ?? await getSystemCurrency()
 
   // Expense and its ledger outflow are written together.
   const row = await prisma.$transaction(async (tx) => {
+    await requireActiveCategory(tx, input.category_id)
     const created = await tx.expenses.create({
       data: {
         ...(fromRow('expenses', input as unknown as Record<string, unknown>) as Prisma.expensesUncheckedCreateInput),
         amount: netAmount,
+        currency,
         tax_amount: taxAmount,
         total_amount: totalAmount,
         created_by: session.id,
       },
     })
-    await createLedgerEntry(
+    if (created.status === 'paid') await createLedgerEntry(
       {
         type: 'expense',
         sourceType: 'expense',
         sourceId: created.id,
         incomeAmount: 0,
         outcomeAmount: totalAmount,
-        // Expenses have no currency of their own: they are kept in the system currency.
-        currency: await getSystemCurrency(),
+        currency,
+        transactionDate: input.date,
         description: `Expense: ${created.description}`,
         createdBy: session.id,
       },
@@ -125,22 +145,37 @@ export async function createExpense(input: CreateExpenseInput) {
 }
 
 export async function updateExpense(id: string, input: CreateExpenseInput) {
-  await requireExpensesUpdate()
+  const session = await requireExpensesUpdate()
+  input = AccountingExpenseCreateSchema.parse(input)
+  if (input.status === 'approved') await requireExpensesApprove()
+  if (input.status === 'void') await requireExpensesVoid()
   const { totalAmount, taxAmount, netAmount } = expenseAmounts(input)
 
   const row = await prisma.$transaction(async (tx) => {
+    await requireActiveCategory(tx, input.category_id)
+    await tx.$queryRaw`SELECT id FROM public.expenses WHERE id = ${id}::uuid FOR UPDATE`
+    const existing = await tx.expenses.findFirst({ where: { id, deleted_at: null } })
+    if (!existing) throw new ExpenseConflictError('Expense not found')
+    if (existing.status === 'paid') throw new ExpenseConflictError('Paid expenses are immutable; record a documented correction instead')
+    const currency = input.currency ?? existing.currency
+    if (!currency) throw new ExpenseConflictError('Resolve the historical expense currency before editing')
     const { count } = await tx.expenses.updateMany({
-      where: { id, deleted_at: null },
+      where: { id, deleted_at: null, status: existing.status },
       data: {
         ...(fromRow('expenses', input as unknown as Record<string, unknown>) as Prisma.expensesUncheckedUpdateManyInput),
         amount: netAmount,
+        currency,
         tax_amount: taxAmount,
         total_amount: totalAmount,
       },
     })
-    if (count === 0) throw new Error('Expense not found')
-    // Keep the ledger outflow in step with the edited amount.
-    await tx.accounting_ledger_entries.updateMany({ where: expenseLedgerWhere(id), data: { outcome_amount: totalAmount } })
+    if (count === 0) throw new ExpenseConflictError('Expense changed; reload and try again')
+    await tx.accounting_ledger_entries.deleteMany({ where: expenseLedgerWhere(id) })
+    if (input.status === 'paid') await createLedgerEntry({
+      type: 'expense', sourceType: 'expense', sourceId: id, incomeAmount: 0,
+      outcomeAmount: totalAmount, currency, transactionDate: input.date,
+      description: `Expense: ${input.description}`, createdBy: session.id,
+    }, tx)
     return tx.expenses.findUniqueOrThrow({ where: { id } })
   })
 
@@ -152,10 +187,10 @@ export async function updateExpense(id: string, input: CreateExpenseInput) {
 export async function approveExpense(id: string) {
   const session = await requireExpensesApprove()
   const { count } = await prisma.expenses.updateMany({
-    where: { id, deleted_at: null },
+    where: { id, deleted_at: null, status: 'draft' },
     data: { status: 'approved', approved_by: session.id, approved_at: new Date() },
   })
-  if (count === 0) throw new Error('Expense not found')
+  if (count === 0) throw new ExpenseConflictError('Only draft expenses can be approved')
   const expense = toExpense(await prisma.expenses.findUniqueOrThrow({ where: { id } }))
   void logExpenseApproved({ id: expense.id, description: expense.description, amount: expense.amount, approvedBy: session.id })
   return expense
@@ -165,9 +200,13 @@ export async function deleteExpense(id: string) {
   await requireExpensesVoid()
   // Remove the ledger outflow together with the expense; otherwise the ledger
   // keeps counting money for an expense that no longer exists.
-  await prisma.$transaction([
-    prisma.expenses.updateMany({ where: { id, deleted_at: null }, data: { deleted_at: new Date() } }),
-    prisma.accounting_ledger_entries.deleteMany({ where: expenseLedgerWhere(id) }),
-  ])
+  await prisma.$transaction(async (tx) => {
+    await tx.$queryRaw`SELECT id FROM public.expenses WHERE id = ${id}::uuid FOR UPDATE`
+    const expense = await tx.expenses.findFirst({ where: { id, deleted_at: null } })
+    if (!expense) throw new ExpenseConflictError('Expense not found')
+    if (expense.status === 'paid') throw new ExpenseConflictError('Paid expenses cannot be deleted; record a documented correction instead')
+    await tx.expenses.update({ where: { id }, data: { deleted_at: new Date() } })
+    await tx.accounting_ledger_entries.deleteMany({ where: expenseLedgerWhere(id) })
+  })
   void logExpenseDeleted(id)
 }

@@ -3,6 +3,7 @@ import type { PdfSection } from '@/shared/utils/pdfMake'
 import type { Locale } from '@/i18n/config'
 import { toMoney, type Money } from '@/shared/currency/money'
 import type { DailyRevenueReport, MonthlyRevenueReport, AccountsReceivableAging, ReportInvoiceDetail, ReportExpenseDetail } from '../types'
+import { formatExpenseAmount } from './expenseMoney'
 
 function formatCurrency(value: number, currency: string): string {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency, minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(value)
@@ -10,10 +11,10 @@ function formatCurrency(value: number, currency: string): string {
 
 /** One figure per currency (`EGP 10,000 · $500`); PDFs never convert between currencies. */
 function formatMoney(value: Money, fallback: string): string {
-  return value.length === 0 ? formatCurrency(0, fallback) : value.map((m) => formatCurrency(m.amount, m.currency || fallback)).join(' · ')
+  return value.length === 0 ? formatCurrency(0, fallback) : value.map((m) => formatExpenseAmount(m.amount, m.currency || null)).join(' · ')
 }
 
-function combinedRows(invoices: ReportInvoiceDetail[], expenses: ReportExpenseDetail[], currency: string): string[][] {
+function combinedRows(invoices: ReportInvoiceDetail[], expenses: ReportExpenseDetail[]): string[][] {
   const inv = invoices.map((i) => [
     'Invoice', i.invoiceNumber,
     i.guestName ?? i.companyName ?? '—',
@@ -25,8 +26,8 @@ function combinedRows(invoices: ReportInvoiceDetail[], expenses: ReportExpenseDe
   const exp = expenses.map((e) => [
     'Expense', e.description,
     e.categoryName ?? '—',
-    formatCurrency(e.totalAmount, currency), formatCurrency(e.totalAmount, currency),
-    '—', '0',
+    formatExpenseAmount(e.totalAmount, e.currency), formatExpenseAmount(e.status === 'paid' ? e.totalAmount : 0, e.currency),
+    '—', formatExpenseAmount(e.status === 'approved' ? e.totalAmount : 0, e.currency),
     e.paymentMethod ?? '—', e.status, e.date?.slice(0, 10) ?? '—',
   ])
   return [...inv, ...exp].sort((a, b) => a[9].localeCompare(b[9])).reverse()
@@ -41,12 +42,16 @@ function buildSections(report: { totalRevenue: Money; expenses: Money }, invoice
   const sections: PdfSection[] = [
     { title: mainTitle, headers: ['Metric', 'Value'], rows: summaryRows },
   ]
+  if (expenses.some((expense) => !expense.currency)) sections.push({
+    title: 'Reconciliation required', headers: ['Warning'],
+    rows: [['Historical expenses with unresolved currency remain unclassified. Reconcile before relying on profit figures.']],
+  })
 
   if (invoices.length > 0 || expenses.length > 0) {
     sections.push({
       title: `All Records (${invoices.length + expenses.length})`,
       headers: ['Type', 'ID/Description', 'Details', 'Amount', 'Paid', 'Refunded', 'Remaining', 'Method', 'Status', 'Date'],
-      rows: combinedRows(invoices, expenses, currency),
+      rows: combinedRows(invoices, expenses),
     })
     sections.push({
       title: 'Summary Totals',

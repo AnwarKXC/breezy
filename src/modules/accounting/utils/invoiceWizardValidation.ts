@@ -175,7 +175,7 @@ export function validateSubmitPayload(state: WizardState): ValidationResult {
   return { valid: Object.keys(errors).length === 0, errors, warnings }
 }
 
-export function buildCreatePayload(state: WizardState) {
+export function buildCreatePayload(state: WizardState, saveAsDraft = false) {
   const subtotal = computeSubtotal(state.items)
   const totalDiscount = computeDiscount(subtotal, state.discount)
   const serviceChargeAmount = computeServiceCharge(subtotal, state.serviceCharge)
@@ -189,7 +189,7 @@ export function buildCreatePayload(state: WizardState) {
     room_number: (state.selectedBooking?.roomNumber ?? state.roomNumber) || null,
     issue_date: state.issueDate,
     due_date: state.dueDate,
-    status: state.status,
+    status: saveAsDraft ? 'draft' : state.recordPayment || state.status !== 'draft' ? 'issued' : 'draft',
     subtotal,
     discount: Math.max(0, totalDiscount),
     tax_amount: Math.max(0, taxAmount),

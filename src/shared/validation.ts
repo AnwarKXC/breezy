@@ -149,13 +149,14 @@ export const AccountingInvoiceUpdateSchema = AccountingInvoiceBaseSchema.partial
 export const AccountingPaymentCreateSchema = z.object({
   invoice_id: z.string().uuid(),
   method: z.enum(['instapay', 'vodafone_cash', 'cash', 'bank_transfer', 'visa', 'card', 'online', 'ota', 'company_credit', 'other']),
-  amount: z.coerce.number().finite(),
+  amount: z.coerce.number().finite().min(0.01, 'Payment amount must be at least 0.01').max(9999999999.99).refine((amount) => Math.abs(amount * 100 - Math.round(amount * 100)) <= 0.00001, 'Payment amount must have at most two decimal places'),
   // Must equal the invoice currency; omitted = the invoice currency.
   currency: currencyCode.optional(),
   description: optionalText(500),
 })
 
 export const AccountingExpenseCreateSchema = z.object({
+  currency: currencyCode.optional(),
   category_id: z.string().uuid(),
   amount: nonNegativeMoney.optional(),
   tax_amount: nonNegativeMoney.default(0),
@@ -175,10 +176,23 @@ export const AccountingExpenseCreateSchema = z.object({
       path: ['amount'],
     })
   }
+  const net = value.amount ?? (value.total_amount ?? 0) - value.tax_amount
+  const total = value.total_amount ?? net + value.tax_amount
+  if (net < 0 || total <= 0 || Math.abs(net + value.tax_amount - total) > 0.001) {
+    ctx.addIssue({ code: 'custom', message: 'Total must equal net amount plus tax and be positive', path: ['total_amount'] })
+  }
+  for (const amount of [net, value.tax_amount, total]) {
+    if (amount > 99999999.99) {
+      ctx.addIssue({ code: 'custom', message: 'Expense exceeds the supported maximum amount', path: ['amount'] })
+    }
+    if (Math.abs(amount * 100 - Math.round(amount * 100)) > 0.000001) {
+      ctx.addIssue({ code: 'custom', message: 'Money must have at most two decimal places', path: ['amount'] })
+    }
+  }
 }).transform((expense) => ({
   ...expense,
-  amount: expense.amount ?? expense.total_amount ?? 0,
-  total_amount: expense.total_amount ?? expense.amount ?? 0,
+  amount: expense.amount ?? (expense.total_amount ?? 0) - expense.tax_amount,
+  total_amount: expense.total_amount ?? (expense.amount ?? 0) + expense.tax_amount,
 }))
 
 export const AccountingExpenseCategoryCreateSchema = z.object({

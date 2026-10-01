@@ -13,6 +13,7 @@ export const RateLimitTier = {
   MUTATION: { name: 'mutation', maxRequests: 30, windowMs: 60_000 },
   READ: { name: 'read', maxRequests: 100, windowMs: 60_000 },
   ANALYTICS: { name: 'analytics', maxRequests: 20, windowMs: 60_000 },
+  AI: { name: 'ai', maxRequests: 10, windowMs: 60_000 },
 } as const
 
 type Tier = { name: string; maxRequests: number; windowMs: number }

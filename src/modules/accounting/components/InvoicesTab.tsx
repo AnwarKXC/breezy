@@ -27,6 +27,7 @@ import { Modal } from '@/shared/components/Modal'
 import { useCan } from '@/shared/rbac/useCan'
 import { ACTIONS } from '@/config/rbac'
 import { formatDate } from '@/shared/utils/date'
+import { MoneyAmount } from '@/shared/components/MoneyTotals'
 
 interface InvoiceFilters {
   searchQuery: string
@@ -128,6 +129,7 @@ export function InvoicesTab({ t, locale, invoiceFilters, onInvoiceFiltersChange 
   ], [t])
 
   const handleEditClick = useCallback((invoice: Invoice) => {
+    if (invoice.status !== 'draft') return
     setEditingInvoice(invoice)
   }, [])
 
@@ -236,7 +238,7 @@ export function InvoicesTab({ t, locale, invoiceFilters, onInvoiceFiltersChange 
     {
       key: 'amount',
       label: t('accounting.invoices.amount'),
-      render: (v, row) => formatCurrency(Number(v), row.currency as CurrencyCode),
+      render: (v, row) => <MoneyAmount amount={Number(v)} currency={row.currency} />,
     },
     {
       key: 'discount',
@@ -251,7 +253,7 @@ export function InvoicesTab({ t, locale, invoiceFilters, onInvoiceFiltersChange 
     {
       key: 'paidAmount',
       label: t('accounting.invoices.paid'),
-      render: (v, row) => formatCurrency(Number(v), row.currency as CurrencyCode),
+      render: (v, row) => <MoneyAmount amount={Number(v)} currency={row.currency} />,
     },
     {
       key: 'refundedAmount',
@@ -270,7 +272,7 @@ export function InvoicesTab({ t, locale, invoiceFilters, onInvoiceFiltersChange 
         const bal = Number(v)
         return (
           <span className={bal > 0 ? 'text-amber-600 font-medium' : 'text-[#787774]'}>
-            {formatCurrency(bal, row.currency as CurrencyCode)}
+            <MoneyAmount amount={bal} currency={row.currency} />
           </span>
         )
       },
@@ -299,13 +301,13 @@ export function InvoicesTab({ t, locale, invoiceFilters, onInvoiceFiltersChange 
           actions={[
             { label: t('accounting.invoices.actions.viewDetail'), onSelect: () => handleViewClick(row) },
             { label: t('accounting.invoices.actions.printPdf') || 'Print PDF', onSelect: () => handlePrintPdf(row) },
-            ...(row.status === 'draft' || row.status === 'issued' ? [{ label: row.status === 'draft' ? t('accounting.invoices.actions.editDraft') : 'Edit', onSelect: () => handleEditClick(row) }] : []),
+            ...(row.status === 'draft' ? [{ label: t('accounting.invoices.actions.editDraft'), onSelect: () => handleEditClick(row) }] : []),
             ...(row.status === 'draft' ? [{ label: t('accounting.invoices.actions.issueInvoice'), onSelect: () => handleIssue(row) }] : []),
             ...(row.status === 'issued' || row.status === 'partially_paid' ? [{ label: t('accounting.invoices.actions.recordPayment'), onSelect: () => handlePayClick(row) }] : []),
             ...(canAdjustInvoices && row.status !== 'void' && row.status !== 'refunded' ? [{ label: t('accounting.invoices.actions.applyDiscount'), onSelect: () => handleDiscountClick(row) }] : []),
             ...(row.status !== 'void' && row.status !== 'refunded' && row.status !== 'paid' ? [{ label: t('accounting.invoices.actions.voidInvoice'), onSelect: () => handleVoidClick(row), destructive: true }] : []),
             ...(row.status === 'paid' || row.status === 'partially_paid' || row.status === 'partially_refunded' ? [{ label: t('accounting.invoices.actions.refundInvoice'), onSelect: () => handleRefundClick(row), destructive: true }] : []),
-            ...(canDeleteInvoices ? [{ label: t('common.delete'), onSelect: () => handleDeleteClick(row), destructive: true }] : []),
+            ...(canDeleteInvoices && row.status === 'draft' && row.paidAmount === 0 ? [{ label: t('common.delete'), onSelect: () => handleDeleteClick(row), destructive: true }] : []),
           ]}
           ariaLabel={t('common.actions')}
         />

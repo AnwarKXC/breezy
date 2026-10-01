@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useTranslation } from '@/i18n/hooks/useTranslation'
 import { toast } from '@/shared/toast/toastEvents'
 import { useBranding, useSetBranding } from '@/shared/branding/BrandingContext'
-import { MAX_PHONES, SOCIAL_PLATFORMS, type OrganizationDetails, type PublicBranding } from '@/shared/branding/branding'
+import { MAX_PHONES, SOCIAL_PLATFORMS, documentQr, type OrganizationDetails, type PublicBranding } from '@/shared/branding/branding'
 
 const inputClass =
   'block h-11 w-full rounded-lg border border-line bg-white px-3 text-sm text-ink outline-none focus:border-ink focus:ring-1 focus:ring-ink disabled:bg-surface-muted'
@@ -13,8 +13,8 @@ const secondaryButton =
   'h-10 rounded-lg border border-line bg-white px-4 text-sm font-medium text-ink transition-colors hover:bg-surface-muted disabled:opacity-50'
 
 function toForm(branding: PublicBranding): OrganizationDetails {
-  const { name, phones, email, website, address, socials } = branding
-  return { name, phones, email, website, address, socials }
+  const { name, phones, email, website, address, socials, taxId, qrLink, showQr, invoiceFooter } = branding
+  return { name, phones, email, website, address, socials, taxId, qrLink, showQr, invoiceFooter }
 }
 
 function Field({ label, hint, children }: { label: string; hint?: string; children: ReactNode }) {
@@ -46,6 +46,7 @@ export function OrganizationTab({ canEdit }: { canEdit: boolean }) {
   const [busy, setBusy] = useState(false)
   const fileInput = useRef<HTMLInputElement>(null)
   const disabled = !canEdit || busy
+  const qr = documentQr(form)
 
   const set = <K extends keyof OrganizationDetails>(key: K, value: OrganizationDetails[K]) =>
     setForm((prev) => ({ ...prev, [key]: value }))
@@ -227,6 +228,65 @@ export function OrganizationTab({ canEdit }: { canEdit: boolean }) {
               />
             </Field>
           ))}
+        </div>
+      </Section>
+
+      <Section title={t('settings.organization.documents')} description={t('settings.organization.documentsHint')}>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label={t('settings.organization.taxId')} hint={t('settings.organization.taxIdHint')}>
+            <input
+              className={inputClass}
+              dir="ltr"
+              maxLength={60}
+              value={form.taxId}
+              disabled={disabled}
+              onChange={(e) => set('taxId', e.target.value)}
+            />
+          </Field>
+          <Field label={t('settings.organization.invoiceFooter')} hint={t('settings.organization.invoiceFooterHint')}>
+            <input
+              className={inputClass}
+              maxLength={160}
+              placeholder={t('settings.organization.invoiceFooterPlaceholder')}
+              value={form.invoiceFooter}
+              disabled={disabled}
+              onChange={(e) => set('invoiceFooter', e.target.value)}
+            />
+          </Field>
+          <div className="sm:col-span-2">
+            <label className="flex min-h-11 cursor-pointer items-center gap-3">
+              <input
+                type="checkbox"
+                className="h-4 w-4 accent-current"
+                checked={form.showQr}
+                disabled={disabled}
+                onChange={(e) => set('showQr', e.target.checked)}
+              />
+              <span className="text-sm font-medium text-ink">{t('settings.organization.showQr')}</span>
+            </label>
+          </div>
+          {form.showQr && (
+            <div className="sm:col-span-2">
+              <Field
+                label={t('settings.organization.qrLink')}
+                hint={
+                  qr
+                    ? t('settings.organization.qrPreview').replace('{link}', qr.value).replace('{caption}', qr.caption || qr.value)
+                    : t('settings.organization.qrEmpty')
+                }
+              >
+                <input
+                  className={inputClass}
+                  type="url"
+                  dir="ltr"
+                  placeholder={form.website || 'https://'}
+                  value={form.qrLink}
+                  disabled={disabled}
+                  onChange={(e) => set('qrLink', e.target.value)}
+                />
+              </Field>
+            </div>
+          )}
         </div>
       </Section>
 

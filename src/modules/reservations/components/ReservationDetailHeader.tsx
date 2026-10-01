@@ -3,6 +3,7 @@
 import type { ReservationDetail } from '@/modules/reservations/types'
 import { useCurrency } from '@/shared/contexts/CurrencyContext'
 import type { CurrencyCode } from '@/shared/utils/types'
+import { MoneyAmount } from '@/shared/components/MoneyTotals'
 
 const STATUS_STYLES: Record<string, string> = {
   draft: 'bg-[#FBF3DB] text-[#956400]',
@@ -25,7 +26,7 @@ interface Props {
 }
 
 export function ReservationDetailHeader({ detail }: Props) {
-  const { formatCurrency, currencyCode } = useCurrency()
+  const { currencyCode } = useCurrency()
   const rowCurrency = (detail.currency as CurrencyCode | null | undefined) ?? currencyCode
 
   const fields = detail as ReservationDetail & {
@@ -79,12 +80,12 @@ export function ReservationDetailHeader({ detail }: Props) {
           <div className="flex items-center gap-6 rounded-lg bg-[#F9F9F8] px-4 py-2.5">
             <div>
               <p className="text-[11px] font-medium uppercase tracking-wide text-[#787774]">Total</p>
-              <p className="text-sm font-semibold text-[#1A1A1A]">{formatCurrency(Number(detail.total_amount ?? 0), rowCurrency)}</p>
+              <p className="text-sm font-semibold text-[#1A1A1A]"><MoneyAmount inline amount={Number(detail.total_amount ?? 0)} currency={rowCurrency} /></p>
             </div>
             <div className="h-8 w-px bg-[#EAEAEA]" />
             <div>
               <p className="text-[11px] font-medium uppercase tracking-wide text-[#787774]">Paid</p>
-              <p className="text-sm font-semibold text-[#1A1A1A]">{formatCurrency(Number(detail.paid_amount ?? 0), rowCurrency)}</p>
+              <p className="text-sm font-semibold text-[#1A1A1A]"><MoneyAmount inline amount={Number(detail.paid_amount ?? 0)} currency={rowCurrency} /></p>
             </div>
           </div>
         </div>

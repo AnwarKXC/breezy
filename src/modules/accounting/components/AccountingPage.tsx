@@ -7,11 +7,13 @@ import { PaymentsTab } from './PaymentsTab'
 import { ExpenseManager } from './ExpenseManager'
 import { LedgerTab } from './LedgerTab'
 import { ReportsTab } from './ReportsTab'
-import { ViewInCurrencyToggle } from '@/shared/components/ViewInCurrencyToggle'
+import { GeneralJournalTab } from './GeneralJournalTab'
+import { ACTIONS } from '@/config/rbac'
+import { useCan } from '@/shared/rbac/useCan'
 import { AccountingPageSkeleton } from './AccountingPageSkeleton'
 import { useTranslation } from '@/i18n/hooks/useTranslation'
 
-type Tab = 'overview' | 'invoices' | 'payments' | 'expenses' | 'ledger' | 'reports'
+type Tab = 'overview' | 'invoices' | 'payments' | 'expenses' | 'ledger' | 'reports' | 'journal'
 
 interface InvoiceFilters {
   searchQuery: string
@@ -31,6 +33,7 @@ const tabs: { key: Tab; labelKey: string }[] = [
   { key: 'expenses', labelKey: 'accounting.tabs.expenses' },
   { key: 'ledger', labelKey: 'accounting.tabs.ledger' },
   { key: 'reports', labelKey: 'accounting.tabs.reports' },
+  { key: 'journal', labelKey: 'accounting.journal.title' },
 ]
 
 const TAB_STORAGE_KEY = 'hotel-system.accounting.activeTab'
@@ -53,6 +56,7 @@ const subscribeToNothing = () => () => {}
 
 export function AccountingPage({ locale }: AccountingPageProps) {
   const { t } = useTranslation()
+  const canReadJournal = useCan(ACTIONS.LEDGER_READ)
   // The user's click wins; until then show the last tab they used (server snapshot: none).
   const [selectedTab, setActiveTab] = useState<Tab | null>(null)
   const storedTab = useSyncExternalStore(subscribeToNothing, readStoredTab, () => null)
@@ -85,13 +89,15 @@ export function AccountingPage({ locale }: AccountingPageProps) {
         return <LedgerTab t={t} />
       case 'reports':
         return <ReportsTab t={t} />
+      case 'journal':
+        return <GeneralJournalTab />
     }
   }, [activeTab, t, locale, invoiceFilters])
 
   return (
     <div className="space-y-6 overflow-x-hidden">
       <div className="flex gap-1 bg-[#F5F5F5] rounded-lg p-1 w-full overflow-x-auto">
-        {tabs.map(({ key, labelKey }) => (
+        {tabs.filter((tab) => tab.key !== 'journal' || canReadJournal).map(({ key, labelKey }) => (
           <button
             key={key}
             onClick={() => handleTabChange(key)}
@@ -107,7 +113,6 @@ export function AccountingPage({ locale }: AccountingPageProps) {
       </div>
 
       {/* Totals are per currency; this converts them on demand with live rates (expenses are already in the system currency). */}
-      {activeTab !== 'expenses' && <ViewInCurrencyToggle className="justify-end" />}
 
       {tabContent}
     </div>

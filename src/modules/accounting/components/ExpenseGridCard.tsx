@@ -2,7 +2,7 @@
 
 import { memo } from 'react'
 import { TableActionsMenu } from '@/shared/table'
-import { useCurrency } from '@/shared/contexts/CurrencyContext'
+import { formatExpenseAmount } from '../utils/expenseMoney'
 import { useLocale } from '@/i18n/components/LocaleContext'
 import { formatDate } from '@/shared/utils/date'
 import type { Expense } from '../types'
@@ -22,7 +22,6 @@ export const ExpenseGridCard = memo(function ExpenseGridCard({
   onDelete,
   onCategoryClick,
 }: ExpenseGridCardProps) {
-  const { formatCurrency } = useCurrency()
   const locale = useLocale()
 
   return (
@@ -59,7 +58,7 @@ export const ExpenseGridCard = memo(function ExpenseGridCard({
             {t('accounting.expenses.amount')}
           </dt>
           <dd className="text-sm font-semibold text-[#1A1A1A]">
-            {formatCurrency(Number(expense.amount))}
+            {formatExpenseAmount(expense.totalAmount, expense.currency)}
           </dd>
         </div>
         <div className="flex items-center justify-between">

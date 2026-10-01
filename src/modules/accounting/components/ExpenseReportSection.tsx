@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useMemo } from 'react'
-import { useCurrency } from '@/shared/contexts/CurrencyContext'
+import { expenseTotals, formatExpenseTotals, formatExpenseAmount } from '../utils/expenseMoney'
 import type { Expense } from '../types'
 import { exportExpensesCsv } from '../utils/expenseCsvExport'
 
@@ -18,12 +18,11 @@ export function ExpenseReportSection({
   periodLabel,
   t,
 }: ExpenseReportSectionProps) {
-  const { formatCurrency } = useCurrency()
 
   const rows = useMemo(() => {
     const byCategory = new Map<string, { entries: number; total: number }>()
     for (const expense of expenses) {
-      const key = expense.categoryId
+      const key = `${expense.categoryId}|${expense.currency ?? 'UNKNOWN'}`
       const current = byCategory.get(key) ?? { entries: 0, total: 0 }
       current.entries += 1
       current.total += Number(expense.totalAmount ?? expense.amount ?? 0)
@@ -32,17 +31,15 @@ export function ExpenseReportSection({
     return Array.from(byCategory.entries())
       .map(([categoryId, stats]) => ({
         categoryId,
-        name: categoryNames[categoryId] ?? categoryId,
+        name: categoryNames[categoryId.split('|')[0]] ?? categoryId.split('|')[0],
+        currency: categoryId.split('|')[1],
         entries: stats.entries,
         total: stats.total,
       }))
       .sort((a, b) => b.total - a.total)
   }, [expenses, categoryNames])
 
-  const grandTotal = useMemo(
-    () => rows.reduce((sum, row) => sum + row.total, 0),
-    [rows],
-  )
+  const grandTotal = formatExpenseTotals(expenseTotals(expenses))
 
   const handleExportCsv = useCallback(() => {
     void exportExpensesCsv(
@@ -91,7 +88,7 @@ export function ExpenseReportSection({
                   <td className="px-4 py-2.5 text-sm font-medium text-[#333333]">{row.name}</td>
                   <td className="px-4 py-2.5 text-right text-sm text-[#555555]">{row.entries}</td>
                   <td className="px-4 py-2.5 text-right text-sm font-medium text-[#1A1A1A]">
-                    {formatCurrency(row.total)}
+                    {formatExpenseAmount(row.total, row.currency)}
                   </td>
                 </tr>
               ))}
@@ -103,7 +100,7 @@ export function ExpenseReportSection({
                   {expenses.length}
                 </td>
                 <td className="px-4 py-3 text-right text-base font-bold text-[#1A1A1A]">
-                  {formatCurrency(grandTotal)}
+                  {grandTotal}
                 </td>
               </tr>
             </tbody>

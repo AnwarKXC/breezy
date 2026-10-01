@@ -6,7 +6,7 @@ function downloadCsv(headers: string[], rows: string[][], fileName: string): voi
   const csvContent = [
     headers.join(','),
     ...rows.map((row) =>
-      row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(',')
+      row.map((cell) => `"${(/^[\s\u0000-\u001f]*[=+@-]/.test(String(cell)) ? `'${cell}` : String(cell)).replace(/"/g, '""')}"`).join(',')
     ),
   ].join('\n')
 
@@ -26,8 +26,7 @@ function moneyRows(label: string, value: Money, fallback: string): string[][] {
   return value.length === 0 ? [[label, fallback, '0']] : value.map((m) => [label, m.currency || fallback, String(m.amount)])
 }
 
-// Expenses have no currency of their own: they are in the system currency.
-function allRows(invoices: ReportInvoiceDetail[], expenses: ReportExpenseDetail[], systemCurrency: string): string[][] {
+function allRows(invoices: ReportInvoiceDetail[], expenses: ReportExpenseDetail[]): string[][] {
   const inv = invoices.map((i) => [
     'Invoice', i.invoiceNumber,
     i.guestName ?? i.companyName ?? '',
@@ -39,8 +38,8 @@ function allRows(invoices: ReportInvoiceDetail[], expenses: ReportExpenseDetail[
   const exp = expenses.map((e) => [
     'Expense', e.description,
     e.categoryName ?? '', '',
-    systemCurrency,
-    String(e.totalAmount), String(e.totalAmount), '0', '0',
+    e.currency ?? 'UNRESOLVED',
+    String(e.totalAmount), String(e.status === 'paid' ? e.totalAmount : 0), '0', String(e.status === 'approved' ? e.totalAmount : 0),
     e.paymentMethod ?? '', e.status, e.date?.slice(0, 10) ?? '',
   ])
   return [...inv, ...exp].sort((a, b) => a[11].localeCompare(b[11])).reverse()
@@ -56,7 +55,7 @@ function downloadReportsCsv(report: DailyRevenueReport | MonthlyRevenueReport, p
 
   downloadCsv(
     ['Type', 'ID/Description', 'Details', 'Room', 'Currency', 'Amount', 'Paid', 'Refunded', 'Remaining', 'Method', 'Status', 'Date'],
-    allRows(inv, exp, systemCurrency),
+    allRows(inv, exp),
     `${prefix}-records-${periodLabel}.csv`,
   )
 
@@ -66,6 +65,7 @@ function downloadReportsCsv(report: DailyRevenueReport | MonthlyRevenueReport, p
     ['Metric', 'Currency', 'Value'],
     [
       ['Period', '', periodLabel],
+      ...(exp.some((expense) => !expense.currency) ? [['Warning', '', 'Historical expenses with unresolved currency remain unclassified; reconcile before relying on profit figures.']] : []),
       ...moneyRows('Total Revenue', totalRevenue, systemCurrency),
       ...moneyRows('Total Paid', invoiceTotal((i) => i.paidAmount), systemCurrency),
       ...moneyRows('Total Refunded', invoiceTotal((i) => i.refundedAmount), systemCurrency),

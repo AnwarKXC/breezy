@@ -1,8 +1,9 @@
+import type { ReactNode } from "react";
 import { InfoHint } from "./InfoHint";
 
 interface AnalyticsCardProps {
   label: string;
-  value: string | number;
+  value: ReactNode;
   trend?: string;
   negative?: boolean;
   /** Optional explanation of what the number means, shown via an info badge. */

@@ -3,6 +3,7 @@ import { secureReadEndpoint, secureMutationEndpoint } from '@/shared/secureEndpo
 import { ACTIONS } from '@/config/rbac'
 import { getExpenses, createExpense, updateExpense, approveExpense, deleteExpense } from '@/modules/accounting/services'
 import { AccountingExpenseCreateSchema, AccountingIdQuerySchema, zodErrorMessage } from '@/shared/validation'
+import { ExpenseConflictError } from '@/modules/accounting/services/expenseErrors'
 
 export async function GET(request: Request) {
   return secureReadEndpoint(request, ACTIONS.ACCOUNTING_READ, async () => {
@@ -22,8 +23,13 @@ export async function POST(request: Request) {
     if (!parsed.success) {
       return NextResponse.json({ error: zodErrorMessage(parsed.error) }, { status: 400 })
     }
-    const data = await createExpense(parsed.data)
-    return NextResponse.json({ data, message: 'Expense created' }, { status: 201 })
+    try {
+      const data = await createExpense(parsed.data)
+      return NextResponse.json({ data, message: 'Expense created' }, { status: 201 })
+    } catch (error) {
+      if (error instanceof ExpenseConflictError) return NextResponse.json({ error: error.message }, { status: 409 })
+      throw error
+    }
   })
 }
 
@@ -37,15 +43,25 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: zodErrorMessage(idParsed.error) }, { status: 400 })
     }
     if (action === 'approve') {
-      const data = await approveExpense(idParsed.data.id)
-      return NextResponse.json({ data, message: 'Expense approved' })
+      try {
+        const data = await approveExpense(idParsed.data.id)
+        return NextResponse.json({ data, message: 'Expense approved' })
+      } catch (error) {
+        if (error instanceof ExpenseConflictError) return NextResponse.json({ error: error.message }, { status: 409 })
+        throw error
+      }
     }
     const parsed = AccountingExpenseCreateSchema.safeParse(await request.json())
     if (!parsed.success) {
       return NextResponse.json({ error: zodErrorMessage(parsed.error) }, { status: 400 })
     }
-    const data = await updateExpense(idParsed.data.id, parsed.data)
-    return NextResponse.json({ data, message: 'Expense updated' })
+    try {
+      const data = await updateExpense(idParsed.data.id, parsed.data)
+      return NextResponse.json({ data, message: 'Expense updated' })
+    } catch (error) {
+      if (error instanceof ExpenseConflictError) return NextResponse.json({ error: error.message }, { status: 409 })
+      throw error
+    }
   })
 }
 
@@ -57,7 +73,12 @@ export async function DELETE(request: Request) {
     if (!parsed.success) {
       return NextResponse.json({ error: zodErrorMessage(parsed.error) }, { status: 400 })
     }
-    await deleteExpense(parsed.data.id)
-    return NextResponse.json({ message: 'Expense deleted' })
+    try {
+      await deleteExpense(parsed.data.id)
+      return NextResponse.json({ message: 'Expense deleted' })
+    } catch (error) {
+      if (error instanceof ExpenseConflictError) return NextResponse.json({ error: error.message }, { status: 409 })
+      throw error
+    }
   })
 }

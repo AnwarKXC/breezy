@@ -5,10 +5,9 @@ import { Card } from '@/shared/components/Card'
 import { ToolbarExportGroup } from '@/shared/components/toolbar'
 import type { Invoice } from '../types/invoiceTypes'
 import { InvoiceModal } from './InvoiceModal'
-import { useCurrency } from '@/shared/contexts/CurrencyContext'
-import type { CurrencyCode } from '@/shared/utils/types'
 import { useLocale } from '@/i18n/components/LocaleContext'
 import { formatDate } from '@/shared/utils/date'
+import { MoneyAmount } from '@/shared/components/MoneyTotals'
 
 interface InvoicesSectionProps {
   invoices: Invoice[]
@@ -28,7 +27,6 @@ function statusColor(status: string): string {
 }
 
 export function InvoicesSection({ invoices, labels, onExportCsv, onExportPdf }: InvoicesSectionProps) {
-  const { formatCurrency } = useCurrency()
   const locale = useLocale()
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null)
   const [printingId, setPrintingId] = useState<string | null>(null)
@@ -122,7 +120,7 @@ export function InvoicesSection({ invoices, labels, onExportCsv, onExportPdf }: 
                   </button>
                 </div>
                 <span className="whitespace-nowrap text-sm font-medium text-[#1A1A1A]">
-                  {formatCurrency(Number(invoice.amount), invoice.currency as CurrencyCode | undefined)}
+                  <MoneyAmount inline amount={Number(invoice.amount)} currency={invoice.currency} />
                 </span>
                 <span className="whitespace-nowrap text-xs text-[#787774]">{formatDate(invoice.issueDate, locale)}</span>
                 <span className="justify-self-end sm:justify-self-start">

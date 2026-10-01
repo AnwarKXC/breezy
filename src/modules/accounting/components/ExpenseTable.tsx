@@ -3,7 +3,7 @@
 import { memo, useMemo } from 'react'
 import { Table, TableActionsMenu, type TableColumn } from '@/shared/table'
 import type { Expense } from '../types'
-import { useCurrency } from '@/shared/contexts/CurrencyContext'
+import { formatExpenseAmount } from '../utils/expenseMoney'
 import { useLocale } from '@/i18n/components/LocaleContext'
 import { formatDate } from '@/shared/utils/date'
 
@@ -28,7 +28,6 @@ export const ExpenseTable = memo(function ExpenseTable({
   onCategoryClick,
   hideCategory,
 }: ExpenseTableProps) {
-  const { formatCurrency } = useCurrency()
   const locale = useLocale()
   const hasActions = Boolean(onDelete)
   const columns = useMemo(() => {
@@ -56,7 +55,7 @@ export const ExpenseTable = memo(function ExpenseTable({
         key: 'amount',
         label: t('accounting.expenses.amount'),
         render: (_value, expense) => (
-          <span className="font-medium">{formatCurrency(Number(expense.amount))}</span>
+          <span className="font-medium">{formatExpenseAmount(expense.totalAmount, expense.currency)}</span>
         ),
       },
       {
@@ -86,7 +85,7 @@ export const ExpenseTable = memo(function ExpenseTable({
     }
 
     return cols
-  }, [hideCategory, t, hasActions, onCategoryClick, categoryNames, formatCurrency, locale, onDelete])
+  }, [hideCategory, t, hasActions, onCategoryClick, categoryNames, locale, onDelete])
 
   return (
     <Table

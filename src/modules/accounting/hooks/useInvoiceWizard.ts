@@ -308,9 +308,9 @@ export function useInvoiceWizard(
     setState((prev) => ({ ...prev, warnings }))
   }, [])
 
-  const createInvoice = useCallback(async (): Promise<{ id: string; invoiceNumber?: string }> => {
+  const createInvoice = useCallback(async (saveAsDraft = false): Promise<{ id: string; invoiceNumber?: string }> => {
     const { buildCreatePayload } = await import('../utils/invoiceWizardValidation')
-    const payload = buildCreatePayload(state)
+    const payload = buildCreatePayload(state, saveAsDraft)
     const res = await fetch('/api/accounting/invoices', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

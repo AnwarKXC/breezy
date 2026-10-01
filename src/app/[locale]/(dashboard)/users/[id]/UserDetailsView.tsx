@@ -5,11 +5,13 @@
 import { useRouter } from 'next/navigation'
 import { memo, useMemo } from 'react'
 import { useTranslation } from '@/i18n/hooks/useTranslation'
-import { useCurrency, type MoneyRow } from '@/shared/contexts/CurrencyContext'
+import type { MoneyRow } from '@/shared/contexts/CurrencyContext'
 
 import type { Locale } from '@/i18n/config'
 import type { UserRole } from '@/modules/users/types'
 import { Table, type TableColumn } from '@/shared/table'
+import { MoneyTotals } from '@/shared/components/MoneyTotals'
+import { MoneyAmount } from '@/shared/components/MoneyTotals'
 
 // 📍 Placeholder types
 const NO_DETAILS: Record<string, string> = {}
@@ -96,7 +98,6 @@ function UserInfoCard({ user, labels }: { user: SerializableUser | null; labels:
 type ReservationRow = Reservation & Record<string, unknown>
 
 function ReservationsTable({ reservations, total, locale, labels }: { reservations: Reservation[]; total: number; locale: Locale; labels: Record<string, unknown> }) {
-  const { formatCurrency } = useCurrency()
   const details = (labels.details ?? NO_DETAILS) as Record<string, string>
   const router = useRouter()
   const { t } = useTranslation()
@@ -131,9 +132,9 @@ function ReservationsTable({ reservations, total, locale, labels }: { reservatio
     {
       key: 'totalPrice',
       label: details.total || 'Total',
-      render: (_value, reservation) => formatCurrency(reservation.totalPrice, reservation.currency),
+      render: (_value, reservation) => <MoneyAmount amount={reservation.totalPrice} currency={reservation.currency} />,
     },
-  ], [details, formatCurrency, t])
+  ], [details, t])
 
   return (
     <div className="rounded-xl bg-white p-6 ">
@@ -162,11 +163,10 @@ function ReservationsTable({ reservations, total, locale, labels }: { reservatio
 
 function AnalyticsCards({ stats, labels }: { stats: ReservationStats; labels: Record<string, unknown> }) {
   const details = (labels.details ?? NO_DETAILS) as Record<string, string>
-  const { formatTotals } = useCurrency()
 
   const cards = [
     { label: details.totalBookings || 'Total Reservations', value: stats.total.toString(), icon: '📅' },
-    { label: details.totalSpent || 'Total Spent', value: formatTotals(stats.revenue), icon: '💰' },
+    { label: details.totalSpent || 'Total Spent', value: <MoneyTotals value={stats.revenue} />, icon: '💰' },
     { label: details.lastBooking || 'Last Reservation', value: stats.lastCheckIn ?? '-', icon: '📆' },
   ]
 

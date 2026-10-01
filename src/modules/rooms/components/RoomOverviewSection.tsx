@@ -6,6 +6,7 @@ import { GridView } from '@/shared'
 import { ToolbarSearch, ToolbarViewToggle } from '@/shared/components/toolbar'
 import type { Room } from '../types'
 import type { RoomType } from '@/modules/room-types/types'
+import { MoneyAmount } from '@/shared/components/MoneyTotals'
 
 type RoomRow = Room & Record<string, unknown>; interface RoomOverviewSectionProps {
  rooms: {
@@ -166,7 +167,7 @@ export function RoomOverviewSection({
  { label: t('rooms.totalRooms'), value: metrics.totalRooms },
  { label: t('rooms.roomTypes'), value: metrics.totalTypes },
  { label: t('rooms.availableRooms'), value: metrics.available },
- { label: t('rooms.avgPrice'), value: formatCurrency(metrics.avgPrice) },
+ { label: t('rooms.avgPrice'), value: <MoneyAmount amount={metrics.avgPrice} /> },
  ].map(m => (
  <div key={m.label} className="bg-white rounded-xl border border-[#EAEAEA] p-3 sm:p-4 "> <div className="text-[10px] sm:text-xs font-medium text-[#787774] uppercase tracking-wide">{m.label}</div> <div className="mt-1 text-xl sm:text-2xl font-semibold text-[#1A1A1A] tabular-nums">{m.value}</div> </div> ))}
  </div> <div className="bg-[#F9F9F8] rounded-xl p-4"> <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-end"> <div> <label className="block text-xs font-medium text-[#787774] mb-1">{t('rooms.roomNumber')}</label> <input

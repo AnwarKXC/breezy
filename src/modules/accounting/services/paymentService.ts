@@ -8,7 +8,7 @@ import { fromRow, serializeRow } from '@/services/db/rows'
 import type { CreatePaymentInput, Payment } from '../types'
 import { mapPaymentRow } from '../types'
 import {
-  requireAccountingRead, requireAccountingWrite, requirePaymentsRefund,
+  requireAccountingRead, requirePaymentsCreate, requirePaymentsRefund,
 } from './serviceSecurity'
 import { logPaymentCreated, logPaymentRefunded } from './activityLogService'
 import { deriveInvoiceStatus } from './deriveInvoiceStatus'
@@ -61,7 +61,10 @@ export async function getAllPayments(params?: { fromDate?: string; toDate?: stri
 }
 
 export async function createPayment(input: CreatePaymentInput) {
-  const session = await requireAccountingWrite()
+  const session = await requirePaymentsCreate()
+  const amount = Number(input.amount)
+  if (!Number.isFinite(amount) || amount <= 0) throw new Error('Payment amount must be greater than zero. Use the refund action for refunds.')
+  if (amount < 0.01 || amount > 9999999999.99 || Math.abs(amount * 100 - Math.round(amount * 100)) > 0.00001) throw new Error('Payment amount must have at most two decimal places and fit the supported monetary limit.')
 
   const payment = await prisma.$transaction(async (tx) => {
     await lockInvoice(tx, input.invoice_id)
@@ -73,13 +76,13 @@ export async function createPayment(input: CreatePaymentInput) {
     if (input.currency && input.currency !== invoice.currency) {
       throw new Error(`Payment currency must match the invoice currency (${invoice.currency})`)
     }
-    if (invoice.status === 'void' || invoice.status === 'refunded') {
-      throw new Error('Cannot record payment for a void or refunded invoice')
+    if (invoice.status === 'draft' || invoice.status === 'void' || invoice.status === 'refunded') {
+      throw new Error('Issue the invoice before recording a payment; void and refunded invoices cannot receive payments')
     }
 
-    const existing = await tx.payments.findMany({ where: { invoice_id: input.invoice_id, deleted_at: null }, select: { amount: true } })
+    const existing = await tx.payments.findMany({ where: { invoice_id: input.invoice_id, deleted_at: null }, select: { amount: true, currency: true } })
+    if (existing.some((payment) => payment.currency !== invoice.currency)) throw new Error('Invoice payment history contains mixed currencies; reconcile it first.')
     const { grossPaid, totalRefunded } = paymentTotals(existing)
-    const amount = Number(input.amount)
     if (amount > 0 && amount > Math.max(0, Number(invoice.amount ?? 0) - grossPaid)) {
       throw new Error('Payment amount cannot exceed the remaining invoice balance')
     }
@@ -111,8 +114,15 @@ export async function refundPayment(id: string, reason?: string) {
     const original = await tx.payments.findFirst({ where: { id, deleted_at: null } })
     if (!original) throw new Error('Payment not found')
     await lockInvoice(tx, original.invoice_id)
+    if (Number(original.amount) <= 0) throw new Error('Only a positive receipt can be refunded')
+    const refundKey = `refund:${original.id}`
+    const priorRefund = await tx.payments.findFirst({ where: { idempotency_key: refundKey, deleted_at: null } })
+    if (priorRefund) return toPayment(priorRefund)
 
-    const invoicePayments = await tx.payments.findMany({ where: { invoice_id: original.invoice_id, deleted_at: null }, select: { amount: true } })
+    const invoice = await tx.invoices.findFirst({ where: { id: original.invoice_id, deleted_at: null }, select: { currency: true } })
+    if (!invoice || invoice.currency !== original.currency) throw new Error('Payment currency does not match its invoice; reconcile it before refunding.')
+    const invoicePayments = await tx.payments.findMany({ where: { invoice_id: original.invoice_id, deleted_at: null }, select: { amount: true, currency: true } })
+    if (invoicePayments.some((payment) => payment.currency !== invoice.currency)) throw new Error('Invoice payment history contains mixed currencies; reconcile it first.')
     const { grossPaid, totalRefunded } = paymentTotals(invoicePayments)
     if (Math.abs(Number(original.amount)) > Math.max(0, grossPaid - totalRefunded)) {
       throw new Error('Refund amount exceeds the remaining refundable amount.')
@@ -121,6 +131,7 @@ export async function refundPayment(id: string, reason?: string) {
     const row = await tx.payments.create({
       data: {
         invoice_id: original.invoice_id,
+        idempotency_key: refundKey,
         method: original.method,
         amount: -Math.abs(Number(original.amount)),
         currency: original.currency,
@@ -139,22 +150,17 @@ export async function refundPayment(id: string, reason?: string) {
 }
 
 export async function deletePayment(id: string) {
-  await requireAccountingWrite()
-  await prisma.$transaction(async (tx) => {
-    const payment = await tx.payments.findFirst({ where: { id, deleted_at: null }, select: { invoice_id: true } })
-    if (!payment) return
-    await tx.payments.update({ where: { id }, data: { deleted_at: new Date() } })
-    // The payment's ledger entry goes with it; otherwise the ledger keeps the cash.
-    await tx.accounting_ledger_entries.deleteMany({ where: { source_type: 'payment', source_id: id } })
-    await updateInvoicePaidAmount(payment.invoice_id, tx)
-  })
+  await requirePaymentsRefund()
+  void id
+  throw new Error('Payment history cannot be deleted. Record a refund or a documented correction.')
 }
 
 /** Recomputes paid/refunded/remaining/status of an invoice from its payments. */
 export async function updateInvoicePaidAmount(invoiceId: string, tx: Db = prisma) {
-  const payments = await tx.payments.findMany({ where: { invoice_id: invoiceId, deleted_at: null }, select: { amount: true } })
-  const invoice = await tx.invoices.findUnique({ where: { id: invoiceId }, select: { amount: true, status: true, reservation_id: true } })
+  const payments = await tx.payments.findMany({ where: { invoice_id: invoiceId, deleted_at: null }, select: { amount: true, currency: true } })
+  const invoice = await tx.invoices.findUnique({ where: { id: invoiceId }, select: { amount: true, status: true, reservation_id: true, currency: true } })
   if (!invoice) return
+  if (payments.some((payment) => payment.currency !== invoice.currency)) throw new Error('Invoice payment history contains mixed currencies; reconcile it before changing this invoice.')
 
   const { grossPaid, totalRefunded } = paymentTotals(payments)
   const total = Number(invoice.amount)

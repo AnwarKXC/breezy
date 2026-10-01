@@ -281,7 +281,8 @@ export async function createInvoice(input: CreateInvoiceDraftInput & { items?: I
 
   const { subtotal, discount, taxAmount, serviceCharge, total } = calculateInvoiceTotals(input)
   const status = input.status ?? 'draft'
-  const isPaid = status === 'paid'
+  if (status !== 'draft' && status !== 'issued') throw new Error('New invoices must be draft or issued. Record receipts through payments.')
+  if (status === 'issued') await requireInvoicesIssue()
   // A reservation's invoice is always in the reservation's currency (no FX).
   const reservationCurrency = input.reservation_id
     ? (await prisma.reservations.findUnique({ where: { id: input.reservation_id }, select: { currency: true } }))?.currency
@@ -329,6 +330,9 @@ export async function createInvoice(input: CreateInvoiceDraftInput & { items?: I
       : null
 
     if (existing) {
+      await lockInvoice(tx, existing.id)
+      const locked = await tx.invoices.findUniqueOrThrow({ where: { id: existing.id } })
+      if (locked.status !== 'draft') return { invoice: toInvoice(locked), reused: true }
       await tx.invoices.update({ where: { id: existing.id }, data: { ...common, updated_by: session.id } })
       if (input.items && input.items.length > 0) {
         await tx.invoice_items.deleteMany({ where: { invoice_id: existing.id } })
@@ -344,9 +348,9 @@ export async function createInvoice(input: CreateInvoiceDraftInput & { items?: I
         ...common,
         contact_id: input.contact_id,
         invoice_number: invoiceNumber,
-        paid_amount: isPaid ? total : 0,
-        remaining_balance: isPaid ? 0 : total,
-        paid_at: isPaid ? new Date() : null,
+        paid_amount: 0,
+        remaining_balance: total,
+        paid_at: null,
         status,
         created_by: session.id,
         ...(input.reservation_id ? { reservation_id: input.reservation_id } : {}),
@@ -365,14 +369,17 @@ export async function createInvoice(input: CreateInvoiceDraftInput & { items?: I
 
 export async function updateInvoice(id: string, input: UpdateInvoiceInput & { items?: InvoiceItemDraftInput[] }) {
   const session = await requireInvoicesUpdate()
-
-  const existingInvoice = await prisma.invoices.findUnique({
-    where: { id },
+  const row = await prisma.$transaction(async (tx) => {
+  await lockInvoice(tx, id)
+  const existingInvoice = await tx.invoices.findFirst({
+    where: { id, deleted_at: null },
     select: { status: true, subtotal: true, discount: true, tax_amount: true, service_charge: true, amount: true, reservation_id: true },
   })
+  if (!existingInvoice) throw new Error('Invoice not found')
+  if (input.status !== undefined && input.status !== existingInvoice.status) throw new Error('Use the dedicated issue, payment, refund or void action to change invoice status.')
 
   if (input.currency && existingInvoice?.reservation_id) {
-    const reservation = await prisma.reservations.findUnique({ where: { id: existingInvoice.reservation_id }, select: { currency: true } })
+    const reservation = await tx.reservations.findUnique({ where: { id: existingInvoice.reservation_id }, select: { currency: true } })
     if (reservation && reservation.currency !== input.currency) {
       throw new Error(`Invoice currency must match the reservation currency (${reservation.currency})`)
     }
@@ -384,7 +391,7 @@ export async function updateInvoice(id: string, input: UpdateInvoiceInput & { it
       'billing_address', 'guest_name', 'company_name',
     ]
     const changedFields = Object.keys(input).filter(k => !allowedFields.includes(k as keyof typeof input))
-    if (changedFields.length > 0 && ['paid', 'void', 'refunded'].includes(existingInvoice.status)) {
+    if (changedFields.length > 0) {
       throw new Error('This invoice cannot be edited. Use adjustments or corrections.')
     }
   }
@@ -398,20 +405,21 @@ export async function updateInvoice(id: string, input: UpdateInvoiceInput & { it
 
   let updatedAmount = input.amount
   if (existingInvoice && (inputItems || input.subtotal !== undefined || input.discount !== undefined || input.tax_amount !== undefined || input.service_charge !== undefined)) {
-    const { total } = calculateInvoiceTotals({
+    const oldItems = inputItems ? await tx.invoice_items.aggregate({ where: { invoice_id: id }, _sum: { discount_amount: true, tax_amount: true } }) : null
+    const { total, subtotal, discount, taxAmount, serviceCharge } = calculateInvoiceTotals({
       ...input,
       subtotal: input.subtotal ?? Number(existingInvoice.subtotal),
-      discount: input.discount ?? Number(existingInvoice.discount),
-      tax_amount: input.tax_amount ?? Number(existingInvoice.tax_amount),
+      discount: input.discount ?? Number(existingInvoice.discount) - Number(oldItems?._sum.discount_amount ?? 0),
+      tax_amount: input.tax_amount ?? Number(existingInvoice.tax_amount) - Number(oldItems?._sum.tax_amount ?? 0),
       service_charge: input.service_charge ?? Number(existingInvoice.service_charge),
       items: inputItems,
     })
     updatedAmount = total
+    Object.assign(invoiceFields, { subtotal, discount, tax_amount: taxAmount, service_charge: serviceCharge })
   }
 
   const updatedInvoiceFields = updatedAmount === undefined ? invoiceFields : { ...invoiceFields, amount: updatedAmount }
 
-  const row = await prisma.$transaction(async (tx) => {
     const { count } = await tx.invoices.updateMany({
       where: { id, deleted_at: null },
       data: {
@@ -425,6 +433,8 @@ export async function updateInvoice(id: string, input: UpdateInvoiceInput & { it
       await tx.invoice_items.deleteMany({ where: { invoice_id: id } })
       if (inputItems.length > 0) await tx.invoice_items.createMany({ data: mapInvoiceItemsForInsert(id, inputItems) })
     }
+
+    if (existingInvoice.status === 'draft') await updateInvoicePaidAmount(id, tx)
 
     await createInvoiceEvent(
       {
@@ -445,36 +455,23 @@ export async function updateInvoice(id: string, input: UpdateInvoiceInput & { it
 
 export async function issueInvoice(id: string) {
   const session = await requireInvoicesIssue()
-  const current = await prisma.invoices.findFirst({ where: { id, deleted_at: null } })
-  if (!current) throw new Error('Failed to fetch invoice: not found')
-  if (current.status === 'void' || current.status === 'refunded') {
-    throw new Error('Invoice is already void or refunded')
-  }
-
-  const shouldUpdateStatus = current.status === 'draft'
-  const row = shouldUpdateStatus
-    ? await prisma.invoices.update({
-        where: { id },
-        data: { status: 'issued', issued_at: new Date(), issued_by: session.id, updated_by: session.id },
-      })
-    : current
+  const row = await prisma.$transaction(async (tx) => {
+    await lockInvoice(tx, id)
+    const current = await tx.invoices.findFirst({ where: { id, deleted_at: null } })
+    if (!current) throw new Error('Failed to fetch invoice: not found')
+    if (current.status === 'void' || current.status === 'refunded') throw new Error('Invoice is already void or refunded')
+    const issued = current.status === 'draft'
+      ? await tx.invoices.update({ where: { id }, data: { status: 'issued', issued_at: new Date(), issued_by: session.id, updated_by: session.id } })
+      : current
+    if (!await tx.invoice_events.findFirst({ where: { invoice_id: id, event_type: 'issued' }, select: { id: true } })) {
+      await createInvoiceEvent({ invoiceId: id, eventType: 'issued', actorId: session.id, oldStatus: current.status, newStatus: issued.status }, tx)
+    }
+    return issued
+  })
 
   const invoice = toInvoice(row)
   void logInvoiceIssued({ id: invoice.id, invoiceNumber: invoice.invoiceNumber })
-  await ensureInvoiceIssuedEvent(invoice, session.id, current.status)
   return invoice
-}
-
-async function ensureInvoiceIssuedEvent(invoice: Invoice, actorId: string, oldStatus: string | null) {
-  const existing = await prisma.invoice_events.findFirst({ where: { invoice_id: invoice.id, event_type: 'issued' }, select: { id: true } })
-  if (existing) return
-  await createInvoiceEvent({
-    invoiceId: invoice.id,
-    eventType: 'issued',
-    actorId,
-    oldStatus,
-    newStatus: 'issued',
-  })
 }
 
 export async function voidInvoice(id: string, reason: string) {
@@ -485,6 +482,9 @@ export async function voidInvoice(id: string, reason: string) {
   }
 
   const row = await prisma.$transaction(async (tx) => {
+    await lockInvoice(tx, id)
+    const locked = await tx.invoices.findFirst({ where: { id, deleted_at: null }, select: { status: true } })
+    if (!locked || locked.status === 'void' || locked.status === 'refunded') throw new Error('Invoice is already void or refunded')
     const { count } = await tx.invoices.updateMany({
       where: { id, deleted_at: null },
       data: { status: 'void', void_reason: reason, voided_at: new Date(), voided_by: session.id, remaining_balance: 0, updated_by: session.id },
@@ -523,6 +523,10 @@ export async function deleteInvoice(id: string) {
 
   const now = new Date()
   await prisma.$transaction(async (tx) => {
+    await lockInvoice(tx, id)
+    const locked = await tx.invoices.findFirst({ where: { id, deleted_at: null }, select: { status: true } })
+    if (!locked || locked.status !== 'draft') throw new Error('Only unpaid draft invoices can be deleted. Void issued invoices instead.')
+    if (await tx.payments.count({ where: { invoice_id: id } })) throw new Error('Invoices with payment history cannot be deleted.')
     await tx.invoices.update({ where: { id }, data: { deleted_at: now } })
 
     // invoice_events has no 'deleted' event type; record it as a status change.
@@ -533,10 +537,6 @@ export async function deleteInvoice(id: string) {
 
     // The cash record and the invoice's general-ledger entries follow the invoice
     // (payment ledger rows carry invoice_id; older rows are keyed by source_id).
-    await tx.payments.updateMany({ where: { invoice_id: id, deleted_at: null }, data: { deleted_at: now } })
-    await tx.accounting_ledger_entries.deleteMany({
-      where: { OR: [{ invoice_id: id }, { source_type: 'invoice', source_id: id }] },
-    })
 
     // Cancel the linked reservation and free its rooms (matches the warning in DeleteInvoiceDialog).
     if (linkedReservation && CANCELLABLE_RESERVATION_STATUSES.includes(linkedReservation.status)) {

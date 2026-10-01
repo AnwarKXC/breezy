@@ -16,4 +16,8 @@ export const OrganizationUpdateSchema = z.object({
   website: optionalUrl,
   address: z.string().trim().max(300),
   socials: z.object(Object.fromEntries(SOCIAL_PLATFORMS.map((p) => [p, optionalUrl.optional()]))).strict(),
+  taxId: z.string().trim().max(60).default(''),
+  qrLink: optionalUrl.default(''),
+  showQr: z.boolean().default(true),
+  invoiceFooter: z.string().trim().max(160).default(''),
 })

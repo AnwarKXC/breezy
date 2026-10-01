@@ -11,6 +11,7 @@ import { useRoomTypes } from '@/modules/room-types/hooks'
 import type { CreatePricingInput, UpdatePricingInput } from '../types'
 import type { RoomTypePricing } from '../types'
 import { useCurrency } from '@/shared/contexts/CurrencyContext'
+import { MoneyAmount } from '@/shared/components/MoneyTotals'
 
 const currencyOptions = (Object.keys(CURRENCY_LABELS) as CurrencyCode[]).map(code => ({
   label: CURRENCY_LABELS[code],
@@ -191,7 +192,7 @@ export function PricingManagement() {
       {
         key: 'price',
         label: t('rooms.pricingForm.standard'),
-        render: (_value, row) => <span className="font-mono tabular-nums">{formatCurrency(row.price, row.currency)}</span>,
+        render: (_value, row) => <MoneyAmount className="font-mono tabular-nums" amount={row.price} currency={row.currency} />,
       },
       {
         key: 'currency',
@@ -428,7 +429,7 @@ export function PricingManagement() {
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div>
                     <span className="text-[#787774]">{t('rooms.pricingForm.standardBadge')}</span>
-                    <p className="font-mono font-semibold text-[#1A1A1A]">{formatCurrency(p.price, p.currency)}</p>
+                    <p className="font-mono font-semibold text-[#1A1A1A]"><MoneyAmount inline amount={p.price} currency={p.currency} /></p>
                   </div>
                   <div>
                     <span className="text-[#787774]">{t('rooms.pricingForm.sdtLabel')}</span>

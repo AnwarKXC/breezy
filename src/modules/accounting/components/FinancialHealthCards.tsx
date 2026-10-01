@@ -1,6 +1,6 @@
 ﻿'use client'
 
-import { useCurrency } from '@/shared/contexts/CurrencyContext'
+import { MoneyTotals } from '@/shared/components/MoneyTotals'
 import { isNonNegativeMoney } from '@/shared/currency/money'
 import type { FinancialHealth } from '../types'
 
@@ -13,8 +13,6 @@ interface FinancialHealthCardsProps {
 const cardClass = 'rounded-xl border border-[#EAEAEA] bg-white p-5 space-y-1'
 
 export function FinancialHealthCards({ stats, loading, t }: FinancialHealthCardsProps) {
-  const { formatTotals } = useCurrency()
-
   if (loading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-pulse">
@@ -38,7 +36,7 @@ export function FinancialHealthCards({ stats, loading, t }: FinancialHealthCards
         <div key={card.label} className={cardClass}>
           <p className="text-sm text-[#787774]">{card.label}</p>
           <p className={`break-words text-2xl font-bold ${card.color}`}>
-            {formatTotals(card.value)}
+            <MoneyTotals value={card.value} />
           </p>
         </div>
       ))}
