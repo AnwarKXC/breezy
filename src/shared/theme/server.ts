@@ -2,6 +2,7 @@
 // (key='theme', value={ primaryColor: '#RRGGBB' }). No row = default theme.
 
 import 'server-only'
+import { revalidateTag, unstable_cache } from 'next/cache'
 import { prisma } from '@/services/db/prisma'
 import { DEFAULT_PRIMARY_COLOR, normalizeHexColor } from './theme'
 
@@ -14,19 +15,22 @@ export interface AppTheme {
 
 const DEFAULT_THEME: AppTheme = { primaryColor: DEFAULT_PRIMARY_COLOR, isDefault: true }
 
-// Read on every dashboard render, changed only from settings: cache briefly
-// in-process and invalidate on write (other instances converge in TTL).
-const THEME_TTL_MS = 60 * 1000
-let themeCache: { theme: AppTheme; ts: number } | null = null
+// Read on every dashboard render, changed only from settings. Uses Next's data
+// cache (shared by route handlers and server components) and expires on write.
+const CACHE_TAG = 'app-settings:theme'
+
+const readRow = unstable_cache(
+  async () =>
+    (await prisma.app_settings.findUnique({ where: { key: THEME_KEY }, select: { value: true } }))?.value ?? null,
+  [CACHE_TAG],
+  { tags: [CACHE_TAG], revalidate: 3600 },
+)
 
 export async function getAppTheme(): Promise<AppTheme> {
-  if (themeCache && Date.now() - themeCache.ts < THEME_TTL_MS) return themeCache.theme
   try {
-    const row = await prisma.app_settings.findUnique({ where: { key: THEME_KEY }, select: { value: true } })
-    const primaryColor = normalizeHexColor((row?.value as { primaryColor?: unknown } | null)?.primaryColor)
-    const theme = primaryColor ? { primaryColor, isDefault: false } : DEFAULT_THEME
-    themeCache = { theme, ts: Date.now() }
-    return theme
+    const value = await readRow()
+    const primaryColor = normalizeHexColor((value as { primaryColor?: unknown } | null)?.primaryColor)
+    return primaryColor ? { primaryColor, isDefault: false } : DEFAULT_THEME
   } catch (err) {
     console.error('[theme] getAppTheme failed:', err)
     return DEFAULT_THEME
@@ -40,10 +44,10 @@ export async function saveAppTheme(primaryColor: string, userId: string): Promis
     create: { key: THEME_KEY, value, updated_by: userId },
     update: { value, updated_by: userId, updated_at: new Date() },
   })
-  themeCache = null
+  revalidateTag(CACHE_TAG, { expire: 0 })
 }
 
 export async function resetAppTheme(): Promise<void> {
   await prisma.app_settings.deleteMany({ where: { key: THEME_KEY } })
-  themeCache = null
+  revalidateTag(CACHE_TAG, { expire: 0 })
 }

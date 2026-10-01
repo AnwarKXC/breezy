@@ -1220,6 +1220,7 @@
     "roomsAndGuests": "الغرف والنزلاء",
     "roomCountSingular": "{n} غرفة",
     "roomCountPlural": "{n} غرف",
+    "selectRoomToManage": "اختر غرفة لعرض النزلاء والإجراءات",
     "noRoomsAssigned": "لم يتم تعيين غرف",
     "assignRoomBeforeCheckIn": "قم بتعيين غرفة قبل متابعة تسجيل الوصول.",
     "reservationNotFound": "الحجز غير موجود",

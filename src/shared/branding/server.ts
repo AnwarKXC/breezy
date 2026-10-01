@@ -2,6 +2,7 @@
 // (key='organization'). No row = defaults. The logo lives in `public.files`.
 
 import 'server-only'
+import { revalidateTag, unstable_cache } from 'next/cache'
 import { prisma } from '@/services/db/prisma'
 import { deleteFile, saveImage } from '@/services/files/fileStore'
 import {
@@ -23,10 +24,21 @@ interface StoredOrganization extends OrganizationDetails {
 
 const EMPTY: StoredOrganization = { ...EMPTY_ORGANIZATION, logoFileId: null }
 
-// Read on every page render, changed only from settings: cache briefly
-// in-process and invalidate on write (other instances converge in TTL).
-const TTL_MS = 60 * 1000
-let cache: { value: StoredOrganization; ts: number } | null = null
+// Read on every page render, changed only from settings. Next's data cache is
+// shared by route handlers and server components (a module-level variable is
+// not: each bundle gets its own copy, which served stale logos after uploads).
+const CACHE_TAG = 'app-settings:organization'
+
+const readRow = unstable_cache(
+  async () =>
+    (await prisma.app_settings.findUnique({ where: { key: ORGANIZATION_KEY }, select: { value: true } }))?.value ?? null,
+  [CACHE_TAG],
+  { tags: [CACHE_TAG], revalidate: 3600 },
+)
+
+function invalidate() {
+  revalidateTag(CACHE_TAG, { expire: 0 })
+}
 
 /** Tolerates rows written by older versions: invalid fields fall back to empty. */
 function parseStored(raw: unknown): StoredOrganization {
@@ -42,12 +54,9 @@ function pickSocials(socials: Record<string, string | undefined>) {
 }
 
 async function readStored(): Promise<StoredOrganization> {
-  if (cache && Date.now() - cache.ts < TTL_MS) return cache.value
   try {
-    const row = await prisma.app_settings.findUnique({ where: { key: ORGANIZATION_KEY }, select: { value: true } })
-    const value = row ? parseStored(row.value) : EMPTY
-    cache = { value, ts: Date.now() }
-    return value
+    const value = await readRow()
+    return value === null ? EMPTY : parseStored(value)
   } catch (err) {
     console.error('[branding] read failed:', err)
     return EMPTY
@@ -61,7 +70,7 @@ async function writeStored(value: StoredOrganization, userId: string) {
     create: { key: ORGANIZATION_KEY, value: json, updated_by: userId },
     update: { value: json, updated_by: userId, updated_at: new Date() },
   })
-  cache = null
+  invalidate()
 }
 
 export async function getBranding(): Promise<PublicBranding> {
@@ -74,17 +83,23 @@ export async function getBranding(): Promise<PublicBranding> {
   }
 }
 
+/** Uncached read for writes and the logo route, which must never act on a stale logo id. */
+async function readFresh(): Promise<StoredOrganization> {
+  const row = await prisma.app_settings.findUnique({ where: { key: ORGANIZATION_KEY }, select: { value: true } })
+  return row ? parseStored(row.value) : EMPTY
+}
+
 export async function getBrandingLogoFileId(): Promise<string | null> {
-  return (await readStored()).logoFileId
+  return (await readFresh()).logoFileId
 }
 
 export async function saveOrganizationDetails(details: OrganizationDetails, userId: string) {
-  const current = await readStored()
+  const current = await readFresh()
   await writeStored({ ...details, socials: pickSocials(details.socials), logoFileId: current.logoFileId }, userId)
 }
 
 export async function setOrganizationLogo(bytes: Uint8Array, userId: string) {
-  const current = await readStored()
+  const current = await readFresh()
   const saved = await saveImage(bytes, userId)
   await writeStored({ ...current, logoFileId: saved.id }, userId)
   if (current.logoFileId) await deleteFile(current.logoFileId)
@@ -92,15 +107,15 @@ export async function setOrganizationLogo(bytes: Uint8Array, userId: string) {
 }
 
 export async function removeOrganizationLogo(userId: string) {
-  const current = await readStored()
+  const current = await readFresh()
   if (!current.logoFileId) return
   await writeStored({ ...current, logoFileId: null }, userId)
   await deleteFile(current.logoFileId)
 }
 
 export async function resetOrganization() {
-  const current = await readStored()
+  const current = await readFresh()
   await prisma.app_settings.deleteMany({ where: { key: ORGANIZATION_KEY } })
-  cache = null
+  invalidate()
   if (current.logoFileId) await deleteFile(current.logoFileId)
 }

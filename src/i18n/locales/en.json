@@ -1150,6 +1150,7 @@
     "roomsAndGuests": "Rooms and guests",
     "roomCountSingular": "{n} room",
     "roomCountPlural": "{n} rooms",
+    "selectRoomToManage": "Select a room to see its guests and actions",
     "noRoomsAssigned": "No rooms assigned",
     "assignRoomBeforeCheckIn": "Assign a room before check-in can continue.",
     "reservationNotFound": "Reservation not found",

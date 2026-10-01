@@ -4,7 +4,7 @@ import { useRef, useState, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslation } from '@/i18n/hooks/useTranslation'
 import { toast } from '@/shared/toast/toastEvents'
-import { useBranding } from '@/shared/branding/BrandingContext'
+import { useBranding, useSetBranding } from '@/shared/branding/BrandingContext'
 import { MAX_PHONES, SOCIAL_PLATFORMS, type OrganizationDetails, type PublicBranding } from '@/shared/branding/branding'
 
 const inputClass =
@@ -41,6 +41,7 @@ export function OrganizationTab({ canEdit }: { canEdit: boolean }) {
   const { t } = useTranslation()
   const router = useRouter()
   const branding = useBranding()
+  const setBranding = useSetBranding()
   const [form, setForm] = useState<OrganizationDetails>(() => toForm(branding))
   const [busy, setBusy] = useState(false)
   const fileInput = useRef<HTMLInputElement>(null)
@@ -55,6 +56,7 @@ export function OrganizationTab({ canEdit }: { canEdit: boolean }) {
       const res = await fetch(url, init)
       const body = (await res.json().catch(() => ({}))) as { data?: PublicBranding; error?: string }
       if (!res.ok || !body.data) throw new Error(body.error ?? 'request failed')
+      setBranding(body.data)
       if (resetForm) setForm(toForm(body.data))
       router.refresh()
       toast.success(t(successKey))

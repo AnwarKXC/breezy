@@ -18,6 +18,17 @@ import { useCurrency } from '@/shared/contexts/CurrencyContext'
 import { toast } from '@/shared/toast/toastEvents'
 import { ReservationDetailHeader } from './ReservationDetailHeader'
 import { RoomGuestCard } from './RoomGuestCard'
+import { RoomGroupCard, groupKey } from './RoomGroupCard'
+
+/** Bucket identical rooms in first-seen order; rooms flagged `solo` always stand alone. */
+function groupRooms<R extends { id: string }>(rooms: R[], solo: (r: R) => boolean): R[][] {
+  const groups = new Map<string, R[]>()
+  for (const r of rooms) {
+    const key = solo(r) ? `solo:${r.id}` : groupKey(r as never)
+    groups.set(key, [...(groups.get(key) ?? []), r])
+  }
+  return [...groups.values()]
+}
 import { ReservationNotes } from './ReservationNotes'
 import { ReservationActions } from './ReservationActions'
 
@@ -460,28 +471,39 @@ export function ReservationDetailPage() {
 
             {detail.rooms.length > 0 ? (
               <div className="space-y-4">
-                  {detail.rooms.map((room) => (
-                    <RoomGuestCard
-                      key={room.id}
-                      room={room}
-                      reservationId={id}
-                      guests={detail.guests.filter((g) => g.reservation_room_id === room.id)}
-                      onGuestChange={refreshDetail}
-                      roomCapacity={(room as { room_capacity?: number | null }).room_capacity ?? undefined}
-                      extendedDate={extendedRooms[room.id]?.date}
-                      shortenedDate={shortenedRooms[room.id]?.date}
-                      onExtend={['held', 'confirmed', 'checked_in'].includes(String(detail.status).toLowerCase()) ? setExtendRoom : undefined}
-                      onShorten={
-                        ['held', 'confirmed', 'checked_in'].includes(String(detail.status).toLowerCase())
+                  {groupRooms(detail.rooms, (r) => Boolean(extendedRooms[r.id] || shortenedRooms[r.id])).map((rooms) => {
+                    const room = rooms[0]
+                    const status = String(detail.status).toLowerCase()
+                    const editable = ['held', 'confirmed', 'checked_in'].includes(status)
+                    const guestsFor = (r: typeof room) => detail.guests.filter((g) => g.reservation_room_id === r.id)
+                    const capacityFor = (r: typeof room) => (r as { room_capacity?: number | null }).room_capacity ?? undefined
+                    const actions = {
+                      reservationId: id,
+                      onGuestChange: refreshDetail,
+                      onExtend: editable ? setExtendRoom : undefined,
+                      onShorten:
+                        editable
                         && Math.round((new Date(room.check_out_date ?? detail.check_out_date).getTime() - new Date(room.check_in_date ?? detail.check_in_date).getTime()) / 86400000) > 1
                           ? setShortenRoom
-                          : undefined
-                      }
-                      onChangeRoom={['held', 'confirmed', 'checked_in'].includes(String(detail.status).toLowerCase()) ? setChangeRoom : undefined}
-                      onEditPrice={['held', 'confirmed', 'checked_in'].includes(String(detail.status).toLowerCase()) ? setEditPriceRoom : undefined}
-                      onExtraCharge={['checked_in', 'confirmed'].includes(String(detail.status).toLowerCase()) ? (r) => { setExtraChargeRoom(r); setExtraChargeModalOpen(true) } : undefined}
-                    />
-                  ))}
+                          : undefined,
+                      onChangeRoom: editable ? setChangeRoom : undefined,
+                      onEditPrice: editable ? setEditPriceRoom : undefined,
+                      onExtraCharge: ['checked_in', 'confirmed'].includes(status) ? (r: typeof room) => { setExtraChargeRoom(r); setExtraChargeModalOpen(true) } : undefined,
+                    }
+                    return rooms.length > 1 ? (
+                      <RoomGroupCard key={room.id} rooms={rooms} guestsFor={guestsFor} capacityFor={capacityFor} {...actions} />
+                    ) : (
+                      <RoomGuestCard
+                        key={room.id}
+                        room={room}
+                        guests={guestsFor(room)}
+                        roomCapacity={capacityFor(room)}
+                        extendedDate={extendedRooms[room.id]?.date}
+                        shortenedDate={shortenedRooms[room.id]?.date}
+                        {...actions}
+                      />
+                    )
+                  })}
               </div>
             ) : (
               <div className="rounded-xl border border-dashed border-[#EAEAEA] bg-[#F9F9F8] p-8 text-center">

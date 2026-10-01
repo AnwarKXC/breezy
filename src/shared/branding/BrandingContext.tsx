@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { createContext, useContext, type ReactNode } from 'react'
+import { createContext, useContext, useState, type ReactNode } from 'react'
 import { DEFAULT_APP_NAME, DEFAULT_LOGO_URL, EMPTY_ORGANIZATION, type PublicBranding } from './branding'
 
 const FALLBACK: PublicBranding = {
@@ -12,14 +12,30 @@ const FALLBACK: PublicBranding = {
 }
 
 const BrandingContext = createContext<PublicBranding>(FALLBACK)
+const SetBrandingContext = createContext<(next: PublicBranding) => void>(() => {})
 
-/** Seeded by the root layout from the DB; refreshed by `router.refresh()` after edits. */
+/**
+ * Seeded by the root layout from the DB. Settings applies its save response
+ * immediately via `useSetBranding()`; the override is dropped once the server
+ * sends a new value (after `router.refresh()` or navigation).
+ */
 export function BrandingProvider({ value, children }: { value: PublicBranding; children: ReactNode }) {
-  return <BrandingContext.Provider value={value}>{children}</BrandingContext.Provider>
+  const [override, setOverride] = useState<{ base: PublicBranding; value: PublicBranding } | null>(null)
+  const current = override && override.base === value ? override.value : value
+  const set = (next: PublicBranding) => setOverride({ base: value, value: next })
+  return (
+    <SetBrandingContext.Provider value={set}>
+      <BrandingContext.Provider value={current}>{children}</BrandingContext.Provider>
+    </SetBrandingContext.Provider>
+  )
 }
 
 export function useBranding() {
   return useContext(BrandingContext)
+}
+
+export function useSetBranding() {
+  return useContext(SetBrandingContext)
 }
 
 export function BrandLogo({ size, className, priority }: { size: number; className?: string; priority?: boolean }) {
