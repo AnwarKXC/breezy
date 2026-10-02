@@ -27,6 +27,20 @@ them all. This document is the contract between the two.
 - `PUT { "token": "<jwt>" }` verifies and stores a renewed license. Returns `422 license/invalid_token`
   if the signature, issuer or instance id doesn't match.
 
+### Password-reset email relay
+
+A hotel admin who forgot their password gets the reset link by email, sent through the first of:
+1. the hotel's Resend key (`RESEND_API_KEY` + `EMAIL_FROM`),
+2. the hotel's own mailbox (Settings → Email), or
+3. **the control plane**, which sends it from its own mailbox (`control_app_email*` in the control plane env).
+   This covers hotels that never set up email.
+
+The relay is `POST <FLEET_CONTROL_URL>/api/relay/password-reset`, with `Authorization: Bearer <FLEET_INSTANCE_SECRET>`,
+`X-Fleet-Instance: <FLEET_INSTANCE_ID>` and the body `{ to, link, locale }`. The control plane writes the email itself
+(EN/AR, using the hotel's name). It rejects links that don't start with the hotel's registered URL, allows at most 10
+emails per hotel per hour, and logs each send in Activity with the address masked. `FLEET_CONTROL_URL` is part of the
+env block every hotel gets.
+
 ## License
 
 An EdDSA JWT signed by the control plane:

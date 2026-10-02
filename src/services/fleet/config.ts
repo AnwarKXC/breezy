@@ -13,6 +13,8 @@ export function fleetConfig() {
     publicKeyPem: process.env.FLEET_LICENSE_PUBLIC_KEY?.replace(/\\n/g, '\n') || null,
     bootstrapLicense: process.env.FLEET_LICENSE_KEY || null,
     appVersion: process.env.APP_VERSION || process.env.VERCEL_GIT_COMMIT_SHA || 'dev',
+    /** The control plane's URL, for services it provides to this instance (password-reset email relay). */
+    controlUrl: process.env.FLEET_CONTROL_URL?.replace(/\/+$/, '') || null,
   }
 }
 

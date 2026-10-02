@@ -4,7 +4,7 @@ import { createHash, randomBytes } from "node:crypto";
 
 import { ROLES } from "@/config/rbac";
 import { prisma } from "@/services/db/prisma";
-import { sendEmail } from "@/services/email/mailer";
+import { sendPasswordResetEmail } from "@/services/email/mailer";
 import { hashPassword } from "@/services/auth/password";
 import { invalidateUserSessionCache } from "@/services/auth/sessionStore";
 
@@ -37,10 +37,15 @@ export async function requestPasswordReset(email: string, appUrl: string, locale
   ]);
 
   const link = `${appUrl}/${locale}/reset-password?token=${token}`;
-  await sendEmail({
+  await sendPasswordResetEmail({
     to: account.email,
-    subject: "Reset your Breezy System password",
-    text: `A password reset was requested for your account.\n\nOpen this link within 30 minutes to choose a new password:\n${link}\n\nIf you did not request this, ignore this email.`,
+    link,
+    locale,
+    message: {
+      to: account.email,
+      subject: "Reset your Breezy System password",
+      text: `A password reset was requested for your account.\n\nOpen this link within 30 minutes to choose a new password:\n${link}\n\nIf you did not request this, ignore this email.`,
+    },
   });
 }
 

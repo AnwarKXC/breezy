@@ -14,6 +14,8 @@ const requestSchema = z.object({
 function getAppUrl(request: Request) {
   const configured = process.env.APP_URL?.replace(/\/+$/, '')
   if (configured) return configured
+  // On Vercel the production domain comes from the platform, not from the request, so it is safe too.
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
   if (process.env.NODE_ENV === 'production') return null
   return new URL(request.url).origin
 }
