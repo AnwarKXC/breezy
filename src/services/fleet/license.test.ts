@@ -26,6 +26,7 @@ const claimsAt = (now: number, overrides: Partial<Parameters<typeof licenseStatu
   graceDays: 7,
   mode: 'active' as const,
   limits: { maxRooms: null, maxUsers: null },
+  warnDays: 15,
   ...overrides,
 })
 
@@ -35,7 +36,7 @@ test('accepts a signed license for this instance, even when expired', async () =
   const verified = await verifyLicenseToken(await sign({ exp: expired }))
   assert.deepEqual(verified, {
     ok: true,
-    claims: { exp: expired, iat: null, plan: 'standard', graceDays: 7, mode: 'active', limits: { maxRooms: null, maxUsers: null } },
+    claims: { exp: expired, iat: null, plan: 'standard', graceDays: 7, mode: 'active', limits: { maxRooms: null, maxUsers: null }, warnDays: 15 },
   })
 })
 
@@ -84,4 +85,23 @@ test('paused and locked win over a valid expiry', () => {
   assert.deepEqual([locked.state, locked.readOnly, locked.locked], ['locked', true, true])
   // The real expiry date is kept, so resuming restores the same term.
   assert.equal(paused.expiresAt, new Date(now + 300 * DAY).toISOString())
+})
+
+test('countdown window comes from warn_days; older licenses default to 15 days', async () => {
+  const now = Date.UTC(2026, 9, 2)
+  const monthly = claimsAt(now + 6 * DAY, { warnDays: 5 })
+  assert.equal(licenseStatusAt(monthly, now).expiringSoon, false) // 6 days left, warns at 5
+  assert.equal(licenseStatusAt(monthly, now + 1.5 * DAY).expiringSoon, true) // 4.5 days left
+  assert.equal(licenseStatusAt(monthly, now + 1.5 * DAY).state, 'active') // still fully usable
+  // Expired or paused licenses use their own banners, not the countdown.
+  assert.equal(licenseStatusAt(monthly, now + 7 * DAY).expiringSoon, false)
+  assert.equal(licenseStatusAt(claimsAt(now + DAY, { mode: 'read_only' }), now).expiringSoon, false)
+
+  const { sign } = await setup()
+  const exp = Math.floor(Date.now() / 1000) + 3600
+  const legacy = await verifyLicenseToken(await sign({ exp }))
+  const set = await verifyLicenseToken(await sign({ exp, extra: { warn_days: 5 } }))
+  assert.ok(legacy.ok && set.ok)
+  assert.equal(legacy.claims.warnDays, 15)
+  assert.equal(set.claims.warnDays, 5)
 })

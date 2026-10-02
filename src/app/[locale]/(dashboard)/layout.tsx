@@ -19,8 +19,14 @@ export default async function DashboardLayout({
       {themeCss && <style>{themeCss}</style>}
       <DashboardShell
         licenseNotice={
-          license.state === "grace" || license.readOnly
-            ? { readOnly: license.readOnly, readOnlyAt: license.readOnlyAt, suspended: license.state === "suspended" }
+          license.state === "grace" || license.readOnly || license.expiringSoon
+            ? {
+                readOnly: license.readOnly,
+                readOnlyAt: license.readOnlyAt,
+                suspended: license.state === "suspended",
+                expiring: license.expiringSoon,
+                expiresAt: license.expiresAt,
+              }
             : null
         }
       >

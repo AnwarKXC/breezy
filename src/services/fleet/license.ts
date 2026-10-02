@@ -7,7 +7,7 @@ import { fleetConfig } from './config'
 
 // A license is an EdDSA-signed JWT issued by the control plane:
 //   { iss: 'breezy-control', sub: <FLEET_INSTANCE_ID>, iat, exp, plan, grace_days?,
-//     mode?: 'active' | 'read_only' | 'locked', max_rooms?, max_users? }
+//     mode?: 'active' | 'read_only' | 'locked', max_rooms?, max_users?, warn_days? }
 // It is verified offline with the control plane's public key, so a control-plane
 // outage never locks a hotel out. The control plane pushes renewals to
 // PUT /api/system/license; FLEET_LICENSE_KEY seeds a fresh install.
@@ -16,6 +16,8 @@ import { fleetConfig } from './config'
 const LICENSE_KEY = 'fleet_license'
 const ISSUER = 'breezy-control'
 const DEFAULT_GRACE_DAYS = 14
+// Licenses issued before warn_days existed: warn like a yearly subscription.
+const DEFAULT_WARN_DAYS = 15
 const CACHE_MS = 60_000
 const DAY_MS = 24 * 60 * 60 * 1000
 
@@ -40,6 +42,10 @@ export interface LicenseStatus {
   /** When the license in force was issued; the control plane compares it to detect a stale copy. */
   issuedAt: string | null
   limits: LicenseLimits
+  /** Active, but within the provider-set warning window before expiry: show the countdown banner. */
+  expiringSoon: boolean
+  /** Days before expiry the countdown banner starts (set by the control plane). */
+  warnDays: number | null
 }
 
 interface LicenseClaims {
@@ -52,6 +58,7 @@ interface LicenseClaims {
   mode?: unknown
   max_rooms?: unknown
   max_users?: unknown
+  warn_days?: unknown
 }
 
 interface LicenseClaimsVerified {
@@ -61,6 +68,7 @@ interface LicenseClaimsVerified {
   graceDays: number
   mode: LicenseMode
   limits: LicenseLimits
+  warnDays: number
 }
 
 type Verified = { ok: true; claims: LicenseClaimsVerified } | { ok: false }
@@ -75,6 +83,8 @@ const blocked = (state: LicenseState): LicenseStatus => ({
   readOnlyAt: null,
   issuedAt: null,
   limits: NO_LIMITS,
+  expiringSoon: false,
+  warnDays: null,
 })
 const UNMANAGED: LicenseStatus = { ...blocked('unmanaged'), readOnly: false }
 
@@ -100,6 +110,10 @@ export async function verifyLicenseToken(token: string): Promise<Verified> {
         // Unknown modes fail closed to read-only rather than open.
         mode: claims.mode === undefined || claims.mode === 'active' ? 'active' : claims.mode === 'locked' ? 'locked' : 'read_only',
         limits: { maxRooms: positiveInt(claims.max_rooms), maxUsers: positiveInt(claims.max_users) },
+        warnDays:
+          typeof claims.warn_days === 'number' && Number.isInteger(claims.warn_days) && claims.warn_days >= 0
+            ? claims.warn_days
+            : DEFAULT_WARN_DAYS,
       },
     }
   } catch {
@@ -127,7 +141,7 @@ async function computeStatus(now = Date.now()): Promise<LicenseStatus> {
 }
 
 export function licenseStatusAt(claims: LicenseClaimsVerified, now: number): LicenseStatus {
-  const { exp, iat, plan, graceDays, mode, limits } = claims
+  const { exp, iat, plan, graceDays, mode, limits, warnDays } = claims
   const expiresAt = exp * 1000
   const graceEnd = expiresAt + graceDays * DAY_MS
   const base = {
@@ -137,11 +151,15 @@ export function licenseStatusAt(claims: LicenseClaimsVerified, now: number): Lic
     limits,
     locked: false,
     readOnlyAt: null,
+    expiringSoon: false,
+    warnDays,
   }
   // Provider decisions win over the calendar: a locked or paused hotel stays so until resumed.
   if (mode === 'locked') return { ...base, state: 'locked', readOnly: true, locked: true }
   if (mode === 'read_only') return { ...base, state: 'suspended', readOnly: true }
-  if (now < expiresAt) return { ...base, state: 'active', readOnly: false }
+  if (now < expiresAt) {
+    return { ...base, state: 'active', readOnly: false, expiringSoon: now >= expiresAt - warnDays * DAY_MS }
+  }
   if (now < graceEnd) return { ...base, state: 'grace', readOnly: false, readOnlyAt: new Date(graceEnd).toISOString() }
   return { ...base, state: 'expired', readOnly: true }
 }

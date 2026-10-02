@@ -33,7 +33,7 @@ An EdDSA JWT signed by the control plane:
 
 ```json
 { "iss": "breezy-control", "sub": "<instanceId>", "iat": 1790950000, "exp": 1822486000, "plan": "standard",
-  "grace_days": 14, "mode": "active", "max_rooms": 40, "max_users": 5 }
+  "grace_days": 14, "warn_days": 15, "mode": "active", "max_rooms": 40, "max_users": 5 }
 ```
 
 The token is verified offline with the public key, so a control plane outage never blocks a hotel. The mode and limits
@@ -42,7 +42,7 @@ are inside the signed token, so a hotel cannot change its own. Unknown modes are
 | State | Meaning | Effect |
 |---|---|---|
 | `unmanaged` | No public key configured | Nothing enforced |
-| `active` | `mode: active`, before `exp` | Normal |
+| `active` | `mode: active`, before `exp` | Normal. Within `warn_days` of `exp`, a countdown banner shows ("ends in 4 days", hours on the last day) |
 | `grace` | `mode: active`, past `exp`, within `grace_days` (default 14) | Warning banner |
 | `suspended` | `mode: read_only` (**Pause** in the control plane) | "Paused by your provider" banner; API writes return `403 license/read_only` |
 | `locked` | `mode: locked` (**Lock** in the control plane) | Every page redirects to `/[locale]/paused`; every API returns `423 license/locked` |
@@ -55,6 +55,10 @@ can still sign in, sign out and reset passwords, and control-plane calls (`/api/
 limit returns `403` with `code: license/room_limit` or `license/user_limit` and a readable message. The check runs
 inside the insert's transaction, under a Postgres advisory lock, so concurrent creates can't overshoot. When a limit is
 absent, there is no limit. Lowering a limit never deletes anything.
+
+**Expiry warning:** the control plane sets `warn_days` per instance. The default follows the billing cycle (monthly 5,
+quarterly 10, yearly or unset 15) and can be overridden on the instance's License card. Licenses issued before
+`warn_days` existed warn 15 days ahead.
 
 The health report includes the license `issuedAt`. The control plane re-delivers the newest license whenever the hotel
 reports a different one.
