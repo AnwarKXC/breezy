@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { isCountryCode } from '@/shared/static/countries'
 import { CURRENCY_CODES, type CurrencyCode } from '@/shared/static/currencies'
+import { optionalPhoneSchema, phoneSchema } from '@/shared/phone'
 
 export function zodErrorMessage(error: z.ZodError): string {
   return error.issues.map((issue) => {
@@ -52,7 +53,7 @@ export const RoomTypeCreateSchema = z.object({
 export const ReservationCreateSchema = z.object({
   booker_name: z.string().min(1).max(200).optional(),
   booker_email: z.string().email().max(300).optional(),
-  booker_phone: z.string().max(30).optional(),
+  booker_phone: phoneSchema.optional(),
   check_in_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   check_out_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   company_id: z.guid().optional(),
@@ -297,7 +298,7 @@ export const ReservationUpdateSchema = z.object({
   check_out_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   booker_name: z.string().trim().max(200).nullable().optional(),
   booker_email: z.string().email().max(300).nullable().optional(),
-  booker_phone: z.string().max(30).nullable().optional(),
+  booker_phone: optionalPhoneSchema,
   roomIds: z.array(z.guid()).optional(),
   roomOccupancies: z.record(z.string(), OccupancyCodeSchema).optional(),
   roomOverrides: z.record(z.string(), z.number().nonnegative().max(10_000_000).nullable()).optional(),
@@ -375,7 +376,7 @@ export const CheckoutSchema = z.object({
 // Contacts
 // ──────────────────────────────
 
-const contactPhoneSchema = z.string().min(6).max(20).regex(/^[+\d\s()-]{6,20}$/)
+const contactPhoneSchema = phoneSchema
 const contactEmailSchema = z.string().email().max(300)
 
 // ISO 3166-1 alpha-2 code ('' clears the field on update).
@@ -417,7 +418,7 @@ export const UserCreateSchema = z.object({
   name: z.string().trim().min(1, 'Name is required').max(200),
   email: z.string().email().max(300),
   password: z.string().min(8, 'Password must be at least 8 characters').max(100),
-  phone: z.string().trim().min(1).max(30),
+  phone: phoneSchema,
   role: z.enum(['admin', 'accountant', 'front_desk']),
 })
 
@@ -425,7 +426,7 @@ export const UserUpdateSchema = z.object({
   name: z.string().trim().min(1).max(200).optional(),
   email: z.string().email().max(300).optional(),
   password: z.string().min(8).max(100).optional(),
-  phone: z.string().trim().min(1).max(30).optional(),
+  phone: phoneSchema.optional(),
   role: z.enum(['admin', 'accountant', 'front_desk']).optional(),
 })
 

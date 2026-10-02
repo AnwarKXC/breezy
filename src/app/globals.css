@@ -297,45 +297,68 @@ input.booking-select-input:not([type="button"]):not([type="checkbox"]):not([type
   }
 }
 
-/* ── Reservations year view: print / PDF ── */
+/* ── Reservations year view: print ──
+   Works with plain Ctrl+P. The dashboard shell is h-screen + overflow-hidden, which
+   crops printing to one viewport, so on this page we hide everything that is not the
+   year view (or one of its ancestors) and let the ancestors grow to full height. */
 @media print {
   @page {
     size: A4 landscape;
-    margin: 10mm;
+    margin: 8mm;
   }
 
-  body.printing * {
-    visibility: hidden;
+  html:has([data-year-view-root]) body *:not([data-year-view-root], [data-year-view-root] *, :has([data-year-view-root])) {
+    display: none !important;
   }
 
-  body.printing [data-year-view-root],
-  body.printing [data-year-view-root] * {
-    visibility: visible;
-    position: static !important;
+  html:has([data-year-view-root]),
+  html:has([data-year-view-root]) body,
+  html:has([data-year-view-root]) body :has([data-year-view-root]) {
+    display: block !important;
+    height: auto !important;
+    min-height: 0 !important;
     overflow: visible !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #fff !important;
+    animation: none !important;
+    transform: none !important;
+  }
+
+  [data-year-view-root] * {
     box-shadow: none !important;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
 
-  body.printing [data-year-view-root] {
-    position: absolute !important;
-    inset-inline-start: 0;
-    top: 0;
-    width: 100%;
-  }
-
-  body.printing .no-print {
+  [data-year-view-root] .no-print {
     display: none !important;
   }
 
-  body.printing [data-wall] {
+  /* Tape chart: no inner scroll box, no sticky cells; header row repeats on every page. */
+  [data-year-view-root] [data-sheet],
+  [data-year-view-root] [data-sheet-scroll] {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  [data-year-view-root] [data-sheet] th,
+  [data-year-view-root] [data-sheet] td {
+    position: static !important;
+  }
+
+  [data-year-view-root] [data-sheet] thead {
+    display: table-header-group;
+  }
+
+  [data-year-view-root] [data-wall] {
     display: grid !important;
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     gap: 6mm;
   }
 
-  body.printing [data-month-wrapper]:nth-child(4n):not(:last-child) {
-    page-break-after: always;
+  [data-year-view-root] [data-month-wrapper]:nth-child(4n):not(:last-child) {
+    break-after: page;
   }
 }
+

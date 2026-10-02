@@ -141,9 +141,16 @@ export function YearOverviewPage() {
     new Intl.DateTimeFormat(locale, { month: 'short', timeZone: 'UTC' }).format(new Date(Date.UTC(data?.year ?? year, i, 1))),
   )
 
+  const exportLabels = {
+    room: t('bookings.yearView.colRoom'),
+    nights: t('bookings.yearView.colNights'),
+    occupied: t('bookings.yearView.rowOccupied'),
+    occupancy: t('bookings.yearView.rowOccupancy'),
+  }
+
   async function handleExportExcel() {
     if (!data) return
-    const buffer = await buildYearExcelBuffer(data, locale)
+    const buffer = await buildYearExcelBuffer(data, locale, exportLabels)
     const blob = new Blob([buffer], {
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     })
@@ -160,7 +167,7 @@ export function YearOverviewPage() {
   async function handleExportPdf() {
     if (!data) return
     try {
-      await downloadYearViewPdf(data, locale)
+      await downloadYearViewPdf(data, locale, exportLabels)
     } catch {
       toast.error('Failed to generate PDF')
     }
@@ -224,6 +231,14 @@ export function YearOverviewPage() {
           <div className="flex shrink-0 items-center gap-2">
             <button
               type="button"
+              onClick={() => window.print()}
+              disabled={showLoading || error}
+              className="inline-flex h-9 items-center rounded-lg border border-[#EAEAEA] bg-white px-3 text-sm font-medium text-[#555555] transition-colors hover:bg-accent/10 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {t('bookings.yearView.print')}
+            </button>
+            <button
+              type="button"
               onClick={handleExportExcel}
               disabled={showLoading || error}
               className="inline-flex h-9 items-center rounded-lg border border-[#EAEAEA] bg-white px-3 text-sm font-medium text-[#555555] transition-colors hover:bg-accent/10 disabled:cursor-not-allowed disabled:opacity-50"
@@ -240,6 +255,20 @@ export function YearOverviewPage() {
             </button>
           </div>
         </header>
+
+        <div className="mb-2 hidden items-baseline justify-between gap-4 print:flex">
+          <h1 className="text-base font-semibold text-[#1A1A1A]">
+            {t('bookings.yearView.title')} · {year}
+          </h1>
+          <p className="flex flex-wrap items-center gap-x-3 text-[9px] text-[#555555]">
+            {legend.map((item) => (
+              <span key={item.color} className="inline-flex items-center gap-1">
+                <span className={`inline-block h-2 w-2 rounded-sm ${item.color}`} />
+                {item.label}
+              </span>
+            ))}
+          </p>
+        </div>
 
         {!showLoading && !error && view === 'sheet' && (
           <div className="no-print mb-4 flex flex-wrap gap-1.5">

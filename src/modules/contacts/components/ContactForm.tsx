@@ -6,6 +6,7 @@ import type { ContactFormDraft, ContactFormMode } from '../hooks/useContactForm'
 import { ContactTypeSelector } from './ContactTypeSelector'
 import { LogoUpload } from './LogoUpload'
 import { useEscapeKey } from '@/shared/hooks/useEscapeKey'
+import { normalizePhone } from '@/shared/phone'
 interface ContactFormLabels {
   createTitle: string
   editTitle: string
@@ -100,6 +101,7 @@ export function ContactForm(props: ContactFormProps) {
               type="tel"
               value={props.draft.phone}
               onChange={(event) => props.onUpdate('phone', event.target.value)}
+              onBlur={(event) => props.onUpdate('phone', normalizePhone(event.target.value))}
             />
             {(props.phoneError ?? props.fieldErrors.phone) ? (
               <p className="mt-1 text-sm text-[#9F2F2D]">{props.phoneErrorDescription || props.fieldErrors.phone}</p>

@@ -5,6 +5,7 @@ import { useTranslation } from '@/i18n/hooks/useTranslation'
 import { toast } from '@/shared/toast/toastEvents'
 import { countryOptions } from '@/shared/static/countries'
 import { useEscapeKey } from '@/shared/hooks/useEscapeKey'
+import { isValidPhone, normalizePhone } from '@/shared/phone'
 
 interface NewContactModalProps {
   isOpen: boolean
@@ -33,6 +34,11 @@ export function NewContactModal({ isOpen, onClose, onCreated }: NewContactModalP
       toast.error(t('reservations.nameRequired'))
       return
     }
+    const normalizedPhone = normalizePhone(phone)
+    if (normalizedPhone && !isValidPhone(normalizedPhone)) {
+      toast.error(t('common.phoneInvalid'))
+      return
+    }
 
     setSaving(true)
     try {
@@ -43,7 +49,7 @@ export function NewContactModal({ isOpen, onClose, onCreated }: NewContactModalP
         body: JSON.stringify({
           type: tab,
           name: name.trim(),
-          phone: optional(phone),
+          phone: normalizedPhone || undefined,
           email: optional(email),
           ...(tab === 'individual' ? { idPassport: optional(idPassport) } : {}),
           ...(tab === 'company' ? { country: optional(country), city: optional(city), responsiblePerson: optional(responsiblePerson) } : {}),
@@ -139,6 +145,7 @@ export function NewContactModal({ isOpen, onClose, onCreated }: NewContactModalP
                 dir="ltr"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
+                onBlur={(e) => setPhone(normalizePhone(e.target.value))}
                 placeholder={t('reservations.placeholderPhoneNumber')}
                 className="mt-1 h-9 w-full rounded-lg border border-[#EAEAEA] bg-white px-3 text-sm text-[#1A1A1A] outline-none transition-colors focus:border-gray-400"
               />

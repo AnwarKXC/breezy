@@ -15,6 +15,7 @@ import {
   type PublicBranding,
 } from './branding'
 import { OrganizationUpdateSchema } from './schema'
+import { isValidPhone, normalizePhone } from '@/shared/phone'
 
 const ORGANIZATION_KEY = 'organization'
 
@@ -43,7 +44,11 @@ function invalidate() {
 /** Tolerates rows written by older versions: invalid fields fall back to empty. */
 function parseStored(raw: unknown): StoredOrganization {
   const value = (raw ?? {}) as Record<string, unknown>
-  const parsed = OrganizationUpdateSchema.safeParse({ ...EMPTY_ORGANIZATION, ...value })
+  // A phone saved before E.164 enforcement must not wipe the whole organization block.
+  const phones = Array.isArray(value.phones)
+    ? value.phones.filter((p): p is string => typeof p === 'string').map(normalizePhone).filter(isValidPhone)
+    : EMPTY_ORGANIZATION.phones
+  const parsed = OrganizationUpdateSchema.safeParse({ ...EMPTY_ORGANIZATION, ...value, phones })
   const details = parsed.success ? parsed.data : EMPTY_ORGANIZATION
   const logoFileId = typeof value.logoFileId === 'string' ? value.logoFileId : null
   return { ...details, socials: pickSocials(details.socials), logoFileId }

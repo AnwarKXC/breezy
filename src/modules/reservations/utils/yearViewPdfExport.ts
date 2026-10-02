@@ -1,138 +1,154 @@
 import { applyPdfFonts, getPdfMake } from '@/shared/utils/pdfMake'
-import type { YearOverviewPayload } from '../types'
-import { buildDayMap, indexByRoomAndDate, type DayBooking } from './dayMap'
-import { getMonthDays } from './occupancy'
-import { buildRoomColumns } from './roomColumns'
+import type { YearOverviewPayload, YearViewStatus } from '../types'
+import { buildDayMap, indexByRoomAndDate } from './dayMap'
+import { monthLabel, statusBucket } from './occupancy'
+import { buildTapeMonth, occupancyPercent, stayLabel, type TapeSegment } from './tapeChart'
 
 const GREEN = '#16A34A'
 const HEADER_BG = '#F9F9F8'
-const WEEKEND_BG = '#FEF3C7'
+const GROUP_BG = '#F1F1EF'
+const WEEKEND_BG = '#F5F5F4'
 const BORDER = '#D9D9D9'
 const TEXT = '#1A1A1A'
 const MUTED = '#787774'
 
+/** Light fills + dark text: readable on mono printers, matches the on-screen bars. */
+const BAR_FILL: Record<YearViewStatus, string> = {
+  confirmed: '#DBEAFE',
+  checked_in: '#D1FAE5',
+  checked_out: '#E5E7EB',
+  other: '#FEF3C7',
+}
+
+// A4 landscape (842pt) minus margins, split between the room column, 31 day columns and nights.
+const PAGE_MARGIN = 14
+const ROOM_COL = 30
+const NIGHTS_COL = 24
+const DAY_COL = (842 - PAGE_MARGIN * 2 - ROOM_COL - NIGHTS_COL) / 31
+const FONT_SIZE = 6
+const AVG_CHAR_WIDTH = FONT_SIZE * 0.52
+
+export interface YearViewPdfLabels {
+  room: string
+  nights: string
+  occupied: string
+  occupancy: string
+}
+
 type Cell = Record<string, unknown>
 
-function cell(text: string, extra: Cell = {}): Cell {
-  return { text, ...extra }
+/** pdfmake wraps instead of clipping, so cut names to the bar width to keep rows one line tall. */
+function fitToSpan(text: string, span: number) {
+  const max = Math.max(1, Math.floor((span * DAY_COL - 4) / AVG_CHAR_WIDTH))
+  return text.length <= max ? text : `${text.slice(0, Math.max(1, max - 1))}…`
 }
 
-function titleRow(monthName: string, colCount: number): Cell[] {
-  return [
+/** colSpan cells must be followed by `span - 1` empty placeholders. */
+function spanned(cell: Cell, span: number): Cell[] {
+  return [span > 1 ? { ...cell, colSpan: span } : cell, ...Array.from({ length: span - 1 }, () => ({}))]
+}
+
+function segmentCells(segment: TapeSegment, isWeekend: boolean): Cell[] {
+  if (!segment.booking) return [{ text: '', fillColor: isWeekend ? WEEKEND_BG : undefined }]
+  return spanned(
     {
-      text: monthName,
-      colSpan: colCount,
-      fillColor: GREEN,
-      color: '#FFFFFF',
-      bold: true,
-      alignment: 'center',
-      fontSize: 12,
+      text: fitToSpan(stayLabel(segment.booking), segment.span),
+      fillColor: BAR_FILL[statusBucket(segment.booking.status)],
+      color: TEXT,
+      noWrap: true,
     },
-    ...Array.from({ length: colCount - 1 }, () => ({})),
-  ]
+    segment.span,
+  )
 }
 
-function groupRow(groups: Array<{ name: string; count: number }>): Cell[] {
-  const row: Cell[] = [cell('', { fillColor: HEADER_BG })]
-  for (const group of groups) {
-    row.push(
-      cell(group.name, {
-        colSpan: group.count,
-        fillColor: HEADER_BG,
-        bold: true,
-        alignment: 'center',
-      }),
-      ...Array.from({ length: group.count - 1 }, () => ({})),
-    )
-  }
-  return row
-}
-
-function roomRow(numbers: string[]): Cell[] {
-  return [
-    cell('#', { fillColor: HEADER_BG, bold: true }),
-    ...numbers.map((n) => cell(n, { fillColor: HEADER_BG, bold: true, alignment: 'center' })),
-  ]
-}
-
-function dayRow(
-  label: string,
-  isWeekend: boolean,
-  isToday: boolean,
-  cells: Array<DayBooking | null>,
-  typeNames: string[],
-): Cell[] {
-  const fill = isWeekend ? WEEKEND_BG : undefined
-  const row: Cell[] = [
-    cell(label, {
-      fillColor: isToday ? '#FDE68A' : fill,
-      bold: isToday,
-      color: MUTED,
-    }),
-  ]
-  for (let i = 0; i < cells.length; i++) {
-    const booking = cells[i]
-    if (booking) {
-      row.push(
-        cell(
-          `${booking.companyName ?? booking.guestName ?? '—'}\n${typeNames[i]}`,
-          { fillColor: fill, color: TEXT },
-        ),
-      )
-    } else {
-      row.push(cell('', { fillColor: fill }))
-    }
-  }
-  return row
-}
-
-export function buildYearViewPdfContent(payload: YearOverviewPayload, locale: string): unknown[] {
-  const dayMap = buildDayMap(payload.stays, payload.year)
-  const bookingIndex = indexByRoomAndDate(dayMap)
+export function buildYearViewPdfContent(payload: YearOverviewPayload, locale: string, labels: YearViewPdfLabels): unknown[] {
+  const bookingIndex = indexByRoomAndDate(buildDayMap(payload.stays, payload.year))
+  // pdfmake has no RTL tables: mirror whole segments (not built cells) so each colSpan
+  // cell stays immediately before its placeholders.
   const isRTL = locale === 'ar'
-  const { groups: rawGroups, typeNameById } = buildRoomColumns(payload.rooms, payload.roomTypes)
-  // Mirror column order for RTL up front (groups + rooms within each group), rather
-  // than reversing built cell arrays: colSpan cells require their `{}` placeholder
-  // cells to immediately follow them, which a post-hoc array reverse breaks.
-  const groups = isRTL
-    ? [...rawGroups].reverse().map((g) => ({ ...g, rooms: [...g.rooms].reverse() }))
-    : rawGroups
-  const orderedRooms = groups.flatMap((g) => g.rooms)
-  const typeNames = orderedRooms.map((r) => typeNameById.get(r.typeId) ?? '')
-  const colCount = orderedRooms.length + 1
-
+  const ordered = <T,>(items: T[]) => (isRTL ? [...items].reverse() : items)
+  const weekdayFormat = new Intl.DateTimeFormat(locale, { weekday: isRTL ? 'narrow' : 'short', timeZone: 'UTC' })
   const content: unknown[] = []
 
   for (let monthIndex = 0; monthIndex < 12; monthIndex++) {
-    const monthName = new Intl.DateTimeFormat(locale, {
-      month: 'long',
-      year: 'numeric',
-      timeZone: 'UTC',
-    }).format(new Date(Date.UTC(payload.year, monthIndex, 1)))
+    const month = buildTapeMonth(payload.year, monthIndex, payload.rooms, payload.roomTypes, bookingIndex, '', locale)
+    const colCount = month.days.length + 2
+    const monthNights = month.totalRooms * month.days.length
+
+    const edgeRow = (first: Cell, days: Cell[], last: Cell) => (isRTL ? [last, ...ordered(days), first] : [first, ...days, last])
 
     const body: Cell[][] = [
-      titleRow(monthName, colCount),
-      groupRow(groups.map((g) => ({ name: g.name, count: g.rooms.length }))),
-      roomRow(orderedRooms.map((r) => r.number)),
+      [
+        {
+          text: `${monthLabel(payload.year, monthIndex, locale)}   ·   ${labels.occupancy} ${occupancyPercent(month.totalNights, monthNights)}%`,
+          colSpan: colCount,
+          fillColor: GREEN,
+          color: '#FFFFFF',
+          bold: true,
+          alignment: 'center',
+          fontSize: 10,
+        },
+        ...Array.from({ length: colCount - 1 }, () => ({})),
+      ],
+      edgeRow(
+        { text: labels.room, bold: true, fillColor: HEADER_BG, color: MUTED },
+        month.days.map((day) => ({
+          text: [
+            { text: `${weekdayFormat.format(new Date(`${day.iso}T00:00:00Z`))}\n`, fontSize: 5, color: MUTED },
+            { text: String(day.dayNumber), bold: true },
+          ],
+          alignment: 'center',
+          fillColor: day.isWeekend ? '#EFEFED' : HEADER_BG,
+        })),
+        { text: labels.nights, bold: true, alignment: 'center', fillColor: HEADER_BG, color: MUTED, fontSize: 5 },
+      ),
     ]
 
-    for (const day of getMonthDays(payload.year, monthIndex, '', locale)) {
-      const cells = orderedRooms.map((room) => bookingIndex.get(`${room.id}|${day.iso}`) ?? null)
+    for (const group of month.groups) {
       body.push(
-        dayRow(
-          `${day.dayNumber}-${monthIndex + 1}-${payload.year}`,
-          day.isWeekend,
-          day.isToday,
-          cells,
-          typeNames,
+        spanned(
+          {
+            text: `${group.name} (${group.rows.length})`,
+            bold: true,
+            fillColor: GROUP_BG,
+            alignment: isRTL ? 'right' : 'left',
+          },
+          colCount,
         ),
       )
+      for (const row of group.rows) {
+        const dayCells = ordered(row.segments).flatMap((segment) => segmentCells(segment, month.days[segment.startIndex].isWeekend))
+        const roomCell = { text: row.room.number, bold: true }
+        const nightsCell = { text: row.nights ? String(row.nights) : '', alignment: 'center', color: MUTED }
+        // Day cells are already mirrored above; only the edge columns swap here.
+        body.push(isRTL ? [nightsCell, ...dayCells, roomCell] : [roomCell, ...dayCells, nightsCell])
+      }
     }
 
+    body.push(
+      edgeRow(
+        { text: labels.occupied, bold: true, fillColor: HEADER_BG },
+        month.occupiedByDay.map((count) => ({ text: String(count), alignment: 'center', fillColor: HEADER_BG })),
+        { text: String(month.totalNights), bold: true, alignment: 'center', fillColor: HEADER_BG },
+      ),
+      edgeRow(
+        { text: labels.occupancy, bold: true, fillColor: HEADER_BG },
+        month.occupiedByDay.map((count) => ({
+          text: `${occupancyPercent(count, month.totalRooms)}%`,
+          alignment: 'center',
+          fillColor: HEADER_BG,
+          fontSize: 5,
+        })),
+        { text: `${occupancyPercent(month.totalNights, monthNights)}%`, bold: true, alignment: 'center', fillColor: HEADER_BG },
+      ),
+    )
+
+    const widths = [ROOM_COL, ...month.days.map(() => '*'), NIGHTS_COL]
     content.push({
       table: {
-        headerRows: 3,
-        widths: [46, ...orderedRooms.map(() => '*')],
+        headerRows: 2,
+        dontBreakRows: true,
+        widths: isRTL ? [...widths].reverse() : widths,
         body,
       },
       layout: {
@@ -140,6 +156,10 @@ export function buildYearViewPdfContent(payload: YearOverviewPayload, locale: st
         vLineWidth: () => 0.5,
         hLineColor: () => BORDER,
         vLineColor: () => BORDER,
+        paddingLeft: () => 1.5,
+        paddingRight: () => 1.5,
+        paddingTop: () => 1.5,
+        paddingBottom: () => 1.5,
       },
       ...(monthIndex < 11 ? { pageBreak: 'after' as const } : {}),
     })
@@ -148,17 +168,17 @@ export function buildYearViewPdfContent(payload: YearOverviewPayload, locale: st
   return content
 }
 
-export async function downloadYearViewPdf(payload: YearOverviewPayload, locale: string): Promise<void> {
+export async function downloadYearViewPdf(payload: YearOverviewPayload, locale: string, labels: YearViewPdfLabels): Promise<void> {
   // Arabic guest/company names can appear even in LTR reports, so always load the font.
   const pdfMake = await getPdfMake(true)
-  const content = buildYearViewPdfContent(payload, locale)
+  const content = buildYearViewPdfContent(payload, locale, labels)
   const docDef = {
     pageSize: 'A4',
     pageOrientation: 'landscape',
-    pageMargins: [8, 8, 8, 8],
+    pageMargins: [PAGE_MARGIN, PAGE_MARGIN, PAGE_MARGIN, PAGE_MARGIN],
     defaultStyle: {
       font: 'Arial',
-      fontSize: 6.5,
+      fontSize: FONT_SIZE,
       color: TEXT,
     },
     // per-cell font assignment (NotoSansArabic for Arabic runs, Arial for

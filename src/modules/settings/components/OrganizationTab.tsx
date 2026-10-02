@@ -6,6 +6,7 @@ import { useTranslation } from '@/i18n/hooks/useTranslation'
 import { toast } from '@/shared/toast/toastEvents'
 import { useBranding, useSetBranding } from '@/shared/branding/BrandingContext'
 import { MAX_PHONES, SOCIAL_PLATFORMS, documentQr, type OrganizationDetails, type PublicBranding } from '@/shared/branding/branding'
+import { isValidPhone, normalizePhone } from '@/shared/phone'
 
 const inputClass =
   'block h-11 w-full rounded-lg border border-line bg-white px-3 text-sm text-ink outline-none focus:border-ink focus:ring-1 focus:ring-ink disabled:bg-surface-muted'
@@ -70,9 +71,14 @@ export function OrganizationTab({ canEdit }: { canEdit: boolean }) {
   }
 
   const save = () => {
+    const phones = form.phones.map(normalizePhone).filter(Boolean)
+    if (phones.some((p) => !isValidPhone(p))) {
+      toast.error(t('common.phoneInvalid'))
+      return
+    }
     const payload: OrganizationDetails = {
       ...form,
-      phones: form.phones.map((p) => p.trim()).filter(Boolean),
+      phones,
       socials: Object.fromEntries(Object.entries(form.socials).filter(([, v]) => v?.trim())),
     }
     void request(
@@ -191,6 +197,7 @@ export function OrganizationTab({ canEdit }: { canEdit: boolean }) {
                   disabled={disabled}
                   aria-label={`${t('settings.organization.phones')} ${index + 1}`}
                   onChange={(e) => set('phones', form.phones.map((p, i) => (i === index ? e.target.value : p)))}
+                  onBlur={(e) => set('phones', form.phones.map((p, i) => (i === index ? normalizePhone(e.target.value) : p)))}
                 />
                 {canEdit && (
                   <button

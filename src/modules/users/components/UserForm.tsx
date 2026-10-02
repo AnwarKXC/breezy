@@ -9,6 +9,7 @@ import type { UserFormDraft, UserFormMode } from '../hooks/useUserForm'
 import { EyeIcon, EyeOffIcon } from './UserIcons'
 import { useEscapeKey } from '@/shared/hooks/useEscapeKey'
 import { useAuth } from '@/modules/auth'
+import { isValidPhone, normalizePhone } from '@/shared/phone'
 
 interface UserFormProps {
   draft: UserFormDraft
@@ -28,6 +29,7 @@ export function UserForm(props: UserFormProps) {
   const isEdit = props.mode === 'edit'
   const { t } = useTranslation()
   const [showPassword, setShowPassword] = useState(false)
+  const [phoneBlurred, setPhoneBlurred] = useState(false)
   useEscapeKey(props.onClose, !props.saving)
   const emailError = props.error === 'auth/email_already_exists' ? props.errorDescription : null
   const formError = props.error && props.error !== 'auth/email_already_exists' ? props.errorDescription : null
@@ -87,13 +89,23 @@ export function UserForm(props: UserFormProps) {
             />
             {emailError ? <p className="text-sm text-[#9F2F2D]">{emailError}</p> : null}
           </div>
-          <FloatingInput
-            required
-            label={props.labels.phone}
-            type="tel"
-            value={props.draft.phone}
-            onChange={(event) => props.onUpdate('phone', event.target.value)}
-          />
+          <div>
+            <FloatingInput
+              required
+              label={props.labels.phone}
+              type="tel"
+              value={props.draft.phone}
+              onChange={(event) => props.onUpdate('phone', event.target.value)}
+              onFocus={() => setPhoneBlurred(false)}
+              onBlur={(event) => {
+                props.onUpdate('phone', normalizePhone(event.target.value))
+                setPhoneBlurred(true)
+              }}
+            />
+            {phoneBlurred && props.draft.phone && !isValidPhone(props.draft.phone) ? (
+              <p className="mt-1 text-sm text-[#9F2F2D]">{t('common.phoneInvalid')}</p>
+            ) : null}
+          </div>
           {isSelf ? (
             <FloatingInput
               disabled

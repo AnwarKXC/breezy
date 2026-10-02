@@ -10,6 +10,7 @@ import type { Contact, ContactsListParams, ContactsMetrics, ContactsPage, Contac
 import { requireContactsCreate, requireContactsDelete, requireContactsRead, requireContactsUpdate } from './serviceSecurity'
 import { logContactCreated, logContactDeleted, logContactUpdated } from './activityLogService'
 import { mapLogRow } from '@/services/logs/logRows'
+import { normalizePhone } from '@/shared/phone'
 
 const DEFAULT_LIMIT = 20
 const MAX_LIMIT = 50
@@ -100,9 +101,12 @@ export async function getContactsPage(params: ContactsListParams = {}): Promise<
   const where: Prisma.contactsWhereInput = { deleted_at: null }
   if (params.type && params.type !== 'all') where.type = params.type as contact_type
   if (search) {
+    // Phones are stored as E.164 (+20…), so match on digits without the local trunk 0.
+    const phoneDigits = normalizePhone(search).replace(/^\+20/, '').replace(/\D/g, '')
     where.OR = [
       { name: { contains: search, mode: 'insensitive' } },
       { phone: { contains: search, mode: 'insensitive' } },
+      ...(phoneDigits.length >= 3 && /^[\d\s()+٠-٩۰-۹-]+$/.test(search) ? [{ phone: { contains: phoneDigits } }] : []),
       { email: { contains: search, mode: 'insensitive' } },
     ]
   }

@@ -4,13 +4,14 @@ import { useState } from 'react'
 import { z } from 'zod'
 import { useLocale } from '@/i18n/components/LocaleContext'
 import { countryOptions, isCountryCode } from '@/shared/static/countries'
+import { PHONE_FORMAT_MESSAGE, isValidPhone, normalizePhone } from '@/shared/phone'
 
 const VALID_DOC_TYPES = ['passport', 'id_card', 'drivers_license'] as const
 
 const guestSchema = z.object({
   full_name: z.string().trim().min(2, 'Name must be at least 2 characters').regex(/^[\p{L}\p{M}\s'.-]+$/u, 'Name contains invalid characters'),
   email: z.string().email('Invalid email').or(z.literal('')).optional(),
-  phone: z.string().optional(),
+  phone: z.string().transform(normalizePhone).refine((value) => value === '' || isValidPhone(value), PHONE_FORMAT_MESSAGE).optional(),
   document_type: z.string().min(1, 'Document type is required'),
   document_number: z.string().min(1, 'Document number is required'),
   nationality: z.string().refine((value): boolean => value === '' || isCountryCode(value), 'Select a valid nationality').optional(),
@@ -107,10 +108,13 @@ export function GuestForm({ initial, onSubmit, onCancel, loading }: Props) {
             inputMode="tel"
             autoComplete="tel"
             dir="ltr"
+            placeholder="+20 10 1234 5678"
             value={form.phone}
             onChange={(e) => set('phone', e.target.value)}
-            className="mt-1 w-full rounded-lg border border-[#EAEAEA] bg-white px-3 py-2.5 text-sm text-[#1A1A1A] outline-none transition-colors focus:border-gray-400"
+            onBlur={(e) => set('phone', normalizePhone(e.target.value))}
+            className={`mt-1 w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-[#1A1A1A] outline-none transition-colors focus:border-gray-400 ${errors.phone ? 'border-rose-300' : 'border-[#EAEAEA]'}`}
           />
+          {errors.phone && <p className="mt-1 text-xs text-rose-500">{errors.phone}</p>}
         </div>
         <div>
           <label className="block text-xs font-medium uppercase tracking-wide text-[#787774]">Document type</label>
