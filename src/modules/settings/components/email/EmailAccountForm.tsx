@@ -25,7 +25,7 @@ const input =
   'h-11 w-full rounded-lg border border-line bg-white px-3 text-sm text-ink outline-none focus:border-ink disabled:opacity-60'
 const label = 'mb-1.5 block text-sm font-medium text-ink'
 const secondaryButton =
-  'h-10 rounded-lg border border-line bg-white px-4 text-sm font-medium text-ink transition-colors hover:bg-surface-muted disabled:opacity-50'
+  'h-10 rounded-lg border border-line bg-white px-4 text-sm font-medium text-ink transition-colors hover:bg-accent/10 disabled:opacity-50'
 
 function presetFor(account: EmailAccount | null): Preset['id'] {
   if (!account) return 'gmail'
@@ -119,7 +119,7 @@ export function EmailAccountForm({
               disabled={disabled}
               onClick={() => choosePreset(p.id)}
               className={`min-h-11 rounded-lg border px-4 py-2 text-start text-sm font-medium transition-colors disabled:opacity-60 ${
-                preset === p.id ? 'border-ink bg-surface-muted text-ink' : 'border-line bg-white text-ink-muted hover:text-ink'
+                preset === p.id ? 'border-accent bg-accent/10 text-accent-ink' : 'border-line bg-white text-ink-muted hover:text-ink'
               }`}
             >
               {t(`settings.email.presets.${p.id}`)}

@@ -279,5 +279,13 @@
     "sqlQueries": "Custom SQL queries",
     "daily": "Tokens per day (30 days)",
     "sqlHint": "Questions that needed custom SQL are candidates for a new built-in report."
+  },
+  "app": {
+    "installTitle": "Install the assistant on your phone",
+    "installHint": "Opens straight into the chat, separate from the dashboard app.",
+    "install": "Install app",
+    "iosInstructions": "In Safari, tap Share, then \"Add to Home Screen\".",
+    "openDashboard": "Open dashboard",
+    "openAsApp": "Open as phone app"
   }
 }

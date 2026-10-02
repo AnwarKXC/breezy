@@ -52,7 +52,7 @@ export function InvoiceModal({ invoice, labels, onClose }: InvoiceModalProps) {
           <button
             type="button"
             onClick={onClose}
-            className="h-8 w-8 rounded-lg text-[#787774] hover:bg-[#F5F5F5] hover:text-[#555555] transition-colors"
+            className="h-8 w-8 rounded-lg text-[#787774] hover:bg-accent/10 hover:text-[#555555] transition-colors"
           >
             ✕
           </button>
@@ -101,7 +101,7 @@ export function InvoiceModal({ invoice, labels, onClose }: InvoiceModalProps) {
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg bg-[#F5F5F5] px-4 py-2 text-sm font-medium text-[#333333] transition-colors hover:bg-[#EAEAEA]"
+            className="rounded-lg bg-[#F5F5F5] px-4 py-2 text-sm font-medium text-[#333333] transition-colors hover:bg-accent/10"
           >
             {labels.close}
           </button>

@@ -8,8 +8,8 @@ export interface TagProps {
 export function Tag({ active = false, children, onClick, className = '' }: TagProps) {
   const baseClasses = 'inline-flex items-center justify-center rounded-full px-3 py-1 text-xs font-medium transition'
 
-  const activeClasses = 'bg-[#1A1A1A] text-white'
-  const inactiveClasses = 'bg-[#F5F5F5] text-[#787774] hover:bg-[#EAEAEA] cursor-pointer'
+  const activeClasses = 'bg-accent text-accent-foreground'
+  const inactiveClasses = 'bg-accent/10 text-accent-ink hover:bg-accent/15 cursor-pointer'
 
   return (
     <span

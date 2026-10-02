@@ -4,8 +4,8 @@ interface EnvVarSpec {
 }
 
 const REQUIRED_VARS: EnvVarSpec[] = [
+  // DIRECT_URL is optional: prisma.config.ts derives it from DATABASE_URL.
   { key: 'DATABASE_URL' },
-  { key: 'DIRECT_URL' },
 ]
 
 export function validateEnv(): void {

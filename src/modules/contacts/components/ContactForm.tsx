@@ -68,7 +68,7 @@ export function ContactForm(props: ContactFormProps) {
           <button
             type="button"
             onClick={props.onClose}
-            className="rounded-lg bg-[#F5F5F5] px-3 py-1 text-sm text-[#555555] transition-all duration-200 hover:bg-[#EAEAEA]"
+            className="rounded-lg bg-[#F5F5F5] px-3 py-1 text-sm text-[#555555] transition-all duration-200 hover:bg-accent/10"
           >
             {props.labels.close}
           </button>
@@ -180,14 +180,14 @@ export function ContactForm(props: ContactFormProps) {
           <button
             type="button"
             onClick={props.onClose}
-            className="rounded-xl bg-[#F5F5F5] px-4 py-2 text-sm font-bold text-[#555555] transition-all duration-200 hover:bg-[#EAEAEA]"
+            className="rounded-xl bg-[#F5F5F5] px-4 py-2 text-sm font-bold text-[#555555] transition-all duration-200 hover:bg-accent/10"
           >
             {props.labels.cancel}
           </button>
           <button
             type="submit"
             disabled={props.saving}
-            className="rounded-xl bg-[#1A1A1A] px-4 py-2 text-sm font-bold text-white transition-all duration-200 hover:bg-[#333333] disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-xl bg-accent px-4 py-2 text-sm font-bold text-accent-foreground transition-all duration-200 hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
           >
             {props.saving ? props.labels.saving : props.labels.save}
           </button>

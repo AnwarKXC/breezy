@@ -105,7 +105,7 @@ function EditPriceModalBody({
             type="button"
             disabled={saving}
             onClick={() => void submit(null)}
-            className="rounded-lg border border-[#EAEAEA] bg-white px-3 py-2 text-sm font-medium text-[#333333] transition-colors hover:bg-[#F9F9F8] disabled:opacity-50"
+            className="rounded-lg border border-[#EAEAEA] bg-white px-3 py-2 text-sm font-medium text-[#333333] transition-colors hover:bg-accent/10 disabled:opacity-50"
           >
             {t('reservations.resetToStandard')}
           </button>
@@ -113,13 +113,13 @@ function EditPriceModalBody({
           <span />
         )}
         <div className="flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="rounded-lg px-4 py-2 text-sm text-[#555555] hover:bg-[#F5F5F5]">
+          <button type="button" onClick={onClose} className="rounded-lg px-4 py-2 text-sm text-[#555555] hover:bg-accent/10">
             {t('common.cancel')}
           </button>
           <button
             type="submit"
             disabled={!isValid || saving}
-            className="rounded-lg bg-[#1A1A1A] px-4 py-2 text-sm text-white transition-colors hover:bg-[#333333] disabled:opacity-50"
+            className="rounded-lg bg-accent px-4 py-2 text-sm text-accent-foreground transition-colors hover:bg-accent-hover disabled:opacity-50"
           >
             {saving ? t('common.saving') : t('reservations.editPriceSave')}
           </button>

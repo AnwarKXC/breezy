@@ -89,7 +89,7 @@ export function NewContactModal({ isOpen, onClose, onCreated }: NewContactModalP
       <div role="dialog" aria-modal="true" className="mx-4 max-h-[calc(100dvh-2rem)] w-full max-w-lg overflow-y-auto rounded-xl border border-[#EAEAEA] bg-white p-4 shadow-xl sm:p-6" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between">
           <h2 className="text-base font-semibold text-[#1A1A1A]">{t('reservations.newContactTitle')}</h2>
-          <button type="button" onClick={onClose} aria-label={t('common.close')} className="rounded-lg p-1 text-[#787774] hover:bg-[#F5F5F5] hover:text-[#555555]">
+          <button type="button" onClick={onClose} aria-label={t('common.close')} className="rounded-lg p-1 text-[#787774] hover:bg-accent/10 hover:text-[#555555]">
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -215,14 +215,14 @@ export function NewContactModal({ isOpen, onClose, onCreated }: NewContactModalP
             <button
               type="button"
               onClick={onClose}
-              className="h-9 rounded-lg border border-[#EAEAEA] bg-white px-4 text-sm font-medium text-[#555555] transition-colors hover:bg-[#F9F9F8]"
+              className="h-9 rounded-lg border border-[#EAEAEA] bg-white px-4 text-sm font-medium text-[#555555] transition-colors hover:bg-accent/10"
             >
               {t('reservations.cancelButton')}
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="h-9 rounded-lg bg-[#1A1A1A] px-4 text-sm font-medium text-white transition-colors hover:bg-[#333333] disabled:opacity-40"
+              className="h-9 rounded-lg bg-accent px-4 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent-hover disabled:opacity-40"
             >
               {saving ? t('common.saving') : t('reservations.createButton')}
             </button>

@@ -172,7 +172,7 @@ export function InvoiceDetailModal({ invoiceId, t, onClose, onEdit }: Props) {
             {invoice.status === 'draft' && (
               <button
                 onClick={() => onEdit(invoice)}
-                className="h-8 rounded-lg border border-[#D4D4D4] px-3 text-xs font-medium text-[#333333] hover:bg-[#F9F9F8]"
+                className="h-8 rounded-lg border border-[#D4D4D4] px-3 text-xs font-medium text-[#333333] hover:bg-accent/10"
               >
                 {t('common.edit')}
               </button>
@@ -204,7 +204,7 @@ export function InvoiceDetailModal({ invoiceId, t, onClose, onEdit }: Props) {
             <button
               onClick={handlePrintPdf}
               disabled={printingPdf}
-              className="h-8 rounded-lg border border-[#D4D4D4] px-3 text-xs font-medium text-[#333333] hover:bg-[#F9F9F8] disabled:opacity-50"
+              className="h-8 rounded-lg border border-[#D4D4D4] px-3 text-xs font-medium text-[#333333] hover:bg-accent/10 disabled:opacity-50"
             >
               {printingPdf ? t('common.loading') : t('accounting.invoices.printPdf')}
             </button>

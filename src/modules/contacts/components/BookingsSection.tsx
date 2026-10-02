@@ -47,20 +47,20 @@ function YearPicker({ value, onChange, onClose }: { value?: number; onChange: (y
     <div ref={ref} className="absolute top-full left-0 z-50 mt-1 w-72 rounded-lg border border-[#EAEAEA] bg-white p-3 shadow-lg">
       <div className="mb-2 flex items-center justify-between">
         <button type="button" onClick={() => setDecadeStart((d) => d - 10)}
-          className="rounded px-2 py-1 text-xs text-[#555555] hover:bg-[#F5F5F5]">←</button>
+          className="rounded px-2 py-1 text-xs text-[#555555] hover:bg-accent/10">←</button>
         <span className="text-sm font-semibold text-[#333333]">{decadeStart} – {decadeStart + 9}</span>
         <button type="button" onClick={() => setDecadeStart((d) => d + 10)}
-          className="rounded px-2 py-1 text-xs text-[#555555] hover:bg-[#F5F5F5]">→</button>
+          className="rounded px-2 py-1 text-xs text-[#555555] hover:bg-accent/10">→</button>
       </div>
       <button type="button" onClick={() => { onChange(undefined); onClose() }}
-        className={`mb-1 w-full rounded-md px-2 py-1.5 text-left text-sm hover:bg-[#F5F5F5] ${!value ? 'bg-[#F5F5F5] font-semibold text-[#1A1A1A]' : 'text-[#555555]'}`}>
+        className={`mb-1 w-full rounded-md px-2 py-1.5 text-left text-sm hover:bg-accent/10 ${!value ? 'bg-[#F5F5F5] font-semibold text-[#1A1A1A]' : 'text-[#555555]'}`}>
         All years
       </button>
       <div className="grid grid-cols-3 gap-1">
         {years.map((y) => (
           <button key={y} type="button" onClick={() => { onChange(y); onClose() }}
             className={`rounded-md px-2 py-1.5 text-sm text-center transition-colors ${
-              value === y ? 'bg-[#1A1A1A] font-semibold text-white' : 'text-[#555555] hover:bg-[#F5F5F5]'
+              value === y ? 'bg-accent/10 font-semibold text-accent-ink' : 'text-[#555555] hover:bg-accent/10'
             }`}>
             {y}
           </button>
@@ -77,12 +77,12 @@ function MonthPicker({ value, onChange, onClose }: { value?: number; onChange: (
   return (
     <div ref={ref} className="absolute top-full left-0 z-50 mt-1 w-44 rounded-lg border border-[#EAEAEA] bg-white py-1 shadow-lg">
       <button type="button" onClick={() => { onChange(undefined); onClose() }}
-        className={`w-full px-3 py-1.5 text-left text-sm hover:bg-[#F5F5F5] ${!value ? 'font-semibold text-[#1A1A1A]' : 'text-[#555555]'}`}>
+        className={`w-full px-3 py-1.5 text-left text-sm hover:bg-accent/10 ${!value ? 'font-semibold text-[#1A1A1A]' : 'text-[#555555]'}`}>
         All months
       </button>
       {MONTH_NAMES.map((name, i) => (
         <button key={i + 1} type="button" onClick={() => { onChange(i + 1); onClose() }}
-          className={`w-full px-3 py-1.5 text-left text-sm hover:bg-[#F5F5F5] ${value === i + 1 ? 'font-semibold text-[#1A1A1A] bg-[#F9F9F8]' : 'text-[#555555]'}`}>
+          className={`w-full px-3 py-1.5 text-left text-sm hover:bg-accent/10 ${value === i + 1 ? 'font-semibold text-[#1A1A1A] bg-[#F9F9F8]' : 'text-[#555555]'}`}>
           {name}
         </button>
       ))}
@@ -181,7 +181,7 @@ export function BookingsSection({ bookings, labels, onExportCsv, onExportPdf, on
               <div className="flex items-center gap-2">
                 <div className="relative sm:min-w-44">
                   <button type="button" onClick={() => { setOpenYear(true); setOpenMonth(false) }}
-                    className="flex w-full items-center justify-between gap-3 rounded-lg border border-[#D4D4D4] bg-white px-3 py-2 text-start text-sm text-[#333333] hover:bg-[#F9F9F8] focus:border-[#555555] focus:outline-none">
+                    className="flex w-full items-center justify-between gap-3 rounded-lg border border-[#D4D4D4] bg-white px-3 py-2 text-start text-sm text-[#333333] hover:bg-accent/10 focus:border-[#555555] focus:outline-none">
                     <span className={filterYear ? 'text-[#333333]' : 'text-[#BBBBBB]'}>{filterYear ?? yearLabel}</span>
                     <svg className="h-4 w-4 shrink-0 text-[#787774]" fill="none" viewBox="0 0 24 24">
                       <path d="m7 10 5 5 5-5" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
@@ -191,7 +191,7 @@ export function BookingsSection({ bookings, labels, onExportCsv, onExportPdf, on
                 </div>
                 <div className="relative sm:min-w-44">
                   <button type="button" onClick={() => { setOpenMonth(true); setOpenYear(false) }}
-                    className="flex w-full items-center justify-between gap-3 rounded-lg border border-[#D4D4D4] bg-white px-3 py-2 text-start text-sm text-[#333333] hover:bg-[#F9F9F8] focus:border-[#555555] focus:outline-none">
+                    className="flex w-full items-center justify-between gap-3 rounded-lg border border-[#D4D4D4] bg-white px-3 py-2 text-start text-sm text-[#333333] hover:bg-accent/10 focus:border-[#555555] focus:outline-none">
                     <span className={filterMonth ? 'text-[#333333]' : 'text-[#BBBBBB]'}>{filterMonth ? MONTH_NAMES[filterMonth - 1] : monthLabel}</span>
                     <svg className="h-4 w-4 shrink-0 text-[#787774]" fill="none" viewBox="0 0 24 24">
                       <path d="m7 10 5 5 5-5" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
@@ -211,7 +211,7 @@ export function BookingsSection({ bookings, labels, onExportCsv, onExportPdf, on
               <button
                 type="button"
                 onClick={onBook}
-                className="h-9 rounded-lg bg-[#1A1A1A] px-3 text-xs font-semibold text-white transition-colors hover:bg-[#333333]"
+                className="h-9 rounded-lg bg-accent px-3 text-xs font-semibold text-accent-foreground transition-colors hover:bg-accent-hover"
               >
                 + Book a Room
               </button>
@@ -219,11 +219,11 @@ export function BookingsSection({ bookings, labels, onExportCsv, onExportPdf, on
             {onExportCsv && onExportPdf ? (
               <div className="flex h-9 overflow-hidden rounded-lg border border-[#EAEAEA] bg-white text-xs font-medium text-[#333333]">
                 <button type="button" onClick={onExportCsv}
-                  className="inline-flex items-center px-3 transition-colors hover:bg-[#F9F9F8]">
+                  className="inline-flex items-center px-3 transition-colors hover:bg-accent/10">
                   {labels.exportCsv}
                 </button>
                 <button type="button" onClick={onExportPdf}
-                  className="inline-flex items-center border-s border-[#EAEAEA] px-3 transition-colors hover:bg-[#F9F9F8]">
+                  className="inline-flex items-center border-s border-[#EAEAEA] px-3 transition-colors hover:bg-accent/10">
                   {labels.exportPdf}
                 </button>
               </div>
@@ -264,7 +264,7 @@ export function BookingsSection({ bookings, labels, onExportCsv, onExportPdf, on
                         router.push(`/${locale}/reservations/${reservationId}`)
                       }
                     }}
-                    className={`grid w-full grid-cols-2 items-center gap-x-4 gap-y-1.5 py-3 text-start sm:grid-cols-[1.4fr_1.8fr_1.4fr_auto] ${reservationId ? 'cursor-pointer transition-colors hover:bg-[#F9F9F8]' : ''}`}
+                    className={`grid w-full grid-cols-2 items-center gap-x-4 gap-y-1.5 py-3 text-start sm:grid-cols-[1.4fr_1.8fr_1.4fr_auto] ${reservationId ? 'cursor-pointer transition-colors hover:bg-accent/10' : ''}`}
                   >
                     <button
                       type="button"

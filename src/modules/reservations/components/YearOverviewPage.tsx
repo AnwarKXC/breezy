@@ -178,7 +178,7 @@ export function YearOverviewPage() {
                   type="button"
                   aria-label="Previous year"
                   onClick={() => setYear((y) => y - 1)}
-                  className="h-9 w-9 rounded-lg border border-[#EAEAEA] bg-white text-sm font-medium text-[#555555] transition-colors hover:bg-[#F9F9F8]"
+                  className="h-9 w-9 rounded-lg border border-[#EAEAEA] bg-white text-sm font-medium text-[#555555] transition-colors hover:bg-accent/10"
                 >
                   ‹
                 </button>
@@ -187,7 +187,7 @@ export function YearOverviewPage() {
                   type="button"
                   aria-label="Next year"
                   onClick={() => setYear((y) => y + 1)}
-                  className="h-9 w-9 rounded-lg border border-[#EAEAEA] bg-white text-sm font-medium text-[#555555] transition-colors hover:bg-[#F9F9F8]"
+                  className="h-9 w-9 rounded-lg border border-[#EAEAEA] bg-white text-sm font-medium text-[#555555] transition-colors hover:bg-accent/10"
                 >
                   ›
                 </button>
@@ -213,7 +213,7 @@ export function YearOverviewPage() {
                     setPopoverPos(null)
                   }}
                   className={`h-8 rounded-md px-3 text-sm font-medium transition-colors ${
-                    view === v ? 'bg-[#1A1A1A] text-white' : 'text-[#555555] hover:bg-[#F9F9F8]'
+                    view === v ? 'bg-accent/10 text-accent-ink' : 'text-[#555555] hover:bg-accent/10'
                   }`}
                 >
                   {t(v === 'wall' ? 'bookings.yearView.viewWall' : 'bookings.yearView.viewSheet')}
@@ -226,7 +226,7 @@ export function YearOverviewPage() {
               type="button"
               onClick={handleExportExcel}
               disabled={showLoading || error}
-              className="inline-flex h-9 items-center rounded-lg border border-[#EAEAEA] bg-white px-3 text-sm font-medium text-[#555555] transition-colors hover:bg-[#F9F9F8] disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex h-9 items-center rounded-lg border border-[#EAEAEA] bg-white px-3 text-sm font-medium text-[#555555] transition-colors hover:bg-accent/10 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {t('bookings.yearView.exportCsv')}
             </button>
@@ -234,7 +234,7 @@ export function YearOverviewPage() {
               type="button"
               onClick={handleExportPdf}
               disabled={showLoading || error}
-              className="inline-flex h-9 items-center gap-1.5 rounded-full bg-[#1A1A1A] px-4 text-sm font-medium text-white transition-colors hover:bg-[#333333] disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex h-9 items-center gap-1.5 rounded-full bg-accent px-4 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
             >
               {t('bookings.yearView.exportPdf')}
             </button>
@@ -249,7 +249,7 @@ export function YearOverviewPage() {
                 type="button"
                 onClick={() => setSheetMonth(i)}
                 className={`h-8 rounded-lg px-3 text-xs font-medium transition-colors ${
-                  sheetMonth === i ? 'bg-[#1A1A1A] text-white' : 'border border-[#EAEAEA] bg-white text-[#555555] hover:bg-[#F9F9F8]'
+                  sheetMonth === i ? 'bg-accent/10 text-accent-ink' : 'border border-[#EAEAEA] bg-white text-[#555555] hover:bg-accent/10'
                 }`}
               >
                 {label}
@@ -270,7 +270,7 @@ export function YearOverviewPage() {
             <button
               type="button"
               onClick={() => setReloadKey((k) => k + 1)}
-              className="mt-3 h-9 rounded-lg border border-[#EAEAEA] bg-white px-3 text-sm font-medium text-[#555555] transition-colors hover:bg-[#F9F9F8]"
+              className="mt-3 h-9 rounded-lg border border-[#EAEAEA] bg-white px-3 text-sm font-medium text-[#555555] transition-colors hover:bg-accent/10"
             >
               {t('common.retry')}
             </button>

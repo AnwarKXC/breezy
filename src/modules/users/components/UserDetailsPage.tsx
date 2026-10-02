@@ -185,7 +185,7 @@ export const UserDetailsPage = memo(function UserDetailsPage({
         <div className="flex items-center gap-4">
           <button
             onClick={() => router.back()}
-            className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#EAEAEA] bg-white text-[#555555] transition-colors hover:bg-[#F9F9F8]"
+            className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#EAEAEA] bg-white text-[#555555] transition-colors hover:bg-accent/10"
           >
             ←
           </button>

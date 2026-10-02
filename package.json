@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "vercel-build": "pnpm db:generate && prisma migrate deploy && next build",
     "start": "next start",
     "lint": "eslint",
     "analyze": "cross-env ANALYZE=true next build",
@@ -21,7 +22,10 @@
     "db:seed:demo": "tsx --conditions=react-server prisma/seed/demo.ts",
     "ai:eval": "tsx --conditions=react-server scripts/ai-eval.ts",
     "admin:create": "tsx --conditions=react-server scripts/create-admin.ts",
-    "fleet:license": "tsx scripts/fleet-license.ts"
+    "fleet:license": "tsx scripts/fleet-license.ts",
+    "fleet:env": "tsx scripts/fleet-env.ts",
+    "setup:project": "tsx scripts/setup-project.ts",
+    "hotel:new": "tsx scripts/hotel-new.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.0",

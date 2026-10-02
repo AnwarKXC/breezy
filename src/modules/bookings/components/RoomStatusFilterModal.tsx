@@ -75,8 +75,8 @@ export function RoomStatusFilterModal({ isOpen, onClose, current, onApply }: Roo
               onClick={() => setStatus('')}
               className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
                 status === ''
-                  ? 'border-[#1A1A1A] bg-[#1A1A1A] text-white'
-                  : 'border-[#EAEAEA] text-[#333333] hover:border-[#D4D4D4] hover:bg-[#F9F9F8]'
+                  ? 'border-accent bg-accent/10 text-accent-ink'
+                  : 'border-[#EAEAEA] text-[#333333] hover:border-[#D4D4D4] hover:bg-accent/10'
               }`}
             >
               {t('bookings.allStatuses')}
@@ -88,8 +88,8 @@ export function RoomStatusFilterModal({ isOpen, onClose, current, onApply }: Roo
                 onClick={() => setStatus(status === s ? '' : s)}
                 className={`rounded-lg border px-3 py-1.5 text-xs font-medium capitalize transition-colors ${
                   status === s
-                    ? 'border-[#1A1A1A] bg-[#1A1A1A] text-white'
-                    : 'border-[#EAEAEA] text-[#333333] hover:border-[#D4D4D4] hover:bg-[#F9F9F8]'
+                    ? 'border-accent bg-accent/10 text-accent-ink'
+                    : 'border-[#EAEAEA] text-[#333333] hover:border-[#D4D4D4] hover:bg-accent/10'
                 }`}
               >
                 {t(labelKey)}
@@ -104,7 +104,7 @@ export function RoomStatusFilterModal({ isOpen, onClose, current, onApply }: Roo
             type="button"
             onClick={handleClear}
             disabled={!hasActiveFilters}
-            className="rounded-lg px-3 py-2 text-sm font-medium text-[#787774] transition-colors hover:bg-[#F5F5F5] disabled:opacity-40"
+            className="rounded-lg px-3 py-2 text-sm font-medium text-[#787774] transition-colors hover:bg-accent/10 disabled:opacity-40"
           >
             {t('bookings.clearAll')}
           </button>
@@ -112,13 +112,13 @@ export function RoomStatusFilterModal({ isOpen, onClose, current, onApply }: Roo
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg px-4 py-2 text-sm font-medium text-[#555555] transition-colors hover:bg-[#F5F5F5]"
+              className="rounded-lg px-4 py-2 text-sm font-medium text-[#555555] transition-colors hover:bg-accent/10"
             >
               {t('common.cancel')}
             </button>
             <button
               type="submit"
-              className="rounded-lg bg-[#1A1A1A] px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-[#333333]"
+              className="rounded-lg bg-accent px-5 py-2 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent-hover"
             >
               {t('bookings.filterApply')}
             </button>

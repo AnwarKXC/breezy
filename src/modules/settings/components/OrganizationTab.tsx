@@ -10,7 +10,7 @@ import { MAX_PHONES, SOCIAL_PLATFORMS, documentQr, type OrganizationDetails, typ
 const inputClass =
   'block h-11 w-full rounded-lg border border-line bg-white px-3 text-sm text-ink outline-none focus:border-ink focus:ring-1 focus:ring-ink disabled:bg-surface-muted'
 const secondaryButton =
-  'h-10 rounded-lg border border-line bg-white px-4 text-sm font-medium text-ink transition-colors hover:bg-surface-muted disabled:opacity-50'
+  'h-10 rounded-lg border border-line bg-white px-4 text-sm font-medium text-ink transition-colors hover:bg-accent/10 disabled:opacity-50'
 
 function toForm(branding: PublicBranding): OrganizationDetails {
   const { name, phones, email, website, address, socials, taxId, qrLink, showQr, invoiceFooter } = branding

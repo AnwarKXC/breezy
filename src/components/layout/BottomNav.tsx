@@ -12,10 +12,12 @@ import {
 } from "@/config/navigation";
 import { useTranslation } from "@/i18n/hooks/useTranslation";
 import { useAuth } from "@/modules/auth";
+import { EmailUnreadBadge } from './EmailUnreadBadge';
 import {
   AccountingIcon,
   ContactsIcon,
   DashboardIcon,
+  EmailIcon,
   LogsIcon,
   ReservationsIcon,
   SettingsIcon,
@@ -26,6 +28,7 @@ const navIcons: Record<DashboardNavIcon, () => React.ReactNode> = {
   accounting: () => <AccountingIcon />,
   contacts: () => <ContactsIcon />,
   dashboard: () => <DashboardIcon />,
+  email: () => <EmailIcon />,
   logs: () => <LogsIcon />,
   reservations: () => <ReservationsIcon />,
   settings: () => <SettingsIcon />,
@@ -47,7 +50,7 @@ export const BottomNav = memo(function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 border-t border-[#EAEAEA] bg-white lg:hidden"
+      className="fixed bottom-0 left-0 right-0 z-50 border-t border-line bg-white lg:hidden"
       style={{ paddingBottom: "max(0.5rem, env(safe-area-inset-bottom, 0px))" }}
     >
       <div
@@ -62,15 +65,17 @@ export const BottomNav = memo(function BottomNav() {
             <Link
               key={item.href || "dashboard"}
               href={href}
-              className={`flex min-w-0 flex-col items-center justify-center px-1 py-1.5 transition-all duration-200 ${
-                active ? "text-accent" : "text-[#787774] hover:text-[#1A1A1A]"
+              aria-current={active ? "page" : undefined}
+              className={`flex min-w-0 flex-col items-center justify-center rounded-lg px-1 py-1.5 transition-all duration-200 ${
+                active ? "bg-accent/10 text-accent-ink" : "text-[#787774] hover:bg-accent/10 hover:text-accent-ink"
               }`}
             >
-              <span className={active ? "text-accent" : "text-[#787774]"}>
+              <span className="relative">
                 {navIcons[item.icon]()}
+                {item.icon === 'email' && <span className="absolute -end-3 -top-2"><EmailUnreadBadge mobile /></span>}
               </span>
               <span
-                className={`mt-0.5 max-w-full truncate text-[11px] font-medium ${active ? "text-accent" : "text-[#787774]"}`}
+                className="mt-0.5 max-w-full truncate text-[11px] font-medium"
               >
                 {t(item.labelKey)}
               </span>

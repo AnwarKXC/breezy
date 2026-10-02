@@ -73,7 +73,7 @@ export function TablePagination({
         <button
           onClick={() => onPageChange(Math.max(1, currentPage - 1))}
           disabled={currentPage === 1}
-          className="h-9 rounded-lg border border-[#EAEAEA] bg-white px-3 text-sm font-medium text-[#333333] hover:bg-[#F9F9F8] disabled:cursor-not-allowed disabled:opacity-50"
+          className="h-9 rounded-lg border border-[#EAEAEA] bg-white px-3 text-sm font-medium text-[#333333] hover:bg-accent/10 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {t("common.previous")}
         </button>
@@ -88,8 +88,8 @@ export function TablePagination({
               onClick={() => onPageChange(page)}
               className={`grid h-8 min-w-8 place-items-center rounded-lg px-2 text-sm font-bold transition-colors ${
                 page === currentPage
-                  ? "bg-[#1A1A1A] text-white"
-                  : "border border-[#EAEAEA] bg-white text-[#333333] hover:bg-[#F9F9F8]"
+                  ? "bg-accent text-accent-foreground"
+                  : "border border-[#EAEAEA] bg-white text-[#333333] hover:bg-accent/10"
               }`}
             >
               {page}
@@ -99,7 +99,7 @@ export function TablePagination({
         <button
           onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
           disabled={currentPage === totalPages}
-          className="h-9 rounded-lg bg-[#1A1A1A] px-3 text-sm font-medium text-white hover:bg-[#333333] disabled:cursor-not-allowed disabled:opacity-50"
+          className="h-9 rounded-lg bg-accent px-3 text-sm font-medium text-accent-foreground hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
         >
           {t("common.next")}
         </button>

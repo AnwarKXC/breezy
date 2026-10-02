@@ -514,7 +514,7 @@ export function InvoicesTab({ t, locale, invoiceFilters, onInvoiceFiltersChange 
             <button
               type="button"
               onClick={() => setDeletePermissionModalOpen(false)}
-              className="cursor-pointer rounded-lg bg-[#1A1A1A] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#333333]"
+              className="cursor-pointer rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent-hover"
             >
               {t('common.ok')}
             </button>

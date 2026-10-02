@@ -48,7 +48,7 @@ export function TableDesktopView<T extends Record<string, unknown>>({
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full">
-        <thead className="border-b border-[#EAEAEA] bg-white">
+        <thead className="border-b border-line bg-accent/10">
           <tr>
             {isSelectable ? (
               <th className="w-12 px-4 py-3 text-left">
@@ -87,7 +87,7 @@ export function TableDesktopView<T extends Record<string, unknown>>({
               <tr
                   key={rowId}
                   data-row-id={rowId}
-                  className={`text-sm text-[#333333] transition-colors duration-150 hover:bg-[#F9F9F8] ${onRowClick ? 'cursor-pointer' : ''}`}
+                  className={`text-sm text-[#333333] transition-colors duration-150 hover:bg-accent/10 ${selectedRowIdSet.has(rowId) ? 'bg-accent/10' : ''} ${onRowClick ? 'cursor-pointer' : ''}`}
                   onClick={(e) => {
                     if ((e.target as HTMLElement).closest('[data-ignore-row-click]')) return
                     onRowClick?.(row, e)

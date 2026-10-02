@@ -98,7 +98,7 @@ export function BookingDeleteModal({
               type="button"
               onClick={() => setMode('choice')}
               disabled={loading}
-              className="rounded-lg border border-[#D4D4D4] px-4 py-2.5 text-sm font-semibold text-[#333333] transition-colors hover:bg-[#F9F9F8] disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-lg border border-[#D4D4D4] px-4 py-2.5 text-sm font-semibold text-[#333333] transition-colors hover:bg-accent/10 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {t('bookings.backLabel')}
             </button>
@@ -158,7 +158,7 @@ export function BookingDeleteModal({
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="rounded-lg border border-[#D4D4D4] px-4 py-2.5 text-sm font-semibold text-[#333333] transition-colors hover:bg-[#F9F9F8] disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-lg border border-[#D4D4D4] px-4 py-2.5 text-sm font-semibold text-[#333333] transition-colors hover:bg-accent/10 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {t('common.cancel')}
           </button>
@@ -169,7 +169,7 @@ export function BookingDeleteModal({
                 type="button"
                 onClick={() => setMode('charge-confirm')}
                 disabled={loading}
-                className="ml-auto rounded-lg border border-[#D4D4D4] px-4 py-2.5 text-sm font-semibold text-[#333333] transition-colors hover:bg-[#F9F9F8] disabled:cursor-not-allowed disabled:opacity-50"
+                className="ml-auto rounded-lg border border-[#D4D4D4] px-4 py-2.5 text-sm font-semibold text-[#333333] transition-colors hover:bg-accent/10 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {t('bookings.chargeBookingTitle')}
               </button>

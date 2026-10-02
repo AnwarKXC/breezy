@@ -74,7 +74,7 @@ export function RoomTypesSection({
  return (
  <div className="space-y-4"> <div className="flex items-center justify-between"> <h3 className="text-base font-semibold text-[#1A1A1A]">{t('rooms.roomTypes')}</h3> <button
  onClick={onOpenCreateType}
- className="rounded-lg bg-[#1A1A1A] px-4 py-2 text-sm font-medium text-white hover:bg-[#333333] transition-colors"> + {t('rooms.newRoomType')}
+ className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-foreground hover:bg-accent-hover transition-colors"> + {t('rooms.newRoomType')}
  </button> </div> <div className="flex flex-col gap-3 border-y border-[#EAEAEA] py-4 sm:flex-row sm:items-center sm:justify-between"> <div className="w-full sm:max-w-xs"> <ToolbarSearch
  value={typesQuery}
  onChange={onTypesQueryChange}

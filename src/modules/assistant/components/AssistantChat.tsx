@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 
 import type { ChatEntry, useAssistantChat } from '../hooks/useAssistantChat'
 import { AnswerLangContext, assistantT, langDir, useAssistantT } from '../i18n'
@@ -38,7 +38,7 @@ function SuggestionLanguageSwitch({ value, onChange }: { value: SuggestionLangua
           aria-checked={value === option.lang}
           lang={option.lang}
           onClick={() => onChange(option.lang)}
-          className={`h-8 rounded-md px-3 text-xs font-medium transition-colors ${value === option.lang ? 'bg-white text-ink shadow-sm' : 'text-ink-muted hover:text-ink'}`}
+          className={`h-8 rounded-md px-3 text-xs font-medium transition-colors ${value === option.lang ? 'bg-accent/10 text-accent-ink shadow-sm' : 'text-ink-muted hover:text-ink'}`}
         >
           {option.text}
         </button>
@@ -85,7 +85,17 @@ function AssistantMessage({ entry }: { entry: ChatEntry }) {
 }
 
 /** Conversation + composer; fills its container (docked panel or full-screen modal). */
-export function AssistantChat({ chat }: { chat: ReturnType<typeof useAssistantChat> }) {
+export function AssistantChat({
+  chat,
+  autoFocus = true,
+  emptyExtra,
+}: {
+  chat: ReturnType<typeof useAssistantChat>
+  /** Off in the phone app, where focusing on open would pop the keyboard over the suggestions. */
+  autoFocus?: boolean
+  /** Rendered under the suggestions while the conversation is empty. */
+  emptyExtra?: ReactNode
+}) {
   const { t, locale } = useAssistantT()
   const [draft, setDraft] = useState('')
   const [suggestionLang, setSuggestionLang] = useState<SuggestionLanguage>(() => initialSuggestionLang(locale))
@@ -94,8 +104,8 @@ export function AssistantChat({ chat }: { chat: ReturnType<typeof useAssistantCh
   const lastEntry = chat.entries.at(-1)
 
   useEffect(() => {
-    inputRef.current?.focus({ preventScroll: true })
-  }, [])
+    if (autoFocus) inputRef.current?.focus({ preventScroll: true })
+  }, [autoFocus])
 
   useEffect(() => {
     if (chat.entries.length) endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
@@ -142,6 +152,7 @@ export function AssistantChat({ chat }: { chat: ReturnType<typeof useAssistantCh
                 })}
               </div>
               <p className="mt-4 text-xs text-ink-muted">{label(t, 'assistant.readOnlyNote')}</p>
+              {emptyExtra}
             </div>
           ) : (
             chat.entries.map((entry) =>
@@ -183,10 +194,10 @@ export function AssistantChat({ chat }: { chat: ReturnType<typeof useAssistantCh
             maxLength={AI_MESSAGE_MAX_LENGTH}
             placeholder={label(t, 'assistant.placeholder')}
             aria-label={label(t, 'assistant.placeholder')}
-            className="max-h-40 min-h-11 flex-1 resize-none bg-transparent px-2 py-2.5 text-sm text-ink outline-none placeholder:text-[#A3A3A0] field-sizing-content"
+            className="max-h-40 min-h-11 flex-1 resize-none bg-transparent px-2 py-2.5 text-base text-ink sm:text-sm outline-none placeholder:text-[#A3A3A0] field-sizing-content"
           />
           {chat.busy ? (
-            <button type="button" onClick={chat.stop} className="h-11 shrink-0 rounded-lg border border-line px-4 text-sm font-medium text-ink hover:bg-surface-muted">
+            <button type="button" onClick={chat.stop} className="h-11 shrink-0 rounded-lg border border-line px-4 text-sm font-medium text-ink hover:bg-accent/10">
               {label(t, 'assistant.stop')}
             </button>
           ) : (

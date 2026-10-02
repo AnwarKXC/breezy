@@ -92,13 +92,13 @@ export function Modal({ children, isOpen, onClose, title, size = 'md' }: ModalPr
         className={`flex max-h-[calc(100dvh-2rem)] w-full flex-col ${sizeClass[size]} overflow-hidden rounded-xl border border-[#EAEAEA] bg-white shadow-xl animate-fade-in-fast`}
       >
         {title && (
-          <div className="flex shrink-0 items-center justify-between px-4 pb-4 pt-4 sm:px-6 sm:pb-5 sm:pt-6">
+          <div className="flex shrink-0 items-center justify-between border-b border-line bg-accent/10 px-4 pb-4 pt-4 sm:px-6 sm:pb-5 sm:pt-6">
             <h3 id={titleId} className="text-lg font-bold text-[#1A1A1A]">{title}</h3>
             <button
               type="button"
               aria-label={t('common.close')}
               onClick={onClose}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-[#787774] transition-colors hover:bg-[#F5F5F5] hover:text-[#333333]"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-[#787774] transition-colors hover:bg-accent/10 hover:text-[#333333]"
             >
               <CloseIcon />
             </button>

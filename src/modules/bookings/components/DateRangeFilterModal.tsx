@@ -61,13 +61,13 @@ export function DateRangeFilterModal({ isOpen, onClose, currentRange, onApply }:
           <button
             type="button"
             onClick={handleClear}
-            className="rounded-lg px-3 py-2 text-sm font-medium text-[#787774] transition-colors hover:bg-[#F5F5F5]"
+            className="rounded-lg px-3 py-2 text-sm font-medium text-[#787774] transition-colors hover:bg-accent/10"
           >
             {t('bookings.filterClear')}
           </button>
           <button
             type="submit"
-            className="rounded-lg bg-[#1A1A1A] px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-[#333333]"
+            className="rounded-lg bg-accent px-5 py-2 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent-hover"
           >
             {t('bookings.filterApply')}
           </button>

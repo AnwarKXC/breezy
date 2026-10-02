@@ -62,7 +62,7 @@ export function ExpenseReportSection({
           type="button"
           onClick={handleExportCsv}
           disabled={expenses.length === 0}
-          className="h-9 rounded-lg border border-[#D4D4D4] px-4 text-sm font-medium text-[#333333] transition-colors hover:bg-[#F9F9F8] disabled:cursor-not-allowed disabled:opacity-50"
+          className="h-9 rounded-lg border border-[#D4D4D4] px-4 text-sm font-medium text-[#333333] transition-colors hover:bg-accent/10 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {t('accounting.expenses.reportExportCsv')}
         </button>

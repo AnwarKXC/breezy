@@ -51,7 +51,7 @@ export function ReservationNotes({ reservationId, notes, onUpdate }: Props) {
         <button
           onClick={handleAdd}
           disabled={saving || !text.trim()}
-          className="w-full rounded-lg bg-[#1A1A1A] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#333333] disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
         >
           {saving ? t('common.saving') : t('reservations.addNoteButton')}
         </button>

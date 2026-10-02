@@ -82,7 +82,7 @@ function TableBlock({ block }: { block: Extract<ResultBlock, { type: 'table' }> 
           <button
             type="button"
             onClick={exportCsv}
-            className="rounded-md border border-line bg-surface-muted px-2.5 py-1 text-xs font-medium text-[#333333] transition-colors hover:bg-ink hover:text-white"
+            className="rounded-md border border-line bg-surface-muted px-2.5 py-1 text-xs font-medium text-[#333333] transition-colors hover:bg-accent hover:text-accent-foreground"
           >
             {label(t, 'assistant.exportCsv')}
           </button>

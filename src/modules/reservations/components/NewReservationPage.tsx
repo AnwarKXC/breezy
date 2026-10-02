@@ -424,7 +424,7 @@ export function NewReservationPage() {
         <button
           type="button"
           onClick={() => router.push(`/${locale}/reservations`)}
-          className="inline-flex items-center rounded-lg border border-[#EAEAEA] bg-white px-3 py-1.5 text-sm font-medium text-[#787774] transition-colors hover:bg-[#F9F9F8] hover:text-[#1A1A1A]"
+          className="inline-flex items-center rounded-lg border border-[#EAEAEA] bg-white px-3 py-1.5 text-sm font-medium text-[#787774] transition-colors hover:bg-accent/10 hover:text-[#1A1A1A]"
         >
           <span aria-hidden="true" className="me-1 rtl:rotate-180">&larr;</span>
           {t('common.back')}
@@ -496,7 +496,7 @@ export function NewReservationPage() {
                           key={result.id}
                           type="button"
                           onClick={() => selectContact(result)}
-                          className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-[#333333] transition-colors hover:bg-[#F9F9F8]"
+                          className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-[#333333] transition-colors hover:bg-accent/10"
                         >
                           <span className="font-medium">{result.name}</span>
                           <span className={`rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${
@@ -516,7 +516,7 @@ export function NewReservationPage() {
                       type="button"
                       onClick={() => setNewContactModalOpen(true)}
                       data-tooltip={t('reservations.new.hints.addContact')}
-                      className="sticky bottom-0 flex w-full items-center justify-center gap-1.5 border-t border-[#EAEAEA] bg-[#F9F9F8] px-3 py-2.5 text-sm font-medium text-[#555555] transition-colors hover:bg-[#F5F5F5]"
+                      className="sticky bottom-0 flex w-full items-center justify-center gap-1.5 border-t border-[#EAEAEA] bg-[#F9F9F8] px-3 py-2.5 text-sm font-medium text-[#555555] transition-colors hover:bg-accent/10"
                     >
                       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -654,7 +654,7 @@ export function NewReservationPage() {
                             type="button"
                             onClick={() => updateRoomTypeCount(roomType.id, Math.max(0, requested - 1))}
                             disabled={!canDecrease}
-                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#EAEAEA] bg-white text-sm font-semibold text-[#555555] transition-colors hover:bg-[#F5F5F5] disabled:cursor-not-allowed disabled:opacity-30"
+                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#EAEAEA] bg-white text-sm font-semibold text-[#555555] transition-colors hover:bg-accent/10 disabled:cursor-not-allowed disabled:opacity-30"
                             aria-label={t('reservations.new.hints.decreaseRooms').replace('{type}', roomType.name)}
                           >
                             &minus;
@@ -666,7 +666,7 @@ export function NewReservationPage() {
                             type="button"
                             onClick={() => updateRoomTypeCount(roomType.id, requested + 1)}
                             disabled={!canIncrease}
-                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#EAEAEA] bg-white text-sm font-semibold text-[#555555] transition-colors hover:bg-[#F5F5F5] disabled:cursor-not-allowed disabled:opacity-30"
+                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#EAEAEA] bg-white text-sm font-semibold text-[#555555] transition-colors hover:bg-accent/10 disabled:cursor-not-allowed disabled:opacity-30"
                             aria-label={t('reservations.new.hints.increaseRooms').replace('{type}', roomType.name)}
                           >
                             +
@@ -847,7 +847,7 @@ export function NewReservationPage() {
               <button
                 type="submit"
                 disabled={!canSubmit || submitting}
-                className="mt-4 h-10 w-full rounded-lg bg-[#1A1A1A] px-4 text-sm font-medium text-white transition-colors hover:bg-[#333333] disabled:cursor-not-allowed disabled:opacity-40"
+                className="mt-4 h-10 w-full rounded-lg bg-accent px-4 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-40"
               >
                 {submitting ? t('reservations.new.creating') : t('reservations.new.create')}
               </button>

@@ -210,7 +210,7 @@ export function InvoiceWizard({ t, mode, existingInvoicesMap, onClose, onCreated
           <button
             type="button"
             onClick={state.step === 0 ? onClose : actions.prevStep}
-            className="h-9 rounded-lg border border-[#D4D4D4] px-4 text-sm font-medium text-[#333333] hover:bg-[#F9F9F8]"
+            className="h-9 rounded-lg border border-[#D4D4D4] px-4 text-sm font-medium text-[#333333] hover:bg-accent/10"
           >
             {state.step === 0 ? t('common.cancel') : t('common.back')}
           </button>
@@ -219,7 +219,7 @@ export function InvoiceWizard({ t, mode, existingInvoicesMap, onClose, onCreated
               <button
                 type="button"
                 onClick={handleSwitchToManual}
-                className="h-9 rounded-lg border border-[#D4D4D4] px-4 text-sm font-medium text-[#333333] hover:bg-[#F9F9F8]"
+                className="h-9 rounded-lg border border-[#D4D4D4] px-4 text-sm font-medium text-[#333333] hover:bg-accent/10"
               >
                 {t('accounting.invoices.wizard.manualInvoiceTitle')}
               </button>
@@ -229,7 +229,7 @@ export function InvoiceWizard({ t, mode, existingInvoicesMap, onClose, onCreated
                 type="button"
                 onClick={actions.nextStep}
                 disabled={!canProceedFromCurrentStep}
-                className="h-9 rounded-lg bg-[#1A1A1A] px-4 text-sm font-medium text-white hover:bg-[#333333] disabled:opacity-50"
+                className="h-9 rounded-lg bg-accent px-4 text-sm font-medium text-accent-foreground hover:bg-accent-hover disabled:opacity-50"
               >
                 {t('common.continue')}
               </button>
@@ -238,7 +238,7 @@ export function InvoiceWizard({ t, mode, existingInvoicesMap, onClose, onCreated
               <button
                 type="button"
                 onClick={actions.nextStep}
-                className="h-9 rounded-lg bg-[#1A1A1A] px-4 text-sm font-medium text-white hover:bg-[#333333]"
+                className="h-9 rounded-lg bg-accent px-4 text-sm font-medium text-accent-foreground hover:bg-accent-hover"
               >
                 {t('accounting.invoices.wizard.stepConfirm')}
               </button>
@@ -249,7 +249,7 @@ export function InvoiceWizard({ t, mode, existingInvoicesMap, onClose, onCreated
                   type="button"
                   onClick={() => handleSubmit(true)}
                   disabled={state.saving}
-                  className="h-9 rounded-lg border border-[#D4D4D4] px-4 text-sm font-medium text-[#333333] hover:bg-[#F9F9F8] disabled:opacity-50"
+                  className="h-9 rounded-lg border border-[#D4D4D4] px-4 text-sm font-medium text-[#333333] hover:bg-accent/10 disabled:opacity-50"
                 >
                   {state.saving ? t('common.saving') : t('accounting.invoices.wizard.saveDraft')}
                 </button>

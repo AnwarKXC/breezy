@@ -6,6 +6,7 @@ import { prisma } from '@/services/db/prisma'
 import { toRow } from '@/services/db/rows'
 import { setStandingRoomRate, standingRoomRates } from '@/modules/rooms/services/rateStore'
 import { getSystemCurrency } from '@/shared/currency/server'
+import { assertRoomCapacity } from '@/services/fleet/limits'
 import {
   mapRoomRow,
   type HousekeepingStatus,
@@ -53,6 +54,7 @@ export async function createRoom(input: RoomInput, actorId: string): Promise<Roo
   const price = input.price ?? 0
   const currency = await getSystemCurrency()
   const row = await prisma.$transaction(async (tx) => {
+    await assertRoomCapacity(tx)
     const created = await tx.rooms.create({
       data: {
         number: input.number,

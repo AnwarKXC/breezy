@@ -160,7 +160,7 @@ export function CheckoutConfirmModal({ isOpen, onClose, booking, formatCurrency,
             type="button"
             onClick={onClose}
             aria-label={t('common.close')}
-            className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-[#787774] transition-colors hover:bg-[#F5F5F5] hover:text-[#333333]"
+            className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-[#787774] transition-colors hover:bg-accent/10 hover:text-[#333333]"
           >
             <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24">
               <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />

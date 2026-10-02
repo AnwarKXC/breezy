@@ -12,4 +12,4 @@ services/
 ```
 
 ## Env:
-`DATABASE_URL` (pooled) and `DIRECT_URL` (migrations) — server-only, never expose to the browser.
+`DATABASE_URL` (pooled; migrations derive the direct URL from it, or use an optional `DIRECT_URL`) — server-only, never expose to the browser.

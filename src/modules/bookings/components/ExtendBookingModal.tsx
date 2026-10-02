@@ -269,13 +269,13 @@ function ExtendBookingModalContent({ isOpen, onClose, booking, onExtend }: Exten
         )}
 
         <div className="flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="rounded-md border border-[#EAEAEA] bg-white px-4 py-2 text-sm font-medium text-[#555] transition-colors hover:bg-[#F5F5F5]">
+          <button type="button" onClick={onClose} className="rounded-md border border-[#EAEAEA] bg-white px-4 py-2 text-sm font-medium text-[#555] transition-colors hover:bg-accent/10">
             Cancel
           </button>
           <button
             type="submit"
             disabled={!canSubmit || saving}
-            className="rounded-md bg-[#1A1A1A] px-5 py-2 text-sm font-medium text-white transition-all hover:bg-[#333] active:scale-[0.98] disabled:opacity-50"
+            className="rounded-md bg-accent px-5 py-2 text-sm font-medium text-accent-foreground transition-all hover:bg-accent-hover active:scale-[0.98] disabled:opacity-50"
           >
             {confirmLabel}
           </button>

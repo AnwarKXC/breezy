@@ -16,14 +16,14 @@ const FlagsSchema = z
 
 async function target(request: Request, context: MessageRouteContext) {
   const uid = UidSchema.safeParse((await context.params).uid)
-  const folder = FolderSchema.parse(new URL(request.url).searchParams.get('folder'))
-  return uid.success ? { uid: uid.data, folder } : null
+  const folder = FolderSchema.safeParse(new URL(request.url).searchParams.get('folder'))
+  return uid.success && folder.success && folder.data !== 'pinned' ? { uid: uid.data, folder: folder.data } : null
 }
 
 const notFound = () => NextResponse.json({ error: 'email/message_not_found' }, { status: 404 })
 
 export async function GET(request: Request, context: MessageRouteContext) {
-  return secureReadEndpoint(request, ACTIONS.SETTINGS_READ, async () => {
+  return secureReadEndpoint(request, ACTIONS.EMAIL_READ, async () => {
     const t = await target(request, context)
     if (!t) return notFound()
     try {
@@ -36,7 +36,7 @@ export async function GET(request: Request, context: MessageRouteContext) {
 }
 
 export async function PATCH(request: Request, context: MessageRouteContext) {
-  return secureMutationEndpoint(request, ACTIONS.SETTINGS_WRITE, async () => {
+  return secureMutationEndpoint(request, ACTIONS.EMAIL_WRITE, async () => {
     const t = await target(request, context)
     if (!t) return notFound()
     const parsed = FlagsSchema.safeParse(await request.json().catch(() => null))
@@ -53,7 +53,7 @@ export async function PATCH(request: Request, context: MessageRouteContext) {
 }
 
 export async function DELETE(request: Request, context: MessageRouteContext) {
-  return secureMutationEndpoint(request, ACTIONS.SETTINGS_WRITE, async () => {
+  return secureMutationEndpoint(request, ACTIONS.EMAIL_WRITE, async () => {
     const t = await target(request, context)
     if (!t) return notFound()
     try {

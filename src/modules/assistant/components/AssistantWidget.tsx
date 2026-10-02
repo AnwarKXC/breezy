@@ -10,6 +10,7 @@ import { useAuth } from '@/modules/auth'
 
 import { useAssistantChat } from '../hooks/useAssistantChat'
 import { label } from '../utils/format'
+import { HistoryIcon } from './icons'
 
 // The chat body (tables, blocks) loads only when the panel is first opened.
 const AssistantChat = dynamic(() => import('./AssistantChat').then((m) => m.AssistantChat), { ssr: false })
@@ -26,7 +27,7 @@ function ExpandIcon({ expanded }: { expanded: boolean }) {
 }
 
 function Panel() {
-  const { t } = useAssistantT()
+  const { t, locale } = useAssistantT()
   const chat = useAssistantChat()
   const [open, setOpen] = useState(false)
   const [expanded, setExpanded] = useState(false)
@@ -101,11 +102,20 @@ function Panel() {
             aria-label={label(t, 'assistant.history.title')}
             title={label(t, 'assistant.history.title')}
           >
-            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-              <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
-              <path d="M3 3v5h5M12 7v5l3 2" />
-            </svg>
+            <HistoryIcon />
           </button>
+          {/* Phones: the standalone assistant app (its own installable PWA). */}
+          <a
+            href={`/${locale}/assistant`}
+            className={`${iconButton} sm:hidden`}
+            aria-label={label(t, 'assistant.app.openAsApp')}
+            title={label(t, 'assistant.app.openAsApp')}
+          >
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+              <rect x="7" y="2" width="10" height="20" rx="2" />
+              <path d="M11 18h2" />
+            </svg>
+          </a>
           <button
             type="button"
             onClick={() => setExpanded((value) => !value)}

@@ -21,7 +21,7 @@ export function ContactTypeSelector({ selected, companyLabel, individualLabel, t
             className={`rounded-xl px-4 py-2 text-sm font-bold transition-all duration-200 ${
               selected === type
                 ? 'bg-black text-white'
-                : 'bg-[#F5F5F5] text-[#555555] hover:bg-[#EAEAEA]'
+                : 'bg-[#F5F5F5] text-[#555555] hover:bg-accent/10'
             }`}
           >
             {type === 'company' ? companyLabel : individualLabel}

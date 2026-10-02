@@ -38,6 +38,8 @@ export const ACTIONS = {
   CONTACTS_PRICE_OVERRIDES_UPDATE: 'contacts:priceOverrides:update',
   SETTINGS_READ: 'settings:read',
   SETTINGS_WRITE: 'settings:write',
+  EMAIL_READ: 'email:read',
+  EMAIL_WRITE: 'email:write',
   ACCOUNTING_SETTINGS: 'accounting:settings',
   RESERVATIONS_READ: 'reservations:read',
   RESERVATIONS_CREATE: 'reservations:create',
@@ -71,6 +73,8 @@ const ADMIN_ONLY_ACTIONS: readonly ActionPermission[] = [ACTIONS.AI_CHAT]
 const ACCOUNTANT_ACTIONS: readonly ActionPermission[] = ACTION_PERMISSIONS.filter((action) => !ADMIN_ONLY_ACTIONS.includes(action))
 
 const FRONT_DESK_ACTIONS: readonly ActionPermission[] = [
+  ACTIONS.EMAIL_READ,
+  ACTIONS.EMAIL_WRITE,
   ACTIONS.DASHBOARD_READ,
   ACTIONS.BOOKINGS_READ,
   ACTIONS.BOOKINGS_WRITE,

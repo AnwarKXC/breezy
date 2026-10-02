@@ -169,14 +169,14 @@ export function GuestForm({ initial, onSubmit, onCancel, loading }: Props) {
         <button
           type="button"
           onClick={onCancel}
-          className="rounded-lg border border-[#EAEAEA] bg-white px-4 py-2 text-sm font-medium text-[#333333] transition-colors hover:bg-[#F9F9F8]"
+          className="rounded-lg border border-[#EAEAEA] bg-white px-4 py-2 text-sm font-medium text-[#333333] transition-colors hover:bg-accent/10"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={loading}
-          className="rounded-lg bg-[#1A1A1A] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#333333] disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
         >
           {loading ? 'Saving...' : initial ? 'Update' : 'Add Guest'}
         </button>

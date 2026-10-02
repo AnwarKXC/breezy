@@ -21,7 +21,7 @@ interface DashboardShellProps {
 
 export function DashboardShell({ children, licenseNotice }: DashboardShellProps) {
   return (
-    <div className="h-screen overflow-hidden bg-[#FFFFFF] text-[#1A1A1A]">
+    <div className="h-screen overflow-hidden bg-page-bg text-ink">
       <AuthStateSync />
       <PWAClient />
       <TooltipLayer />
@@ -29,7 +29,7 @@ export function DashboardShell({ children, licenseNotice }: DashboardShellProps)
         <div className="flex h-full w-full">
           <Sidebar />
 
-          <div className="relative flex min-w-0 flex-1 flex-col bg-[#FFFFFF]">
+          <div className="relative flex min-w-0 flex-1 flex-col bg-page-bg">
             <Navbar />
             <main className="min-w-0 flex-1 overflow-y-auto overflow-x-hidden px-4 pb-24 pt-24 sm:px-6 lg:px-8 lg:pb-8 lg:pt-8">
               {licenseNotice && <LicenseNotice {...licenseNotice} />}

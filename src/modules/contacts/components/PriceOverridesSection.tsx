@@ -181,7 +181,7 @@ export function PriceOverridesSection({ overrides, roomTypes, canEdit, onSave, l
                       type="button"
                       disabled={savingCategory === rt.slug || !hasRowChanges(rt.slug)}
                       onClick={() => handleSaveRow(rt.slug)}
-                      className="rounded-lg bg-[#1A1A1A] px-3 py-1.5 text-xs font-bold text-white transition-all duration-200 hover:bg-[#333333] disabled:cursor-not-allowed disabled:opacity-30"
+                      className="rounded-lg bg-accent px-3 py-1.5 text-xs font-bold text-accent-foreground transition-all duration-200 hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-30"
                     >
                       {savingCategory === rt.slug ? labels.savingOverrides : labels.saveOverrides}
                     </button>

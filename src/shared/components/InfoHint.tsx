@@ -14,7 +14,7 @@ export function InfoHint({ text, label, className = '' }: InfoHintProps) {
       aria-label={label ?? text}
       data-tooltip={text}
       data-tooltip-tap=""
-      className={`inline-grid h-4 w-4 shrink-0 cursor-help place-items-center rounded-full border border-[#C9C9C6] align-middle text-[10px] font-bold leading-none text-[#787774] transition-colors hover:border-[#1A1A1A] hover:text-[#1A1A1A] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1A1A1A] ${className}`}
+      className={`inline-grid h-4 w-4 shrink-0 cursor-help place-items-center rounded-full border border-[#C9C9C6] align-middle text-[10px] font-bold leading-none text-[#787774] transition-colors hover:border-accent hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-ink ${className}`}
       // Inside a <label>, a click would otherwise focus/toggle the associated control.
       onClick={(event) => event.preventDefault()}
     >

@@ -86,6 +86,7 @@
     "hidePassword": "Hide password"
   },
   "nav": {
+    "email": "Email",
     "home": "Home",
     "dashboard": "Dashboard",
     "users": "Users",
@@ -1888,7 +1889,14 @@
       "folders": {
         "inbox": "Inbox",
         "sent": "Sent",
+        "drafts": "Drafts",
+        "archive": "Archive",
+        "pinned": "Pinned",
         "trash": "Trash"
+      },
+      "actions": {
+        "read": "Mark read", "unread": "Mark unread", "pin": "Pin", "unpin": "Unpin",
+        "archive": "Archive", "trash": "Move to trash", "restore": "Restore to inbox", "deleteForever": "Delete permanently"
       },
       "presets": {
         "gmail": "Gmail / Google Workspace",
@@ -1925,6 +1933,12 @@
         "disconnected": "Mailbox disconnected"
       },
       "inbox": {
+        "folders": "Email folders",
+        "selectAll": "Select all",
+        "selected": "selected",
+        "select": "Select message",
+        "updated": "Email updated",
+        "deleteConfirm": "Permanently delete the selected emails? This cannot be undone.",
         "search": "Search subject, sender or recipient",
         "refresh": "Refresh",
         "loading": "Loading…",
@@ -1947,6 +1961,12 @@
         "deletedForever": "Deleted permanently"
       },
       "compose": {
+        "saved": "Draft saved",
+        "saveDraft": "Save draft",
+        "saving": "Saving…",
+        "discardConfirm": "Discard unsaved changes to this email?",
+        "draftNotRemoved": "Email sent, but the saved draft could not be removed. Remove it before sending again.",
+        "draftNotReplaced": "Draft saved, but the previous copy could not be removed. Check Drafts before sending.",
         "title": "New email",
         "reply": "Reply",
         "close": "Close",
@@ -1963,6 +1983,18 @@
       "errors": {
         "generic": "Something went wrong. Try again.",
         "not_configured": "No mailbox is connected yet.",
+        "folder_not_found": "The required mail folder is missing. Ask your administrator to check the mailbox.",
+        "operation_failed": "The mail server could not complete this action. Refresh and try again.",
+        "draft_save_failed": "The draft could not be saved. Keep this window open and try again.",
+        "draft_busy": "Another staff member is updating this draft. Refresh Drafts and try again.",
+        "send_uncertain": "The mail server did not confirm submission. Check Sent before trying again.",
+        "draft_already_sent": "This draft has already been sent. Refresh Drafts and remove the remaining copy.",
+        "delete_requires_trash": "Move this email to Trash before permanently deleting it.",
+        "cannot_restore": "Only archived or trashed emails can be restored to the inbox.",
+        "invalid_folder": "This mail folder is not supported.",
+        "invalid_header": "Email headers must not contain line breaks.",
+        "recipient_required": "Enter at least one recipient.",
+        "send_failed": "Email could not be sent. Check the connection and try again.",
         "imap_failed": "Could not sign in to the incoming (IMAP) server. Check the address, password and server settings.",
         "smtp_failed": "Could not sign in to the outgoing (SMTP) server. Check the password and SMTP settings.",
         "password_required": "Enter the mailbox password.",
@@ -1972,6 +2004,16 @@
         "attachments_too_large": "Attachments are limited to 10 files and 10 MB in total."
       }
     }
+  },
+  "email": {
+    "title": "Email",
+    "description": "Manage the shared hotel inbox",
+    "configure": "Email settings",
+    "notConnected": "Connect the hotel mailbox",
+    "connectPrompt": "Open Email settings to connect the shared hotel mailbox.",
+    "contactAdmin": "Ask an administrator to connect the hotel mailbox.",
+    "openMailbox": "Open Email",
+    "unreadMessages": "unread emails"
   },
   "settingsPricing": {
     "loadFailed": "Failed to load pricing settings",

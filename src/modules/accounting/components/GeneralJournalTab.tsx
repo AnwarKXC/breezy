@@ -119,7 +119,7 @@ export function GeneralJournalTab() {
         <p className="mt-1 max-w-2xl text-sm text-stone-500">{label(mode === 'owner' ? 'ownerIntro' : 'accountantIntro')}</p>
       </div>
       <div role="group" aria-label={label('mode')} className="flex gap-1 rounded-lg bg-[#F5F5F5] p-1">
-        {(['owner', 'accountant'] as const).map((item) => <button key={item} type="button" aria-pressed={mode === item} onClick={() => changeMode(item)} className={`min-h-9 rounded-md px-4 text-sm font-medium ${mode === item ? 'bg-white text-ink shadow-sm' : 'text-ink-muted hover:text-stone-800'}`}>{label(item === 'owner' ? 'ownerView' : 'accountantView')}</button>)}
+        {(['owner', 'accountant'] as const).map((item) => <button key={item} type="button" aria-pressed={mode === item} onClick={() => changeMode(item)} className={`min-h-9 rounded-md px-4 text-sm font-medium ${mode === item ? 'bg-accent/10 text-accent-ink shadow-sm' : 'text-ink-muted hover:text-stone-800'}`}>{label(item === 'owner' ? 'ownerView' : 'accountantView')}</button>)}
       </div>
     </div>
 
@@ -162,7 +162,7 @@ export function GeneralJournalTab() {
         <Summary title={label('health')} value={label(data.health.balanced ? 'balanced' : 'unbalanced')} tone={data.health.balanced ? 'text-emerald-700' : 'text-red-700'} ltr={false} />
       </div>
       <nav aria-label={label('views')} className="flex gap-1 overflow-x-auto border-b border-stone-200">
-        {views.map((item) => <button key={item} type="button" aria-current={view === item ? 'page' : undefined} className={`-mb-px min-h-11 whitespace-nowrap border-b-2 px-4 text-sm font-medium ${view === item ? 'border-stone-800 text-stone-900' : 'border-transparent text-stone-500 hover:text-stone-800'}`} onClick={() => setView(item)}>{label(item)}</button>)}
+        {views.map((item) => <button key={item} type="button" aria-current={view === item ? 'page' : undefined} className={`-mb-px min-h-11 whitespace-nowrap border-b-2 px-4 text-sm font-medium ${view === item ? 'border-accent bg-accent/10 text-accent-ink' : 'border-transparent text-stone-500 hover:text-stone-800'}`} onClick={() => setView(item)}>{label(item)}</button>)}
       </nav>
 
       {view === 'entries' && <div className="space-y-3">
@@ -170,7 +170,7 @@ export function GeneralJournalTab() {
         {!entries.length ? <Empty text={label('noEntries')} /> : <>
           <div className="hidden overflow-hidden rounded-xl border border-stone-200 bg-white md:block"><table className="w-full text-sm">
             <thead className="bg-stone-50 text-stone-500"><tr><th className="p-3 text-start font-medium">{label('date')}</th><th className="p-3 text-start font-medium">{label('entryNumber')}</th><th className="p-3 text-start font-medium">{label('description')}</th><th className="p-3 text-end font-medium">{label('amount')}</th><th className="p-3 text-start font-medium">{label('status')}</th></tr></thead>
-            <tbody>{entries.map((entry) => <tr key={entry.id} tabIndex={0} onClick={() => openEntry(entry)} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openEntry(entry) } }} className="cursor-pointer border-t border-stone-100 hover:bg-stone-50 focus:bg-stone-50 focus:outline-none">
+            <tbody>{entries.map((entry) => <tr key={entry.id} tabIndex={0} onClick={() => openEntry(entry)} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openEntry(entry) } }} className="cursor-pointer border-t border-stone-100 hover:bg-accent/10 focus:bg-accent/10 focus:outline-none">
               <td className="p-3 whitespace-nowrap">{entry.date}</td>
               <td className="p-3 whitespace-nowrap font-mono text-xs">{entry.entryNumber}</td>
               <td className="p-3 max-w-md truncate">{entry.description}</td>

@@ -19,6 +19,7 @@ import {
   AccountingIcon,
   ContactsIcon,
   DashboardIcon,
+  EmailIcon,
   LogoutIcon,
   LogsIcon,
   ReservationsIcon,
@@ -26,6 +27,7 @@ import {
   UsersIcon,
 } from "./LayoutIcons";
 import { SidebarNavLink } from "./SidebarNavLink";
+import { EmailUnreadBadge } from './EmailUnreadBadge';
 import { SidebarSocialLinks } from "./SidebarSocialLinks";
 import { BrandLogo, useBranding } from "@/shared/branding/BrandingContext";
 
@@ -33,6 +35,7 @@ const navIcons: Record<DashboardNavIcon, () => React.ReactNode> = {
   accounting: () => <AccountingIcon />,
   contacts: () => <ContactsIcon />,
   dashboard: () => <DashboardIcon />,
+  email: () => <EmailIcon />,
   logs: () => <LogsIcon />,
   reservations: () => <ReservationsIcon />,
   settings: () => <SettingsIcon />,
@@ -103,6 +106,7 @@ export const Sidebar = memo(function Sidebar() {
               isActive={isActive}
               key={item.href || "dashboard"}
               label={t(item.labelKey)}
+              badge={item.icon === 'email' ? <EmailUnreadBadge /> : undefined}
             />
           );
         })}
@@ -111,7 +115,7 @@ export const Sidebar = memo(function Sidebar() {
       <div className="mt-auto border-t border-[#EAEAEA] pt-4">
         <SidebarSocialLinks />
         <button
-          className="mt-1.5 flex h-10 w-full items-center gap-3 rounded-md px-4 text-sm font-medium text-[#787774] transition-colors duration-200 hover:bg-[#F5F5F5] hover:text-[#1A1A1A] disabled:cursor-not-allowed disabled:opacity-50"
+          className="mt-1.5 flex h-10 w-full items-center gap-3 rounded-md px-4 text-sm font-medium text-[#787774] transition-colors duration-200 hover:bg-accent/10 hover:text-accent-ink disabled:cursor-not-allowed disabled:opacity-50"
           disabled={loading}
           onClick={handleLogout}
           type="button"

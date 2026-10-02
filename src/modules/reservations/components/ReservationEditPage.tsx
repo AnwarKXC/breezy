@@ -384,7 +384,7 @@ export function ReservationEditPage() {
         <div className="mx-auto max-w-2xl rounded-xl border border-[#EAEAEA] bg-white p-8">
           <p className="text-sm font-semibold text-rose-700">{error ?? 'Reservation not found'}</p>
           <button onClick={() => router.push(`/${locale}/reservations`)}
-            className="mt-5 inline-flex items-center rounded-lg border border-[#EAEAEA] bg-white px-4 py-2 text-sm font-medium text-[#333333] transition-colors hover:bg-[#F9F9F8]">
+            className="mt-5 inline-flex items-center rounded-lg border border-[#EAEAEA] bg-white px-4 py-2 text-sm font-medium text-[#333333] transition-colors hover:bg-accent/10">
             Back to reservations
           </button>
         </div>
@@ -400,7 +400,7 @@ export function ReservationEditPage() {
           <p className="text-sm font-medium text-[#333333]">{t('reservations.new.desk')}</p>
           <p className="mt-1 text-sm text-[#787774]">{t('reservations.new.subtitle')}</p>
           <button onClick={() => router.push(`/${locale}/reservations/${id}`)}
-            className="mt-5 inline-flex items-center rounded-lg border border-[#EAEAEA] bg-white px-4 py-2 text-sm font-medium text-[#333333] transition-colors hover:bg-[#F9F9F8]">
+            className="mt-5 inline-flex items-center rounded-lg border border-[#EAEAEA] bg-white px-4 py-2 text-sm font-medium text-[#333333] transition-colors hover:bg-accent/10">
             {t('common.back')}
           </button>
         </div>
@@ -415,7 +415,7 @@ export function ReservationEditPage() {
         <button
           type="button"
           onClick={() => router.push(`/${locale}/reservations/${id}`)}
-          className="inline-flex items-center rounded-lg border border-[#EAEAEA] bg-white px-3 py-1.5 text-sm font-medium text-[#787774] transition-colors hover:bg-[#F9F9F8] hover:text-[#1A1A1A]"
+          className="inline-flex items-center rounded-lg border border-[#EAEAEA] bg-white px-3 py-1.5 text-sm font-medium text-[#787774] transition-colors hover:bg-accent/10 hover:text-[#1A1A1A]"
         >
           &larr; {t('common.back')}
         </button>
@@ -717,7 +717,7 @@ export function ReservationEditPage() {
               <button
                 type="submit"
                 disabled={saving || !datesValid || form.selectedRoomIds.length === 0}
-                className="mt-4 h-10 w-full rounded-lg bg-[#1A1A1A] px-4 text-sm font-medium text-white transition-colors hover:bg-[#333333] disabled:cursor-not-allowed disabled:opacity-40"
+                className="mt-4 h-10 w-full rounded-lg bg-accent px-4 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-40"
               >
                 {saving ? t('common.saving') : t('common.save')}
               </button>

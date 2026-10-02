@@ -60,6 +60,14 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        // Scoped to /{locale}/assistant, outside the script's own directory.
+        source: '/assistant-sw.js',
+        headers: [
+          { key: 'Cache-Control', value: 'no-cache, no-store, must-revalidate' },
+          { key: 'Service-Worker-Allowed', value: '/' },
+        ],
+      },
+      {
         source: '/api/sw',
         headers: [
           { key: 'Cache-Control', value: 'no-cache, no-store, must-revalidate' },

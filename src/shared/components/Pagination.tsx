@@ -45,15 +45,15 @@ export function Pagination({ page, totalPages, onPageChange }: PaginationProps) 
               onClick={() => onPageChange(p)}
               className={`grid h-8 min-w-8 place-items-center rounded-lg px-2 text-sm font-bold transition-colors ${
                 p === page
-                  ? "bg-[#1A1A1A] text-white"
-                  : "bg-white text-[#555555] hover:bg-[#F5F5F5]"
+                  ? "bg-accent text-accent-foreground"
+                  : "bg-white text-[#555555] hover:bg-accent/10"
               }`}
             >
               {p}
             </button>
           )
         )}
-        <button type="button" disabled={page === totalPages} onClick={() => onPageChange(page + 1)} className="rounded-xl bg-[#1A1A1A] px-4 py-2 font-bold text-white transition-all duration-200 hover:bg-[#333333] disabled:opacity-50">{t("common.next")}</button>
+        <button type="button" disabled={page === totalPages} onClick={() => onPageChange(page + 1)} className="rounded-xl bg-accent px-4 py-2 font-bold text-accent-foreground transition-all duration-200 hover:bg-accent-hover disabled:opacity-50">{t("common.next")}</button>
       </div>
     </div>
   );

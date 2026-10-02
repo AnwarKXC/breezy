@@ -113,10 +113,10 @@ function Pagination({ page, totalPages, onPrev, onNext, from, to, total, t }: {
       <span>{from + 1}–{Math.min(to, total)} of {total}</span>
       <div className="flex gap-1">
         <button onClick={onPrev} disabled={page <= 0}
-          className="px-3 py-1 rounded border border-[#D4D4D4] disabled:opacity-30 hover:bg-[#F5F5F5]"
+          className="px-3 py-1 rounded border border-[#D4D4D4] disabled:opacity-30 hover:bg-accent/10"
         >{t('common.previous')}</button>
         <button onClick={onNext} disabled={page >= totalPages - 1}
-          className="px-3 py-1 rounded border border-[#D4D4D4] disabled:opacity-30 hover:bg-[#F5F5F5]"
+          className="px-3 py-1 rounded border border-[#D4D4D4] disabled:opacity-30 hover:bg-accent/10"
         >{t('common.next')}</button>
       </div>
     </div>
@@ -147,7 +147,7 @@ function CombinedTable({ rows, page, totalPages, onPrev, onNext, onDownloadInvoi
           </thead>
           <tbody>
             {rows.map((r) => (
-              <tr key={`${r.type}-${r.id}`} className="hover:bg-[#F9F9F9]">
+              <tr key={`${r.type}-${r.id}`} className="hover:bg-accent/10">
                 <td className={tableCellClass}><TypeBadge type={r.type} t={t} /></td>
                 <td className={tableCellClass}>
                   {r.type === 'invoice' ? (
@@ -306,7 +306,7 @@ export function ReportsTab({ t }: Props) {
         {(['daily', 'monthly'] as const).map((type) => (
           <button key={type} onClick={() => setReportType(type)}
             className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-              reportType === type ? 'bg-white text-[#1A1A1A]' : 'text-[#787774] hover:text-[#333333]'
+              reportType === type ? 'bg-accent/10 text-accent-ink' : 'text-[#787774] hover:text-[#333333]'
             }`}>
             {t(`accounting.reports.${type}`)}
           </button>
@@ -323,7 +323,7 @@ export function ReportsTab({ t }: Props) {
             value={month} onChange={(e) => setMonth(e.target.value)} />
         )}
         <button onClick={loadReport}
-          className="h-9 rounded-lg bg-[#1A1A1A] px-4 text-sm font-medium text-white hover:bg-[#333333]">
+          className="h-9 rounded-lg bg-accent px-4 text-sm font-medium text-accent-foreground hover:bg-accent-hover">
           {t('common.search')}
         </button>
         <ToolbarExportGroup onExportCsv={handleExportCsv} onExportPdf={handleExportPdf} csvLabel="CSV" pdfLabel="PDF" csvExporting={exportingCsv} pdfExporting={exportingPdf} />

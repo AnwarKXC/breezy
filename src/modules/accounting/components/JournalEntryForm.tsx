@@ -85,7 +85,7 @@ export function JournalEntryForm({ workspace, currency, defaultDate, preset, onC
   return <Modal isOpen onClose={() => { if (!saving) onClose() }} title={label('newEntry')} size="xl">
     <form onSubmit={submit} className="space-y-5">
       <p className="text-sm text-stone-500">{label('immutableHint')}</p>
-      {!advanced && <div className="flex flex-wrap gap-2">{JOURNAL_QUICK_ACTIONS.map((action) => <button type="button" key={action.key} aria-pressed={from.accountCode === action.from && to.accountCode === action.to} className="min-h-10 rounded-lg border border-stone-200 px-3 py-2 text-xs aria-pressed:border-stone-800 aria-pressed:bg-stone-800 aria-pressed:text-white" onClick={() => { setFrom({ ...emptyLine(), accountCode: action.from }); setTo({ ...emptyLine(), accountCode: action.to }); setDescription(label(action.key)) }}>{label(action.key)}</button>)}</div>}
+      {!advanced && <div className="flex flex-wrap gap-2">{JOURNAL_QUICK_ACTIONS.map((action) => <button type="button" key={action.key} aria-pressed={from.accountCode === action.from && to.accountCode === action.to} className="min-h-10 rounded-lg border border-stone-200 px-3 py-2 text-xs hover:bg-accent/10 aria-pressed:border-accent aria-pressed:bg-accent/10 aria-pressed:text-accent-ink" onClick={() => { setFrom({ ...emptyLine(), accountCode: action.from }); setTo({ ...emptyLine(), accountCode: action.to }); setDescription(label(action.key)) }}>{label(action.key)}</button>)}</div>}
       <div className="grid gap-3 sm:grid-cols-2">
         <FloatingInput type="date" label={label('date')} value={date} required onChange={(event) => setDate(event.target.value)} />
         <FloatingInput label={label('currency')} value={currency} readOnly />

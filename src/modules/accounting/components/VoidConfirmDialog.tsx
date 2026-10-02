@@ -110,7 +110,7 @@ export function VoidConfirmDialog({ invoice, t, onClose, onVoided }: Props) {
           <button
             type="button"
             onClick={onClose}
-            className="h-9 rounded-lg border border-[#D4D4D4] px-4 text-sm font-medium text-[#333333] hover:bg-[#F9F9F8]"
+            className="h-9 rounded-lg border border-[#D4D4D4] px-4 text-sm font-medium text-[#333333] hover:bg-accent/10"
           >
             {t('common.cancel')}
           </button>

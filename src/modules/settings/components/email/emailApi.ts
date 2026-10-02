@@ -1,7 +1,9 @@
 // Client-side types and helpers for /api/settings/email. Mirrors the server
 // shapes in src/services/email (kept separate: those modules are server-only).
 
-export type MailFolder = 'inbox' | 'sent' | 'trash'
+export type MailFolder = 'inbox' | 'sent' | 'drafts' | 'archive' | 'pinned' | 'trash'
+export type MailAction = 'read' | 'unread' | 'pin' | 'unpin' | 'archive' | 'trash' | 'restore' | 'deleteForever'
+export interface MailAttachment { filename: string; contentType: string; content: string }
 
 export interface EmailAccount {
   displayName: string
@@ -23,6 +25,7 @@ export interface MailAddress {
 
 export interface MailSummary {
   uid: number
+  folder?: MailFolder
   subject: string
   from: MailAddress[]
   to: MailAddress[]
@@ -36,10 +39,11 @@ export interface MailDetail extends MailSummary {
   cc: MailAddress[]
   replyTo: MailAddress[]
   messageId: string | null
+  inReplyTo?: string | null
   references: string[]
   html: string | null
   text: string
-  attachments: { index: number; filename: string; contentType: string; size: number }[]
+  attachments: { index: number; filename: string; contentType: string; size: number; content?: string }[]
 }
 
 export interface MailPage {
@@ -50,6 +54,8 @@ export interface MailPage {
 }
 
 const KNOWN_ERRORS = new Set([
+  'email/send_uncertain',
+  'email/draft_already_sent',
   'email/not_configured',
   'email/imap_failed',
   'email/smtp_failed',
@@ -58,6 +64,15 @@ const KNOWN_ERRORS = new Set([
   'email/server_unreachable',
   'email/message_not_found',
   'email/attachments_too_large',
+  'email/folder_not_found',
+  'email/operation_failed',
+  'email/draft_save_failed',
+  'email/delete_requires_trash',
+  'email/cannot_restore',
+  'email/invalid_header',
+  'email/recipient_required',
+  'email/send_failed',
+  'email/draft_busy',
 ])
 
 export function emailErrorText(t: (key: string) => string, code: string): string {

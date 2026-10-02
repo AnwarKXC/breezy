@@ -43,7 +43,7 @@ export function ContactInfoCard({ contact, labels, permissions, onEdit, onDelete
  <button
  type="button"
  onClick={onEdit}
- className="rounded-xl bg-[#F5F5F5] px-4 py-2 text-sm font-bold text-[#555555] transition-all duration-200 hover:bg-[#EAEAEA]"> {labels.edit}
+ className="rounded-xl bg-[#F5F5F5] px-4 py-2 text-sm font-bold text-[#555555] transition-all duration-200 hover:bg-accent/10"> {labels.edit}
  </button> )}
  {permissions.canDeleteContacts && (
  <button

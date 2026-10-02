@@ -202,7 +202,7 @@ function ChangeRoomModalBody({
         )}
 
         <div className="flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="rounded-lg px-4 py-2 text-sm text-[#555555] hover:bg-[#F5F5F5]">
+          <button type="button" onClick={onClose} className="rounded-lg px-4 py-2 text-sm text-[#555555] hover:bg-accent/10">
             {t('common.cancel')}
           </button>
           <button

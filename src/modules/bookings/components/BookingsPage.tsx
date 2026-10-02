@@ -457,7 +457,7 @@ export function BookingsPage() {
           </div>
           <Link
             href={`/${locale}/reservations/year-view`}
-            className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border border-[#EAEAEA] bg-white px-3 text-sm font-medium text-[#555555] transition-colors hover:bg-[#F9F9F8]"
+            className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border border-[#EAEAEA] bg-white px-3 text-sm font-medium text-[#555555] transition-colors hover:bg-accent/10"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
               <path
@@ -610,7 +610,7 @@ export function BookingsPage() {
             type="button"
             onClick={() => { setBookingCancelOpen(false); setBookingCancelFee(''); setConfirmAction(null) }}
             disabled={bookingCancelLoading}
-            className="rounded-lg border border-[#EAEAEA] bg-white px-4 py-2 text-sm font-medium text-[#333333] transition-colors hover:bg-[#F9F9F8] disabled:opacity-50"
+            className="rounded-lg border border-[#EAEAEA] bg-white px-4 py-2 text-sm font-medium text-[#333333] transition-colors hover:bg-accent/10 disabled:opacity-50"
           >
             {t('bookings.backLabel')}
           </button>

@@ -39,7 +39,7 @@ export const ExpenseTable = memo(function ExpenseTable({
           onCategoryClick ? (
             <button
               onClick={() => onCategoryClick(expense.categoryId)}
-              className="rounded-md border border-[#EAEAEA] bg-[#F9F9F8] px-2.5 py-1 text-xs font-medium text-[#333333] hover:bg-[#1A1A1A] hover:text-white transition-colors cursor-pointer"
+              className="rounded-md border border-[#EAEAEA] bg-[#F9F9F8] px-2.5 py-1 text-xs font-medium text-[#333333] hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
             >
               {categoryNames[expense.categoryId] ?? expense.categoryId}
             </button>

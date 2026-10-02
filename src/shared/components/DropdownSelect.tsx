@@ -54,7 +54,7 @@ export function DropdownSelect<T extends string>({
         aria-controls={dropdownId}
         aria-expanded={open}
         aria-label={ariaLabel}
-        className="form-control flex w-full items-center justify-between gap-3 text-start hover:bg-[#F9F9F8]"
+        className="form-control flex w-full items-center justify-between gap-3 text-start hover:bg-accent/10"
         onClick={() => setOpen((value) => !value)}
         type="button"
       >
@@ -74,7 +74,7 @@ export function DropdownSelect<T extends string>({
               <button
                 aria-current={active ? 'true' : undefined}
                 className={`block w-full rounded-xl px-3 py-2 text-start transition-colors ${
-                  active ? 'bg-[#F5F5F5] font-semibold text-[#1A1A1A]' : 'text-[#333333] hover:bg-[#F9F9F8]'
+                  active ? 'bg-accent/10 font-semibold text-accent-ink' : 'text-[#333333] hover:bg-accent/10'
                 }`}
                 key={option.value}
                 onClick={() => handleChange(option.value)}

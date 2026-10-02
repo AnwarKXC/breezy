@@ -260,7 +260,7 @@ export function RoomDetailPage() {
           </p>
           <button
             onClick={() => router.push(`/${locale}/reservations`)}
-            className="mt-5 rounded-lg bg-[#1A1A1A] px-4 py-2 text-sm font-semibold text-white transition-all duration-200 hover:bg-[#333333] active:scale-[0.98]"
+            className="mt-5 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground transition-all duration-200 hover:bg-accent-hover active:scale-[0.98]"
           >
             {t('rooms.detail.backToRooms')}
           </button>

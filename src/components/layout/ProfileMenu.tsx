@@ -73,7 +73,7 @@ export const ProfileMenu = memo(function ProfileMenu({
       {open ? (
         <div className="absolute end-0 top-12 z-40 w-48 overflow-hidden rounded-xl border border-line bg-white p-2 text-sm shadow-lg">
           <button
-            className="block w-full rounded-md px-3 py-2 text-start font-bold text-[#1A1A1A] transition-colors hover:bg-[#F5F5F5] disabled:cursor-not-allowed disabled:opacity-50"
+            className="block w-full rounded-md px-3 py-2 text-start font-bold text-[#1A1A1A] transition-colors hover:bg-accent/10 disabled:cursor-not-allowed disabled:opacity-50"
             disabled={loading}
             onClick={handleLogout}
             type="button"

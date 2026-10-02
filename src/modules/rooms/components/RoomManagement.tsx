@@ -388,7 +388,7 @@ export function RoomManagement({ canDeleteRooms }: { canDeleteRooms?: boolean })
           editingRoomId === row.id ? (
             <div className="flex justify-end gap-1">
               <button onClick={saveEditRoom} disabled={savingEditRoom} className="text-xs font-medium text-[#346538] hover:text-emerald-800 px-2 py-1 rounded hover:bg-[#EDF3EC] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{savingEditRoom ? t('rooms.saving') : t('common.save')}</button>
-              <button onClick={() => setEditingRoomId(null)} disabled={savingEditRoom} className="text-xs font-medium text-[#787774] hover:text-[#333333] px-2 py-1 rounded hover:bg-[#F5F5F5] transition-colors disabled:opacity-50">{t('common.cancel')}</button>
+              <button onClick={() => setEditingRoomId(null)} disabled={savingEditRoom} className="text-xs font-medium text-[#787774] hover:text-[#333333] px-2 py-1 rounded hover:bg-accent/10 transition-colors disabled:opacity-50">{t('common.cancel')}</button>
             </div>
           ) : (
             <TableActionsMenu
@@ -454,8 +454,8 @@ export function RoomManagement({ canDeleteRooms }: { canDeleteRooms?: boolean })
             }}
             className={`whitespace-nowrap px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
               section === s
-                ? 'bg-[#1A1A1A] text-white '
-                : 'bg-white text-[#555555] hover:bg-[#F5F5F5] border border-[#EAEAEA]'
+                ? 'bg-accent/10 text-accent-ink '
+                : 'bg-white text-[#555555] hover:bg-accent/10 border border-[#EAEAEA]'
             }`}
           >
             {t(s === 'types' ? 'rooms.roomTypes' : `rooms.${s}`)}
@@ -519,7 +519,7 @@ export function RoomManagement({ canDeleteRooms }: { canDeleteRooms?: boolean })
         <button
           onClick={handleQuickAdd}
           disabled={!quickNumber || !quickTypeId || quickAdding}
-          className="w-full sm:w-auto rounded-lg bg-[#1A1A1A] px-5 py-2 text-sm font-medium text-white hover:bg-[#333333] disabled:opacity-50 disabled:cursor-not-allowed transition-colors self-end"
+          className="w-full sm:w-auto rounded-lg bg-accent px-5 py-2 text-sm font-medium text-accent-foreground hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors self-end"
         >
           {quickAdding ? t('rooms.adding') : t('common.add')}
         </button>
@@ -534,7 +534,7 @@ export function RoomManagement({ canDeleteRooms }: { canDeleteRooms?: boolean })
       <p className="mt-1 text-sm text-[#787774]">{t('rooms.createTypeFirst')}</p>
       <button
         onClick={() => setSection('types')}
-        className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-[#1A1A1A] px-4 py-2 text-sm font-medium text-white hover:bg-[#333333] transition-colors"
+        className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-foreground hover:bg-accent-hover transition-colors"
       >
         {t('rooms.newRoomType')}
       </button>
@@ -548,7 +548,7 @@ export function RoomManagement({ canDeleteRooms }: { canDeleteRooms?: boolean })
       <div className="flex justify-end">
         <button
           onClick={openBulkModal}
-          className="rounded-lg bg-[#1A1A1A] px-4 py-2 text-sm font-medium text-white hover:bg-[#333333] transition-colors"
+          className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-foreground hover:bg-accent-hover transition-colors"
         >
           + {t('rooms.bulkAdd')}
         </button>
@@ -655,7 +655,7 @@ export function RoomManagement({ canDeleteRooms }: { canDeleteRooms?: boolean })
         <h3 className="text-base font-semibold text-[#1A1A1A]">{t('rooms.roomTypes')}</h3>
         <button
           onClick={openCreateType}
-          className="rounded-lg bg-[#1A1A1A] px-4 py-2 text-sm font-medium text-white hover:bg-[#333333] transition-colors"
+          className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-foreground hover:bg-accent-hover transition-colors"
         >
           + {t('rooms.newRoomType')}
         </button>
@@ -737,10 +737,10 @@ export function RoomManagement({ canDeleteRooms }: { canDeleteRooms?: boolean })
           />
         </div>
         <div className="flex justify-end gap-2 pt-1">
-          <button type="button" onClick={closeTypeModal} className="rounded-lg border border-[#D4D4D4] px-5 py-2.5 text-sm font-semibold text-[#333333] hover:bg-[#F9F9F8] transition-colors">
+          <button type="button" onClick={closeTypeModal} className="rounded-lg border border-[#D4D4D4] px-5 py-2.5 text-sm font-semibold text-[#333333] hover:bg-accent/10 transition-colors">
             {t('common.cancel')}
           </button>
-          <button type="submit" disabled={savingRoomType} className="rounded-lg bg-[#1A1A1A] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#333333] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+          <button type="submit" disabled={savingRoomType} className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
             {savingRoomType ? t('common.saving') : (editingTypeId ? t('common.save') : t('common.create'))}
           </button>
         </div>
@@ -788,13 +788,13 @@ export function RoomManagement({ canDeleteRooms }: { canDeleteRooms?: boolean })
           </div>
         )}
         <div className="flex justify-end gap-2 pt-1">
-          <button type="button" onClick={closeBulkModal} className="rounded-lg border border-[#D4D4D4] px-5 py-2.5 text-sm font-semibold text-[#333333] hover:bg-[#F9F9F8] transition-colors">
+          <button type="button" onClick={closeBulkModal} className="rounded-lg border border-[#D4D4D4] px-5 py-2.5 text-sm font-semibold text-[#333333] hover:bg-accent/10 transition-colors">
             {t('common.cancel')}
           </button>
           <button
             type="submit"
             disabled={bulkCreating || bulkDistSum !== bulkTotal}
-            className="rounded-lg bg-[#1A1A1A] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#333333] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {bulkCreating ? t('common.saving') : `${t('common.create')} ${bulkTotal}`}
           </button>
@@ -817,13 +817,13 @@ export function RoomManagement({ canDeleteRooms }: { canDeleteRooms?: boolean })
           onChange={e => setRenameNumber(e.target.value)}
         />
         <div className="flex justify-end gap-2 pt-1">
-          <button type="button" onClick={closeRenameModal} className="rounded-lg border border-[#D4D4D4] px-5 py-2.5 text-sm font-semibold text-[#333333] hover:bg-[#F9F9F8] transition-colors">
+          <button type="button" onClick={closeRenameModal} className="rounded-lg border border-[#D4D4D4] px-5 py-2.5 text-sm font-semibold text-[#333333] hover:bg-accent/10 transition-colors">
             {t('common.cancel')}
           </button>
           <button
             type="submit"
             disabled={!renameNumber.trim() || savingRename}
-            className="rounded-lg bg-[#1A1A1A] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#333333] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {savingRename ? t('common.saving') : t('common.save')}
           </button>

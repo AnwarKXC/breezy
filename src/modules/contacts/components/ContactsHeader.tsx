@@ -26,7 +26,7 @@ export function ContactsHeader({ title, subtitle, actionLabel, locale, onCreate 
         <button
           type="button"
           onClick={onCreate}
-          className="h-9 rounded-lg bg-[#1A1A1A] px-4 text-sm font-medium text-white transition-all duration-200 hover:bg-[#333333]"
+          className="h-9 rounded-lg bg-accent px-4 text-sm font-medium text-accent-foreground transition-all duration-200 hover:bg-accent-hover"
         >
           {actionLabel}
         </button>

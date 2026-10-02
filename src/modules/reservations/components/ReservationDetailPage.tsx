@@ -384,7 +384,7 @@ export function ReservationDetailPage() {
           <p className="mt-2 text-sm text-[#787774]">{t('reservations.couldNotBeLoaded')}</p>
           <button
             onClick={() => router.push(`/${locale}/reservations`)}
-            className="mt-5 inline-flex items-center rounded-lg border border-[#EAEAEA] bg-white px-4 py-2 text-sm font-medium text-[#333333] transition-colors hover:bg-[#F9F9F8]"
+            className="mt-5 inline-flex items-center rounded-lg border border-[#EAEAEA] bg-white px-4 py-2 text-sm font-medium text-[#333333] transition-colors hover:bg-accent/10"
           >
             {t('reservations.backToReservations')}
           </button>
@@ -420,7 +420,7 @@ export function ReservationDetailPage() {
                 void fetchCheckoutInvoiceSummary()
               }}
               data-tooltip={t('reservations.hints.checkOut')}
-              className="rounded-lg bg-[#1A1A1A] px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-[#333333]"
+              className="rounded-lg bg-accent px-5 py-2 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent-hover"
             >
               {t('reservations.checkOutButton')}
             </button>
@@ -448,7 +448,7 @@ export function ReservationDetailPage() {
                   console.error(e)
                 }
               }}
-              className="rounded-lg border border-[#EAEAEA] bg-white px-5 py-2 text-sm font-medium text-[#333333] transition-colors hover:bg-[#F9F9F8]"
+              className="rounded-lg border border-[#EAEAEA] bg-white px-5 py-2 text-sm font-medium text-[#333333] transition-colors hover:bg-accent/10"
             >
               {t('reservations.invoiceButton')}
             </button>

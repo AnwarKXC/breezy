@@ -7,6 +7,7 @@ export const PERMISSION_MODULES = {
   CONTACTS: 'contacts',
   LOGS: 'logs',
   SETTINGS: 'settings',
+  EMAIL: 'email',
 } as const
 
 export type PermissionModule = (typeof PERMISSION_MODULES)[keyof typeof PERMISSION_MODULES]
@@ -18,4 +19,5 @@ export const PERMISSIONS = {
   [PERMISSION_MODULES.CONTACTS]: [ROLES.ADMIN, ROLES.ACCOUNTANT, ROLES.FRONT_DESK],
   [PERMISSION_MODULES.LOGS]: [ROLES.ADMIN, ROLES.ACCOUNTANT],
   [PERMISSION_MODULES.SETTINGS]: [ROLES.ADMIN, ROLES.ACCOUNTANT],
+  [PERMISSION_MODULES.EMAIL]: [ROLES.ADMIN, ROLES.ACCOUNTANT, ROLES.FRONT_DESK],
 } as const satisfies Record<PermissionModule, readonly UserRole[]>

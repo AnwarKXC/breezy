@@ -15,6 +15,7 @@ interface SidebarNavLinkProps {
   isActive: boolean;
   label: string;
   onClick?: () => void;
+  badge?: React.ReactNode;
 }
 
 export const SidebarNavLink = memo(function SidebarNavLink({
@@ -23,20 +24,22 @@ export const SidebarNavLink = memo(function SidebarNavLink({
   isActive,
   label,
   onClick,
+  badge,
 }: SidebarNavLinkProps) {
   return (
     <Link
       aria-current={isActive ? "page" : undefined}
       className={`flex h-10 items-center gap-3 rounded-md px-4 text-sm font-medium transition-all duration-200 ${
         isActive
-          ? "bg-[#F5F5F5] text-accent"
-          : "text-[#787774] hover:bg-[#F5F5F5] hover:text-[#1A1A1A]"
+          ? "bg-accent/10 text-accent-ink ring-1 ring-inset ring-accent/20"
+          : "text-[#787774] hover:bg-accent/10 hover:text-accent-ink"
       }`}
       href={href}
       onClick={onClick}
     >
       <span className="grid h-5 w-5 place-items-center">{icon}</span>
       <span className="truncate">{label}</span>
+      {badge}
       <PendingIndicator />
     </Link>
   );

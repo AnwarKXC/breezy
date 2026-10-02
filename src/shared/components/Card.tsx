@@ -15,9 +15,9 @@ export function Card({ children, className = '', padding = 'lg', onClick }: Card
   return ( 
     <div 
       className={`
-        relative rounded-xl border border-[#EAEAEA] bg-white
+        relative rounded-xl border border-line bg-white
         transition duration-200
-        hover:bg-[#F9F9F8]
+        hover:border-accent/30 hover:bg-accent/5
         ${paddingClass} 
         ${className}
       `}

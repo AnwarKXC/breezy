@@ -47,10 +47,10 @@ export function TableCheckbox({
       type="button"
     >
       <span
-        className={`grid h-4 w-4 place-items-center rounded-[5px] border  transition-all duration-200 ease-out group-hover:scale-105 group-focus-visible:ring-2 group-focus-visible:ring-gray-900/15 ${
+        className={`grid h-4 w-4 place-items-center rounded-[5px] border  transition-all duration-200 ease-out group-hover:scale-105 group-focus-visible:ring-2 group-focus-visible:ring-accent/20 ${
           isActive
-            ? "border-[#1A1A1A] bg-[#1A1A1A] text-white shadow-gray-900/20"
-            : "border-[#D4D4D4] bg-white text-transparent group-hover:border-gray-500 group-hover:bg-[#F9F9F8]"
+            ? "border-accent bg-accent text-accent-foreground shadow-accent/20"
+            : "border-[#D4D4D4] bg-white text-transparent group-hover:border-accent group-hover:bg-accent/10"
         }`}
       >
         {indeterminate ? (

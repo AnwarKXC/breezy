@@ -25,7 +25,7 @@ export const NotificationsMenu = memo(function NotificationsMenu({
         aria-controls={dropdownId}
         aria-expanded={open}
         aria-label={t("layout.notifications")}
-        className="relative grid h-10 w-10 place-items-center rounded-xl bg-white text-[#1A1A1A] transition-colors hover:bg-[#333333] hover:text-white"
+        className="relative grid h-10 w-10 place-items-center rounded-xl bg-white text-[#1A1A1A] transition-colors hover:bg-accent-hover hover:text-accent-foreground"
         onClick={() => setOpen((value) => !value)}
         type="button"
       >

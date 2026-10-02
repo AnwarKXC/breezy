@@ -94,7 +94,7 @@ export function BookingListPanel({
             type="button"
             onClick={onFilterClick}
             data-tooltip={t('bookings.hints.listFilter')}
-            className={`inline-flex h-9 items-center gap-1.5 rounded-lg border px-3 text-sm font-medium transition-colors hover:bg-[#F9F9F8] ${activeFilterCount > 0 ? 'border-[#1A1A1A] bg-white text-[#1A1A1A]' : 'border-[#EAEAEA] bg-white text-[#555555]'}`}
+            className={`inline-flex h-9 items-center gap-1.5 rounded-lg border px-3 text-sm font-medium transition-colors hover:bg-accent/10 ${activeFilterCount > 0 ? 'border-[#1A1A1A] bg-white text-[#1A1A1A]' : 'border-[#EAEAEA] bg-white text-[#555555]'}`}
           >
             {t('bookings.filter')}
             {activeFilterCount > 0 && (
@@ -108,7 +108,7 @@ export function BookingListPanel({
               type="button"
               onClick={onAddBooking}
               data-tooltip={t('bookings.hints.addBooking')}
-              className="inline-flex h-9 items-center gap-1.5 rounded-full bg-[#1A1A1A] px-4 text-sm font-medium text-white transition-colors hover:bg-[#333333]"
+              className="inline-flex h-9 items-center gap-1.5 rounded-full bg-accent px-4 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent-hover"
             >
               <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

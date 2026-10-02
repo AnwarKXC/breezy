@@ -127,9 +127,9 @@ export function SettingsPage({ permissions, theme }: SettingsPageProps) {
               <Link
                 href={hrefFor(id)}
                 scroll={false}
-                className="group flex h-full items-start gap-4 rounded-xl border border-line bg-white p-5 transition-colors hover:border-ink/25 hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+                className="group flex h-full items-start gap-4 rounded-xl border border-line bg-white p-5 transition-colors hover:border-accent/30 hover:bg-accent/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
               >
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-surface-muted text-ink transition-colors group-hover:bg-white">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-accent/10 text-accent-ink transition-colors group-hover:bg-accent/20">
                   <SectionIcon />
                 </span>
                 <span className="min-w-0 flex-1">

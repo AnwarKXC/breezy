@@ -25,7 +25,7 @@ export function ToolbarExportGroup({ onExportCsv, onExportPdf, csvLabel, pdfLabe
         type="button"
         onClick={onExportCsv}
         disabled={csvExporting}
-        className="inline-flex items-center gap-1.5 px-3 py-2 transition-all duration-200 hover:bg-[#F9F9F8] disabled:opacity-50 disabled:cursor-not-allowed"
+        className="inline-flex items-center gap-1.5 px-3 py-2 transition-all duration-200 hover:bg-accent/10 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {csvExporting ? <Spinner /> : null}
         {csvLabel}
@@ -34,7 +34,7 @@ export function ToolbarExportGroup({ onExportCsv, onExportPdf, csvLabel, pdfLabe
         type="button"
         onClick={onExportPdf}
         disabled={pdfExporting}
-        className="inline-flex items-center gap-1.5 border-s border-[#EAEAEA] px-3 py-2 transition-all duration-200 hover:bg-[#F9F9F8] disabled:opacity-50 disabled:cursor-not-allowed"
+        className="inline-flex items-center gap-1.5 border-s border-[#EAEAEA] px-3 py-2 transition-all duration-200 hover:bg-accent/10 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {pdfExporting ? <Spinner /> : null}
         {pdfLabel}

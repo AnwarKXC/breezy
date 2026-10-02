@@ -29,7 +29,7 @@ export const WeeklyProgress = memo(function WeeklyProgress({ t, title }: { t: Tr
         </svg>
         <div className="mt-1 grid grid-cols-7 text-center text-xs font-medium text-[#333333]">
           {["dashboard.dayMon", "dashboard.dayTue", "dashboard.dayWed", "dashboard.dayThu", "dashboard.dayFri", "dashboard.daySat", "dashboard.daySun"].map((day, index) => (
-            <span key={day} className={index === 5 ? "mx-auto grid h-7 w-7 place-items-center rounded-full bg-[#1A1A1A] text-white" : ""}>{t(day)}</span>
+            <span key={day} className={index === 5 ? "mx-auto grid h-7 w-7 place-items-center rounded-full bg-accent/10 text-accent-ink" : ""}>{t(day)}</span>
           ))}
         </div>
       </section>
@@ -53,7 +53,7 @@ export const MonthProgress = memo(function MonthProgress({ t }: { t: Translate }
             <div className="grid h-24 w-24 place-items-center rounded-full border-[8px] border-[#EAEAEA] bg-white text-center"><span className="text-lg font-bold leading-none">120%</span></div>
           </div>
         </div>
-        <button type="button" className="mt-6 h-10 w-full rounded-lg border border-[#1A1A1A] bg-white px-4 text-sm font-medium text-[#1A1A1A] transition-all duration-200 hover:bg-[#1A1A1A] hover:text-white">{t("dashboard.downloadReport")}</button>
+        <button type="button" className="mt-6 h-10 w-full rounded-lg border border-accent bg-accent/10 px-4 text-sm font-medium text-accent-ink transition-all duration-200 hover:bg-accent hover:text-accent-foreground">{t("dashboard.downloadReport")}</button>
       </section>
     </AOS>
   );

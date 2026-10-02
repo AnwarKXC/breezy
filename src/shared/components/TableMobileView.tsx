@@ -37,7 +37,7 @@ export function TableMobileView<T extends Record<string, unknown>>({
           key={String(row.id ?? rowIndex)}
           data-row-id={String(row.id ?? rowIndex)}
           data-row-clickable={onRowClick ? true : undefined}
-          className={`min-w-0 border-b border-[#EAEAEA] bg-white px-4 py-4 text-sm text-[#333333] last:border-b-0 ${onRowClick ? "cursor-pointer transition-colors duration-150 active:bg-[#F9F9F8]" : ""}`}
+          className={`min-w-0 border-b border-line px-4 py-4 text-sm text-[#333333] last:border-b-0 ${selectable && isRowSelected?.(row, rowIndex) ? 'bg-accent/10' : 'bg-white'} ${onRowClick ? "cursor-pointer transition-colors duration-150 active:bg-accent/10" : ""}`}
           onClick={(e) => {
             if ((e.target as HTMLElement).closest('[data-ignore-row-click]')) return
             onRowClick?.(row, e)

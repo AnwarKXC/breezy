@@ -41,9 +41,9 @@ const ACTION_MAP: Record<
 }
 
 const BUTTON_STYLES = {
-  primary: 'bg-[#1A1A1A] text-white hover:bg-[#333333]',
+  primary: 'bg-accent text-accent-foreground hover:bg-accent-hover',
   danger: 'bg-white text-rose-700 border border-[#EAEAEA] hover:bg-rose-50',
-  quiet: 'bg-white text-[#333333] border border-[#EAEAEA] hover:bg-[#F9F9F8]',
+  quiet: 'bg-white text-[#333333] border border-[#EAEAEA] hover:bg-accent/10',
 }
 
 export function ReservationActions({ detail, onRefresh, onDeleted, onEdit }: Props) {
@@ -260,7 +260,7 @@ export function ReservationActions({ detail, onRefresh, onDeleted, onEdit }: Pro
             type="button"
             onClick={() => onEdit(detail)}
             data-tooltip={tr('editHint')}
-            className="rounded-lg border border-[#EAEAEA] bg-white px-4 py-2 text-sm font-medium text-[#333333] transition-colors hover:bg-[#F9F9F8]"
+            className="rounded-lg border border-[#EAEAEA] bg-white px-4 py-2 text-sm font-medium text-[#333333] transition-colors hover:bg-accent/10"
           >
             {tr('edit')}
           </button>
@@ -290,7 +290,7 @@ export function ReservationActions({ detail, onRefresh, onDeleted, onEdit }: Pro
             type="button"
             onClick={closeCancel}
             disabled={loading === 'cancel'}
-            className="rounded-lg border border-[#EAEAEA] bg-white px-4 py-2 text-sm font-medium text-[#333333] transition-colors hover:bg-[#F9F9F8] disabled:opacity-50"
+            className="rounded-lg border border-[#EAEAEA] bg-white px-4 py-2 text-sm font-medium text-[#333333] transition-colors hover:bg-accent/10 disabled:opacity-50"
           >
             {tr('back')}
           </button>
@@ -321,7 +321,7 @@ export function ReservationActions({ detail, onRefresh, onDeleted, onEdit }: Pro
           <button
             type="button"
             onClick={() => setConfirmDelete(false)}
-            className="rounded-lg border border-[#EAEAEA] bg-white px-4 py-2 text-sm font-medium text-[#333333] transition-colors hover:bg-[#F9F9F8]"
+            className="rounded-lg border border-[#EAEAEA] bg-white px-4 py-2 text-sm font-medium text-[#333333] transition-colors hover:bg-accent/10"
           >
             {tr('back')}
           </button>

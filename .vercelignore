@@ -1,0 +1,8 @@
+# Never upload local env files or caches with `vercel deploy`; Vercel holds the env vars.
+.env*
+!.env.example
+graphify-out
+test-results
+playwright-report
+.playwright-mcp
+.claude

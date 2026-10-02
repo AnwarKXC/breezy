@@ -147,7 +147,7 @@ export function RoomOverviewSection({
  label: t('common.actions'),
  render: (_value, row) => (
  editingRoomId === row.id ? (
- <div className="flex justify-end gap-1"> <button onClick={onSaveEditRoom} className="text-xs font-medium text-[#346538] hover:text-emerald-800 px-2 py-1 rounded hover:bg-[#EDF3EC] transition-colors">{t('common.save')}</button> <button onClick={() => onEditingRoomIdChange(null)} className="text-xs font-medium text-[#787774] hover:text-[#333333] px-2 py-1 rounded hover:bg-[#F5F5F5] transition-colors">{t('common.cancel')}</button> </div> ) : (
+ <div className="flex justify-end gap-1"> <button onClick={onSaveEditRoom} className="text-xs font-medium text-[#346538] hover:text-emerald-800 px-2 py-1 rounded hover:bg-[#EDF3EC] transition-colors">{t('common.save')}</button> <button onClick={() => onEditingRoomIdChange(null)} className="text-xs font-medium text-[#787774] hover:text-[#333333] px-2 py-1 rounded hover:bg-accent/10 transition-colors">{t('common.cancel')}</button> </div> ) : (
  <TableActionsMenu
  actions={[
  { label: t('common.edit'), onSelect: () => onStartEditRoom(row as Room) },
@@ -189,10 +189,10 @@ export function RoomOverviewSection({
  </select> </div> <button
  onClick={onQuickAdd}
  disabled={!quickNumber || !quickTypeId || quickAdding}
- className="w-full sm:w-auto rounded-lg bg-[#1A1A1A] px-5 py-2 text-sm font-medium text-white hover:bg-[#333333] disabled:opacity-50 disabled:cursor-not-allowed transition-colors self-end"> {quickAdding ? t('rooms.adding') : t('common.add')}
+ className="w-full sm:w-auto rounded-lg bg-accent px-5 py-2 text-sm font-medium text-accent-foreground hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors self-end"> {quickAdding ? t('rooms.adding') : t('common.add')}
  </button> </div> </div> <div className="flex justify-end"> <button
  onClick={onOpenBulkModal}
- className="rounded-lg bg-[#1A1A1A] px-4 py-2 text-sm font-medium text-white hover:bg-[#333333] transition-colors"> + {t('rooms.bulkAdd')}
+ className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-foreground hover:bg-accent-hover transition-colors"> + {t('rooms.bulkAdd')}
  </button> </div> {!roomTypes.items.length && (
  <div className="bg-white rounded-xl border border-[#EAEAEA] p-12 text-center"> <div className="text-4xl mb-3">🏗️</div> <h3 className="text-lg font-medium text-[#1A1A1A]">{t('rooms.noRoomTypes')}</h3> <p className="mt-1 text-sm text-[#787774]">{t('rooms.createTypeFirst')}</p> </div> )}
 

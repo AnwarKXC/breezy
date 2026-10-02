@@ -72,7 +72,7 @@ export function AccountingDashboardTab({ t }: Props) {
           onClick={handleRefresh}
           disabled={loading}
           data-tooltip={t('accounting.hints.refresh')}
-          className="h-9 shrink-0 rounded-lg border border-[#EAEAEA] bg-white px-3 text-sm font-medium text-[#1A1A1A] transition-colors hover:bg-[#F9F9F8] disabled:opacity-50"
+          className="h-9 shrink-0 rounded-lg border border-[#EAEAEA] bg-white px-3 text-sm font-medium text-[#1A1A1A] transition-colors hover:bg-accent/10 disabled:opacity-50"
         >
           {loading ? t('common.loading') : t('common.refresh')}
         </button>

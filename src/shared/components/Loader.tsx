@@ -18,14 +18,14 @@ export function Loader({ size = 'md', fullScreen = false }: LoaderProps) {
   if (fullScreen) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm z-50">
-        <div className={`animate-spin rounded-full border-2 border-[#D4D4D4] border-t-blue-600 ${sizeStyles[size]}`} />
+        <div className={`animate-spin rounded-full border-2 border-[#D4D4D4] border-t-accent ${sizeStyles[size]}`} />
       </div>
     )
   }
 
   return (
     <div className="flex items-center justify-center p-4">
-      <div className={`animate-spin rounded-full border-2 border-[#D4D4D4] border-t-blue-600 ${sizeStyles[size]}`} />
+      <div className={`animate-spin rounded-full border-2 border-[#D4D4D4] border-t-accent ${sizeStyles[size]}`} />
     </div>
   )
 }

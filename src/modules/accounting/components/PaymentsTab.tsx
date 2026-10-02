@@ -135,7 +135,7 @@ export function PaymentsTab({ t }: Props) {
         </div>
         <button
           onClick={loadPayments}
-          className="h-9 rounded-lg bg-[#1A1A1A] px-4 text-sm font-medium text-white hover:bg-[#333333]"
+          className="h-9 rounded-lg bg-accent px-4 text-sm font-medium text-accent-foreground hover:bg-accent-hover"
         >
           {t('common.refresh')}
         </button>

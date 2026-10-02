@@ -8,6 +8,7 @@ export type DashboardNavIcon =
   | "reservations"
   | "accounting"
   | "logs"
+  | "email"
   | "settings";
 
 export interface DashboardNavItem {
@@ -54,6 +55,12 @@ export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
     labelKey: "nav.settings",
     module: PERMISSION_MODULES.SETTINGS,
   },
+  {
+    href: "/email",
+    icon: "email",
+    labelKey: "nav.email",
+    module: PERMISSION_MODULES.EMAIL,
+  },
 ];
 
 export const DASHBOARD_TITLE_KEYS: Array<[string, string]> = [
@@ -63,6 +70,7 @@ export const DASHBOARD_TITLE_KEYS: Array<[string, string]> = [
   ["/accounting", "nav.accounting"],
   ["/logs", "nav.logs"],
   ["/settings", "settings.title"],
+  ["/email", "nav.email"],
 ];
 
 export function buildLocalizedDashboardHref(locale: Locale, href: string) {

@@ -69,7 +69,7 @@ export function RoomStatusPanel({
             type="button"
             onClick={onFilterClick}
             data-tooltip={t('bookings.hints.roomFilter')}
-            className="rounded-lg px-2.5 py-1 text-xs font-medium text-[#787774] transition-colors hover:bg-[#F5F5F5] hover:text-[#333333]"
+            className="rounded-lg px-2.5 py-1 text-xs font-medium text-[#787774] transition-colors hover:bg-accent/10 hover:text-[#333333]"
           >
             {t('bookings.filter')}
           </button>
@@ -78,7 +78,7 @@ export function RoomStatusPanel({
               type="button"
               onClick={onRefresh}
               data-tooltip={t('bookings.hints.refresh')}
-              className="rounded-lg px-2 py-1 text-xs font-medium text-[#1A1A1A] transition-colors hover:bg-[#F5F5F5]"
+              className="rounded-lg px-2 py-1 text-xs font-medium text-[#1A1A1A] transition-colors hover:bg-accent/10"
             >
               {t('bookings.refresh')}
             </button>

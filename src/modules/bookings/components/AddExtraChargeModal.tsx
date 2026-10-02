@@ -159,7 +159,7 @@ export function AddExtraChargeModal({ isOpen, onClose, booking, formatCurrency, 
                   className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
                     selectedDay === day.index
                       ? 'border-[#1A1A1A] bg-[#1A1A1A] text-white'
-                      : 'border-[#EAEAEA] text-[#333333] hover:border-[#D4D4D4] hover:bg-[#F9F9F8]'
+                      : 'border-[#EAEAEA] text-[#333333] hover:border-[#D4D4D4] hover:bg-accent/10'
                   }`}
                 >
                   {day.label}
@@ -182,7 +182,7 @@ export function AddExtraChargeModal({ isOpen, onClose, booking, formatCurrency, 
                 key={qc.label}
                 type="button"
                 onClick={() => addCharge(qc.label, qc.amount)}
-                className="rounded-lg border border-[#EAEAEA] px-3 py-1.5 text-xs font-medium text-[#333333] transition-colors hover:border-[#D4D4D4] hover:bg-[#F9F9F8]"
+                className="rounded-lg border border-[#EAEAEA] px-3 py-1.5 text-xs font-medium text-[#333333] transition-colors hover:border-[#D4D4D4] hover:bg-accent/10"
               >
                 {qc.label}{qc.amount > 0 ? ` (${formatCurrency(qc.amount)})` : ''}
               </button>
@@ -265,7 +265,7 @@ export function AddExtraChargeModal({ isOpen, onClose, booking, formatCurrency, 
         </div>
 
         <div className="flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="rounded-lg px-4 py-2 text-sm text-[#555555] hover:bg-[#F5F5F5]">
+          <button type="button" onClick={onClose} className="rounded-lg px-4 py-2 text-sm text-[#555555] hover:bg-accent/10">
             {t('common.cancel')}
           </button>
           <button

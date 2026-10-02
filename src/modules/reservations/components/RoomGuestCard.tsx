@@ -163,7 +163,7 @@ export function RoomGuestCard({ room, reservationId, guests, onGuestChange, room
               type="button"
               onClick={() => onEditPrice(room)}
               data-tooltip={t('reservations.hints.editPrice')}
-              className="whitespace-nowrap rounded-lg border border-[#EAEAEA] bg-white px-3 py-1.5 text-xs font-medium text-[#333333] transition-colors hover:bg-[#F9F9F8]"
+              className="whitespace-nowrap rounded-lg border border-[#EAEAEA] bg-white px-3 py-1.5 text-xs font-medium text-[#333333] transition-colors hover:bg-accent/10"
             >
               {t('reservations.editPriceLabel')}
             </button>
@@ -173,7 +173,7 @@ export function RoomGuestCard({ room, reservationId, guests, onGuestChange, room
               type="button"
               onClick={() => onExtraCharge(room)}
               data-tooltip={t('reservations.hints.extraCharge')}
-              className="whitespace-nowrap rounded-lg border border-[#EAEAEA] bg-white px-3 py-1.5 text-xs font-medium text-[#333333] transition-colors hover:bg-[#F9F9F8]"
+              className="whitespace-nowrap rounded-lg border border-[#EAEAEA] bg-white px-3 py-1.5 text-xs font-medium text-[#333333] transition-colors hover:bg-accent/10"
             >
               {t('reservations.extraChargeLabel')}
             </button>
@@ -183,7 +183,7 @@ export function RoomGuestCard({ room, reservationId, guests, onGuestChange, room
               type="button"
               onClick={() => onChangeRoom(room)}
               data-tooltip={t('reservations.hints.changeRoom')}
-              className="whitespace-nowrap rounded-lg border border-[#EAEAEA] bg-white px-3 py-1.5 text-xs font-medium text-[#333333] transition-colors hover:bg-[#F9F9F8]"
+              className="whitespace-nowrap rounded-lg border border-[#EAEAEA] bg-white px-3 py-1.5 text-xs font-medium text-[#333333] transition-colors hover:bg-accent/10"
             >
               {t('reservations.changeRoomLabel')}
             </button>
@@ -193,7 +193,7 @@ export function RoomGuestCard({ room, reservationId, guests, onGuestChange, room
               type="button"
               onClick={() => onShorten(room)}
               data-tooltip={t('reservations.hints.shorten')}
-              className="whitespace-nowrap rounded-lg border border-[#EAEAEA] bg-white px-3 py-1.5 text-xs font-medium text-[#333333] transition-colors hover:bg-[#F9F9F8]"
+              className="whitespace-nowrap rounded-lg border border-[#EAEAEA] bg-white px-3 py-1.5 text-xs font-medium text-[#333333] transition-colors hover:bg-accent/10"
             >
               {t('reservations.shortenLabel')}
             </button>
@@ -203,7 +203,7 @@ export function RoomGuestCard({ room, reservationId, guests, onGuestChange, room
               type="button"
               onClick={() => onExtend(room)}
               data-tooltip={t('reservations.hints.extend')}
-              className="whitespace-nowrap rounded-lg border border-[#EAEAEA] bg-white px-3 py-1.5 text-xs font-medium text-[#333333] transition-colors hover:bg-[#F9F9F8]"
+              className="whitespace-nowrap rounded-lg border border-[#EAEAEA] bg-white px-3 py-1.5 text-xs font-medium text-[#333333] transition-colors hover:bg-accent/10"
             >
               {t('reservations.extendLabel')}
             </button>
@@ -293,7 +293,7 @@ export function RoomGuestCard({ room, reservationId, guests, onGuestChange, room
             <div className="mt-5 flex justify-end gap-2">
               <button
                 onClick={() => setConfirmRemoveGuest(null)}
-                className="rounded-lg border border-[#EAEAEA] bg-white px-4 py-2 text-sm font-medium text-[#333333] transition-colors hover:bg-[#F9F9F8]"
+                className="rounded-lg border border-[#EAEAEA] bg-white px-4 py-2 text-sm font-medium text-[#333333] transition-colors hover:bg-accent/10"
               >
                 {t('common.cancel')}
               </button>

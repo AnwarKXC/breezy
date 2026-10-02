@@ -116,7 +116,7 @@ export function TableActionsMenu({ actions, ariaLabel }: TableActionsMenuProps) 
         aria-expanded={open}
         aria-haspopup="menu"
         aria-label={ariaLabel}
-        className="grid h-9 w-9 place-items-center rounded-lg text-[#787774] transition-colors hover:bg-[#F5F5F5] hover:text-[#1A1A1A] focus-visible:outline-2 focus-visible:outline-[#1A1A1A]"
+        className="grid h-9 w-9 place-items-center rounded-lg text-[#787774] transition-colors hover:bg-accent/10 hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-accent-ink"
         onClick={toggleMenu}
         type="button"
       >
@@ -144,7 +144,7 @@ export function TableActionsMenu({ actions, ariaLabel }: TableActionsMenuProps) 
                   className={`block w-full rounded-lg px-3 py-2 text-start transition-colors focus:outline-none ${
                     action.destructive
                       ? 'text-[#9F2F2D] hover:bg-[#FDEBEC] focus:bg-[#FDEBEC]'
-                      : 'text-[#333333] hover:bg-[#F5F5F5] focus:bg-[#F5F5F5]'
+                      : 'text-[#333333] hover:bg-accent/10 focus:bg-accent/10'
                   }`}
                   key={action.label}
                   onClick={() => handleSelect(action)}

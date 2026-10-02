@@ -99,7 +99,7 @@ export function InvoicesSection({ invoices, labels, onExportCsv, onExportPdf }: 
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedInvoice(invoice) } }}
-                className="grid w-full cursor-pointer grid-cols-2 items-center gap-x-4 gap-y-1.5 py-3 text-start transition-colors hover:bg-[#F9F9F8] sm:grid-cols-[1.4fr_1fr_1fr_auto]"
+                className="grid w-full cursor-pointer grid-cols-2 items-center gap-x-4 gap-y-1.5 py-3 text-start transition-colors hover:bg-accent/10 sm:grid-cols-[1.4fr_1fr_1fr_auto]"
               >
                 <div className="min-w-0">
                   <button

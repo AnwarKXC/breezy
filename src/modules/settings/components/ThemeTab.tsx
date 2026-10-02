@@ -77,7 +77,7 @@ export function ThemeTab({ initialPrimaryColor, canEdit }: ThemeTabProps) {
               disabled={disabled}
               onClick={() => pick(preset)}
               className={`h-11 w-11 rounded-full border-2 border-white transition-transform disabled:cursor-not-allowed disabled:opacity-50 ${
-                color === preset ? 'scale-110 ring-2 ring-ink' : 'ring-1 ring-line hover:scale-105'
+                color === preset ? 'scale-110 ring-2 ring-accent-ink' : 'ring-1 ring-line hover:scale-105'
               }`}
               style={{ backgroundColor: preset }}
             />
@@ -114,10 +114,10 @@ export function ThemeTab({ initialPrimaryColor, canEdit }: ThemeTabProps) {
           <span className="inline-flex h-10 items-center rounded-lg bg-accent px-4 text-sm font-medium text-accent-foreground">
             {t('settings.theme.previewButton')}
           </span>
-          <span className="inline-flex h-10 items-center rounded-md bg-[#F5F5F5] px-4 text-sm font-medium text-accent">
+          <span className="inline-flex h-10 items-center rounded-md bg-accent/10 px-4 text-sm font-medium text-accent-ink">
             {t('settings.theme.previewActiveLink')}
           </span>
-          <span className="inline-flex h-10 items-center rounded-lg border border-accent px-4 text-sm font-medium text-accent">
+          <span className="inline-flex h-10 items-center rounded-lg border border-accent px-4 text-sm font-medium text-accent-ink">
             {t('settings.theme.previewOutline')}
           </span>
         </div>

@@ -8,7 +8,7 @@ function SortControls({ t }: { t: Translate }) {
     <div className="flex items-center gap-2 text-xs font-bold text-[#555555]">
       <span>{t("dashboard.sortBy")}</span>
       <span className="grid h-8 w-8 place-items-center rounded-lg border border-[#EAEAEA] bg-white text-[#787774]" aria-hidden="true">#</span>
-      <span className="grid h-8 w-8 place-items-center rounded-lg bg-[#1A1A1A] text-white" aria-hidden="true">=</span>
+      <span className="grid h-8 w-8 place-items-center rounded-lg bg-accent/10 text-accent-ink" aria-hidden="true">=</span>
     </div>
   );
 }

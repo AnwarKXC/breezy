@@ -360,10 +360,10 @@ export function PricingManagement() {
           <p className="text-sm text-[#9F2F2D] bg-[#FDEBEC] rounded-lg px-3 py-2">{formError}</p>
         )}
         <div className="flex justify-end gap-2 pt-1">
-          <button type="button" onClick={closeModal} className="rounded-lg border border-[#D4D4D4] px-5 py-2.5 text-sm font-semibold text-[#333333] hover:bg-[#F9F9F8] transition-colors">
+          <button type="button" onClick={closeModal} className="rounded-lg border border-[#D4D4D4] px-5 py-2.5 text-sm font-semibold text-[#333333] hover:bg-accent/10 transition-colors">
             {t('common.cancel')}
           </button>
-          <button type="submit" disabled={saving} className="rounded-lg bg-[#1A1A1A] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#333333] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+          <button type="submit" disabled={saving} className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
             {saving ? t('common.saving') : (editingId ? t('common.save') : t('common.create'))}
           </button>
         </div>
@@ -381,7 +381,7 @@ export function PricingManagement() {
         <h3 className="text-base font-semibold text-[#1A1A1A]">{t('rooms.pricing')}</h3>
         <button
           onClick={openCreate}
-          className="rounded-lg bg-[#1A1A1A] px-4 py-2 text-sm font-medium text-white hover:bg-[#333333] transition-colors"
+          className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-foreground hover:bg-accent-hover transition-colors"
         >
           + {t('rooms.newRate')}
         </button>

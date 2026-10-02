@@ -2,6 +2,7 @@ import 'server-only'
 
 import { prisma } from '@/services/db/prisma'
 import { hashPassword } from '@/services/auth/password'
+import { assertUserCapacity } from '@/services/fleet/limits'
 import type { User } from '../types'
 import type { CreateStaffUserInput } from './authTypes'
 import { mapProfileRow } from './userMapper'
@@ -11,6 +12,7 @@ export async function createAuthUserDocument(input: CreateStaffUserInput): Promi
   const passwordHash = await hashPassword(input.password)
 
   const profile = await prisma.$transaction(async (tx) => {
+    await assertUserCapacity(tx)
     const user = await tx.users.create({ data: { email, password_hash: passwordHash } })
     return tx.profiles.create({
       data: {

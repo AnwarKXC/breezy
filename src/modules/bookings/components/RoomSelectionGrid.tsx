@@ -102,14 +102,14 @@ export function RoomSelectionGrid({
  type="button"
  onClick={() => onDecreaseRoomType(roomType.id)}
  disabled={!canDecrease}
- className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#EAEAEA] bg-white text-sm font-semibold text-[#555555] transition-colors hover:bg-[#F5F5F5] disabled:cursor-not-allowed disabled:opacity-30"
+ className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#EAEAEA] bg-white text-sm font-semibold text-[#555555] transition-colors hover:bg-accent/10 disabled:cursor-not-allowed disabled:opacity-30"
  aria-label={`Decrease ${roomType.name} rooms`}> &minus;
  </button> <span className="min-w-[2ch] text-center text-sm font-semibold tabular-nums"> {requested}
  </span> <button
  type="button"
  onClick={() => onIncreaseRoomType(roomType.id, maxAllowed)}
  disabled={!canIncrease}
- className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#EAEAEA] bg-white text-sm font-semibold text-[#555555] transition-colors hover:bg-[#F5F5F5] disabled:cursor-not-allowed disabled:opacity-30"
+ className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#EAEAEA] bg-white text-sm font-semibold text-[#555555] transition-colors hover:bg-accent/10 disabled:cursor-not-allowed disabled:opacity-30"
  aria-label={`Increase ${roomType.name} rooms`}> +
  </button> </div> {isTooHigh && (
  <p className="mt-2 text-xs font-medium text-[#9F2F2D]"> Only {available} room{available === 1 ? '' : 's'} available.

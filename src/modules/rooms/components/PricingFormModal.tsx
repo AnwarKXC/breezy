@@ -78,7 +78,7 @@ export function PricingFormModal({
   onChange={e => onFormChange({ effective_until: e.target.value })}
   /> </div> {error && (
   <p className="text-sm text-[#9F2F2D] bg-[#FDEBEC] rounded-lg px-3 py-2">{error}</p> )}
-  <div className="flex justify-end gap-2 pt-1"> <button type="button" onClick={onClose} className="rounded-lg border border-[#D4D4D4] px-5 py-2.5 text-sm font-semibold text-[#333333] hover:bg-[#F9F9F8] transition-colors"> {t('common.cancel')}
-  </button> <button type="submit" disabled={saving} className="rounded-lg bg-[#1A1A1A] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#333333] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"> {saving ? t('common.saving') : (editingId ? t('common.save') : t('common.create'))}
+  <div className="flex justify-end gap-2 pt-1"> <button type="button" onClick={onClose} className="rounded-lg border border-[#D4D4D4] px-5 py-2.5 text-sm font-semibold text-[#333333] hover:bg-accent/10 transition-colors"> {t('common.cancel')}
+  </button> <button type="submit" disabled={saving} className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"> {saving ? t('common.saving') : (editingId ? t('common.save') : t('common.create'))}
   </button> </div> </form> </Modal> )
 }

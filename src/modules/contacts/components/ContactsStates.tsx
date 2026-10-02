@@ -38,7 +38,7 @@ export function ContactsStateCard({ title, description, retryLabel, onRetry }: C
         <button
           type="button"
           onClick={onRetry}
-          className="mt-4 rounded-lg border border-[#D4D4D4] px-4 py-2 text-sm font-semibold text-[#333333] transition-colors hover:bg-[#F5F5F5]"
+          className="mt-4 rounded-lg border border-[#D4D4D4] px-4 py-2 text-sm font-semibold text-[#333333] transition-colors hover:bg-accent/10"
         >
           {retryLabel ?? 'Retry'}
         </button>

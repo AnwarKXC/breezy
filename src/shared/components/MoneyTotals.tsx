@@ -103,8 +103,8 @@ export function MoneyTotals({ value, convertible = true, inline = false, classNa
           onClick={toggle}
           className={`absolute end-0 inline-flex items-center ${inline ? 'top-1/2 h-5 w-5 -translate-y-1/2' : 'top-0 h-6 w-6'} justify-center rounded-md border transition-colors ${
             target
-              ? 'border-[#1A1A1A] bg-[#1A1A1A] text-white'
-              : 'border-[#EAEAEA] bg-white text-[#9B9A97] hover:bg-[#F7F6F3] hover:text-[#1A1A1A]'
+              ? 'border-accent bg-accent text-accent-foreground'
+              : 'border-[#EAEAEA] bg-white text-[#9B9A97] hover:bg-accent/10 hover:text-accent-ink'
           }`}
         >
           <SwapIcon spinning={fx.loading && target !== null} />
@@ -144,7 +144,7 @@ export function MoneyTotals({ value, convertible = true, inline = false, classNa
                 aria-pressed={code === target}
                 onClick={() => setTarget(code)}
                 className={`h-7 rounded-md px-2 text-[11px] font-semibold transition-colors ${
-                  code === target ? 'bg-[#1A1A1A] text-white' : 'bg-[#F1F1EF] text-[#787774] hover:text-[#1A1A1A]'
+                  code === target ? 'bg-accent text-accent-foreground' : 'bg-[#F1F1EF] text-[#787774] hover:text-accent-ink'
                 }`}
               >
                 {code}

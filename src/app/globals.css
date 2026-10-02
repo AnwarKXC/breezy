@@ -7,11 +7,14 @@
   --color-ink-muted: #787774;
   /* Primary color: overridable per deployment from Settings > Theme (--app-primary). */
   --color-accent: var(--app-primary, #1A1A1A);
-  --color-accent-hover: color-mix(in oklab, var(--app-primary, #1A1A1A) 85%, white);
+  --color-accent-hover: var(--app-primary-hover, #161616);
   --color-accent-foreground: var(--app-primary-foreground, #FFFFFF);
-  --color-line: #EAEAEA;
-  --color-page-bg: #F7F6F3;
-  --color-surface-muted: #F9F9F8;
+  /* Darkened theme ink stays readable on white and 10% tinted surfaces,
+     including when the selected primary color is very light. */
+  --color-accent-ink: var(--app-primary-ink);
+  --color-line: var(--line);
+  --color-page-bg: var(--background);
+  --color-surface-muted: var(--surface-muted);
   --font-sans: var(--font-poppins), 'SF Pro Display', 'Geist Sans', 'Helvetica Neue', 'Switzer', sans-serif;
   --font-serif: 'Lyon Text', 'Newsreader', 'Playfair Display', 'Instrument Serif', serif;
   --font-mono: 'Geist Mono', 'SF Mono', 'JetBrains Mono', monospace;
@@ -60,14 +63,15 @@
 }
 
 :root {
-  --background: #F7F6F3;
+  --app-primary-ink: color-mix(in srgb, var(--app-primary, #1A1A1A) 40%, #000000);
+  --background: color-mix(in srgb, var(--app-primary, #1A1A1A) 4%, #ffffff);
   --foreground: #1A1A1A;
   --surface: #ffffff;
-  --surface-muted: #F9F9F8;
+  --surface-muted: color-mix(in srgb, var(--app-primary, #1A1A1A) 10%, #ffffff);
   --surface-raised: #ffffff;
   --ink: #1A1A1A;
   --ink-muted: #787774;
-  --line: #EAEAEA;
+  --line: color-mix(in srgb, var(--app-primary, #1A1A1A) 16%, #ffffff);
 }
 
 * {
@@ -95,11 +99,22 @@ select {
   -webkit-tap-highlight-color: transparent;
 }
 
+input[type="checkbox"],
+input[type="radio"],
+input[type="range"] {
+  accent-color: var(--app-primary, #1A1A1A);
+}
+
+:where(button, a, [role="button"], [role="checkbox"]):focus-visible {
+  outline: 2px solid var(--app-primary-ink);
+  outline-offset: 3px;
+}
+
 input:not([type="button"]):not([type="checkbox"]):not([type="color"]):not([type="file"]):not([type="hidden"]):not([type="radio"]):not([type="range"]):not([type="reset"]):not([type="submit"]),
 select,
 textarea {
   min-height: 2.5rem !important;
-  border: 1px solid #EAEAEA !important;
+  border: 1px solid var(--line) !important;
   border-radius: 0.375rem !important;
   background-color: #ffffff !important;
   color: #1A1A1A !important;
@@ -124,8 +139,8 @@ textarea::placeholder {
 input:not([type="button"]):not([type="checkbox"]):not([type="color"]):not([type="file"]):not([type="hidden"]):not([type="radio"]):not([type="range"]):not([type="reset"]):not([type="submit"]):focus,
 select:focus,
 textarea:focus {
-  border-color: #1A1A1A !important;
-  box-shadow: 0 0 0 1px #1A1A1A !important;
+  border-color: var(--app-primary-ink) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--app-primary, #1A1A1A) 10%, transparent) !important;
 }
 
 input:not([type="button"]):not([type="checkbox"]):not([type="color"]):not([type="file"]):not([type="hidden"]):not([type="radio"]):not([type="range"]):not([type="reset"]):not([type="submit"]):disabled,
@@ -138,7 +153,7 @@ textarea:disabled {
 
 .form-control {
   min-height: 2.5rem;
-  border: 1px solid #EAEAEA;
+  border: 1px solid var(--line);
   border-radius: 0.375rem;
   background-color: #ffffff;
   color: #1A1A1A;
@@ -160,8 +175,12 @@ textarea:disabled {
 }
 
 .form-control:focus {
-  border-color: #1A1A1A;
-  box-shadow: 0 0 0 1px #1A1A1A;
+  border-color: var(--app-primary-ink);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--app-primary, #1A1A1A) 10%, transparent);
+}
+
+.floating-field:focus-within .floating-label {
+  color: var(--app-primary-ink);
 }
 
 .form-control:disabled {
@@ -232,8 +251,8 @@ input.booking-select-input:not([type="button"]):not([type="checkbox"]):not([type
 }
 
 ::selection {
-  background: #1A1A1A;
-  color: #ffffff;
+  background: var(--app-primary, #1A1A1A);
+  color: var(--app-primary-foreground, #ffffff);
 }
 
 .content-visibility-auto {
@@ -266,7 +285,7 @@ input.booking-select-input:not([type="button"]):not([type="checkbox"]):not([type
   height: 32px;
   margin: -16px 0 0 -16px;
   border: 3px solid #e5e7eb;
-  border-top-color: #3b82f6;
+  border-top-color: var(--app-primary, #1A1A1A);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   z-index: 11;

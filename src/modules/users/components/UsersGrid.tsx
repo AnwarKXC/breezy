@@ -59,7 +59,7 @@ export const UsersGrid = memo(function UsersGrid({
                 <button
                   type="button"
                   onClick={() => onEdit(user)}
-                  className="rounded-xl bg-[#F5F5F5] px-4 py-2 text-sm font-bold text-[#555555] transition-all duration-200 hover:bg-[#EAEAEA]"
+                  className="rounded-xl bg-[#F5F5F5] px-4 py-2 text-sm font-bold text-[#555555] transition-all duration-200 hover:bg-accent/10"
                 >
                   {labels.edit}
                 </button>

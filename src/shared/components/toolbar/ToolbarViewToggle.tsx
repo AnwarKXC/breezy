@@ -42,8 +42,8 @@ export function ToolbarViewToggle({ view, onChange, rowLabel, gridLabel }: Toolb
           onClick={() => onChange(mode)}
           className={`grid h-9 w-9 place-items-center rounded-lg transition-all duration-200 ${
             view === mode
-              ? 'bg-[#1A1A1A] text-white'
-              : 'border border-[#EAEAEA] bg-white text-[#787774] hover:bg-[#F9F9F8]'
+              ? 'bg-accent text-accent-foreground'
+              : 'border border-[#EAEAEA] bg-white text-[#787774] hover:bg-accent/10'
           }`}
         >
           {mode === 'row' ? <RowsIcon /> : <GridIcon />}

@@ -62,7 +62,7 @@ export function UserForm(props: UserFormProps) {
           <button
             type="button"
             onClick={props.onClose}
-            className="rounded-lg bg-[#F5F5F5] px-3 py-1 text-sm text-[#555555] transition-all duration-200 hover:bg-[#EAEAEA]"
+            className="rounded-lg bg-[#F5F5F5] px-3 py-1 text-sm text-[#555555] transition-all duration-200 hover:bg-accent/10"
           >
             {props.labels.close}
           </button>
@@ -119,7 +119,7 @@ export function UserForm(props: UserFormProps) {
                   type="button"
                   aria-label={showPassword ? t('common.hidePassword') : t('common.showPassword')}
                   onClick={() => setShowPassword((current) => !current)}
-                  className="absolute end-2 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-[#787774] transition-all duration-200 hover:bg-[#F5F5F5] hover:text-[#1A1A1A]"
+                  className="absolute end-2 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-[#787774] transition-all duration-200 hover:bg-accent/10 hover:text-[#1A1A1A]"
                 >
                   {showPassword ? <EyeOffIcon /> : <EyeIcon />}
                 </button>
@@ -135,14 +135,14 @@ export function UserForm(props: UserFormProps) {
           <button
             type="button"
             onClick={props.onClose}
-            className="rounded-xl bg-[#F5F5F5] px-4 py-2 text-sm font-bold text-[#555555] transition-all duration-200 hover:bg-[#EAEAEA]"
+            className="rounded-xl bg-[#F5F5F5] px-4 py-2 text-sm font-bold text-[#555555] transition-all duration-200 hover:bg-accent/10"
           >
             {props.labels.cancel}
           </button>
           <button
             type="submit"
             disabled={props.saving}
-            className="rounded-xl bg-[#1A1A1A] px-4 py-2 text-sm font-bold text-white transition-all duration-200 hover:bg-[#333333] disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-xl bg-accent px-4 py-2 text-sm font-bold text-accent-foreground transition-all duration-200 hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
           >
             {props.saving ? props.labels.saving : props.labels.save}
           </button>
