@@ -119,6 +119,7 @@
     "moduleComingSoon": "This module is ready in navigation and will be connected to its workspace next.",
     "poweredBy": "Powered by Step.eg",
     "license": {
+      "suspended": "Your account is paused by your provider. The system is read-only: you can view data but not make changes. Please contact your provider.",
       "grace": "Your subscription has expired. The system will switch to read-only on {date}. Please contact your provider to renew.",
       "readOnly": "Your subscription has ended. The system is read-only: you can view data but not make changes. Please contact your provider to renew."
     },
@@ -1757,6 +1758,10 @@
       "invalidResetLink": "This reset link is invalid or has expired.",
       "rateLimited": "Too many attempts. Wait a minute and try again.",
       "requestFailed": "Something went wrong. Try again."
+    },
+    "paused": {
+      "title": "Service paused",
+      "description": "This system is temporarily paused by your provider. Your data is safe. Please contact your provider to restore access."
     },
     "unauthorized": {
       "eyebrow": "Restricted access",

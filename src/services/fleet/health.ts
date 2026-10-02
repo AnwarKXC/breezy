@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { fleetMigrationStatus } from '@/generated/prisma/sql'
 import { prisma } from '@/services/db/prisma'
 import { fleetConfig } from './config'
 import { getLicenseStatus } from './license'
@@ -7,23 +8,14 @@ import { getLicenseStatus } from './license'
 // Report pulled by the control plane. Counts and versions only: no guest,
 // financial or user data ever leaves the instance through this endpoint.
 
-interface MigrationRow {
-  applied: bigint
-  failed: bigint
-  latest: string | null
-}
-
 export async function getInstanceReport() {
   const { instanceId, appVersion } = fleetConfig()
   const startedAt = Date.now()
 
   const [[migrations], rooms, users, activeReservations, lastReservation, lastLogin, license] = await Promise.all([
-    prisma.$queryRaw<MigrationRow[]>`
-      SELECT count(*) FILTER (WHERE finished_at IS NOT NULL AND rolled_back_at IS NULL) AS applied,
-             count(*) FILTER (WHERE finished_at IS NULL AND rolled_back_at IS NULL) AS failed,
-             max(migration_name) FILTER (WHERE finished_at IS NOT NULL) AS latest
-      FROM _prisma_migrations`,
-    prisma.rooms.count(),
+    prisma.$queryRawTyped(fleetMigrationStatus()),
+    // Same rule as the room limit: deleted rooms do not count.
+    prisma.rooms.count({ where: { deleted_at: null } }),
     prisma.users.count({ where: { is_active: true } }),
     prisma.reservations.count({ where: { status: { in: ['confirmed', 'checked_in'] } } }),
     prisma.reservations.findFirst({ orderBy: { created_at: 'desc' }, select: { created_at: true } }),

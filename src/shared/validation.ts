@@ -20,7 +20,7 @@ const currencyCode = z.enum(CURRENCY_CODES as [CurrencyCode, ...CurrencyCode[]])
 
 const optionalUuid = z.preprocess(
   (value) => (value === '' ? null : value),
-  z.string().uuid().nullable().optional(),
+  z.guid().nullable().optional(),
 )
 
 const dateString = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Expected YYYY-MM-DD')
@@ -30,7 +30,7 @@ const positiveQuantity = z.coerce.number().finite().min(0.01)
 export const RoomCreateSchema = z.object({
   number: z.string().min(1).max(10),
   floor: z.number().int().min(-5).max(200),
-  room_type_id: z.string().uuid(),
+  room_type_id: z.guid(),
   status: z.enum(['available', 'occupied', 'maintenance', 'cleaning', 'dirty']).optional(),
   occupancy_status: z.enum(['vacant', 'occupied']).optional(),
   housekeeping_status: z.enum(['clean', 'dirty', 'cleaning', 'inspected']).optional(),
@@ -55,7 +55,7 @@ export const ReservationCreateSchema = z.object({
   booker_phone: z.string().max(30).optional(),
   check_in_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   check_out_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  company_id: z.string().uuid().optional(),
+  company_id: z.guid().optional(),
   room_count: z.number().int().min(1).max(100).optional(),
   occupancy_adults: z.number().int().min(0).max(100).default(1),
   occupancy_children: z.number().int().min(0).max(100).default(0),
@@ -64,7 +64,7 @@ export const ReservationCreateSchema = z.object({
 })
 
 export const PricingCreateSchema = z.object({
-  room_type_id: z.string().uuid(),
+  room_type_id: z.guid(),
   price: z.number().min(0),
   price_single: z.number().min(0).optional(),
   price_double: z.number().min(0).optional(),
@@ -101,7 +101,7 @@ export const AccountingInvoiceItemSchema = z.object({
 }))
 
 const AccountingInvoiceBaseSchema = z.object({
-  contact_id: z.string().uuid(),
+  contact_id: z.guid(),
   invoice_number: z.string().trim().max(40).optional(),
   reservation_id: optionalUuid,
   room_id: optionalUuid,
@@ -147,7 +147,7 @@ export const AccountingInvoiceUpdateSchema = AccountingInvoiceBaseSchema.partial
 }).superRefine(validateInvoiceDates)
 
 export const AccountingPaymentCreateSchema = z.object({
-  invoice_id: z.string().uuid(),
+  invoice_id: z.guid(),
   method: z.enum(['instapay', 'vodafone_cash', 'cash', 'bank_transfer', 'visa', 'card', 'online', 'ota', 'company_credit', 'other']),
   amount: z.coerce.number().finite().min(0.01, 'Payment amount must be at least 0.01').max(9999999999.99).refine((amount) => Math.abs(amount * 100 - Math.round(amount * 100)) <= 0.00001, 'Payment amount must have at most two decimal places'),
   // Must equal the invoice currency; omitted = the invoice currency.
@@ -157,7 +157,7 @@ export const AccountingPaymentCreateSchema = z.object({
 
 export const AccountingExpenseCreateSchema = z.object({
   currency: currencyCode.optional(),
-  category_id: z.string().uuid(),
+  category_id: z.guid(),
   amount: nonNegativeMoney.optional(),
   tax_amount: nonNegativeMoney.default(0),
   total_amount: nonNegativeMoney.optional(),
@@ -226,7 +226,7 @@ export const AccountingSettingsUpdateSchema = z.object({
 })
 
 export const AccountingIdQuerySchema = z.object({
-  id: z.string().uuid(),
+  id: z.guid(),
 })
 
 // ──────────────────────────────
@@ -254,16 +254,16 @@ export const PricingUpdateSchema = PricingCreateSchema.partial()
 export const OccupancyCodeSchema = z.enum(['S', 'D', 'T'])
 
 export const ReservationRoomTypeCountSchema = z.object({
-  roomTypeId: z.string().uuid(),
+  roomTypeId: z.guid(),
   count: z.number().int().min(0),
   occupancyCode: OccupancyCodeSchema.optional(),
   overrideRatePerNight: z.number().nonnegative().max(10_000_000).nullish(),
 })
 
 export const ReservationCreateWithRoomsSchema = z.object({
-  contactId: z.string().uuid().optional(),
+  contactId: z.guid().optional(),
   guestName: z.string().trim().min(1).max(200),
-  guestId: z.string().uuid().optional(),
+  guestId: z.guid().optional(),
   checkIn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Expected YYYY-MM-DD'),
   checkOut: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Expected YYYY-MM-DD'),
   roomTypeCounts: z.array(ReservationRoomTypeCountSchema).min(1),
@@ -287,7 +287,7 @@ export const ReservationCreateWithRoomsSchema = z.object({
 }))
 
 export const ReservationRoomPriceOverrideSchema = z.object({
-  reservationRoomId: z.string().uuid(),
+  reservationRoomId: z.guid(),
   ratePerNight: z.number().nonnegative().max(10_000_000).nullable(),
   reason: z.string().trim().max(500).optional(),
 })
@@ -298,7 +298,7 @@ export const ReservationUpdateSchema = z.object({
   booker_name: z.string().trim().max(200).nullable().optional(),
   booker_email: z.string().email().max(300).nullable().optional(),
   booker_phone: z.string().max(30).nullable().optional(),
-  roomIds: z.array(z.string().uuid()).optional(),
+  roomIds: z.array(z.guid()).optional(),
   roomOccupancies: z.record(z.string(), OccupancyCodeSchema).optional(),
   roomOverrides: z.record(z.string(), z.number().nonnegative().max(10_000_000).nullable()).optional(),
 }).superRefine((value, ctx) => {
@@ -318,19 +318,19 @@ export const CancelReservationSchema = z.object({
 
 export const ExtendReservationSchema = z.object({
   newCheckOut: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Expected YYYY-MM-DD'),
-  reservationRoomId: z.string().uuid().optional(),
-  newRoomId: z.string().uuid().optional(),
+  reservationRoomId: z.guid().optional(),
+  newRoomId: z.guid().optional(),
   newRoomNumber: z.string().max(10).optional(),
 })
 
 export const ShortenReservationSchema = z.object({
   newCheckOut: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Expected YYYY-MM-DD'),
-  reservationRoomId: z.string().uuid().optional(),
+  reservationRoomId: z.guid().optional(),
 })
 
 export const ChangeRoomSchema = z.object({
-  reservationRoomId: z.string().uuid(),
-  newRoomId: z.string().uuid(),
+  reservationRoomId: z.guid(),
+  newRoomId: z.guid(),
   newRoomNumber: z.string().max(10).optional(),
   occupancyCode: z.enum(['S', 'D', 'T']).optional(),
 })
@@ -341,7 +341,7 @@ export const ReservationNotesSchema = z.object({
 })
 
 export const ReservationExtrasSchema = z.object({
-  reservationRoomId: z.string().uuid().optional(),
+  reservationRoomId: z.guid().optional(),
   charges: z.array(z.object({
     dayIndex: z.number().int().min(0),
     dayLabel: z.string().max(20),
@@ -351,7 +351,7 @@ export const ReservationExtrasSchema = z.object({
 })
 
 export const ReservationHoldSchema = z.object({
-  roomId: z.string().uuid(),
+  roomId: z.guid(),
   checkIn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Expected YYYY-MM-DD'),
   checkOut: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Expected YYYY-MM-DD'),
 })

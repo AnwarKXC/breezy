@@ -9,7 +9,7 @@ import { countryCodeSchema } from '@/shared/validation'
 const optionalText = (max: number) => z.string().trim().max(max).nullable().optional()
 
 export const ReservationGuestSchema = z.object({
-  reservation_room_id: z.string().uuid().nullable().optional(),
+  reservation_room_id: z.guid().nullable().optional(),
   full_name: z.string().trim().min(1).max(200),
   email: z.string().trim().email().max(300).nullable().optional().or(z.literal('').transform(() => null)),
   phone: optionalText(40),

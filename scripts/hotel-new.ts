@@ -2,6 +2,7 @@
 //                      [--admin-email=owner@hotel.com] [--demo]
 //   optional client details:  [--contact-name="..."] [--contact-email=...] [--contact-phone=...] [--country=...]
 //   optional subscription:    [--cycle=monthly|quarterly|yearly] [--price=1500] [--currency=EGP] [--start=2026-10-01]
+//   optional plan limits:     [--max-rooms=40] [--max-users=5]   (signed into the license; unlimited when omitted)
 //   (anything left out shows as "details to complete" in the control plane)
 //
 // Creates a complete, deployed hotel from one name (e.g. hotel12), with no copy/paste
@@ -55,6 +56,10 @@ const subscription = definedOnly({
   price: flag("price") === undefined ? undefined : Number(flag("price")),
   currency: flag("currency")?.toUpperCase(),
   contract_start: flag("start"),
+});
+const limits = definedOnly({
+  max_rooms: flag("max-rooms") === undefined ? undefined : Number(flag("max-rooms")),
+  max_users: flag("max-users") === undefined ? undefined : Number(flag("max-users")),
 });
 const sourceDir = process.cwd();
 
@@ -132,6 +137,9 @@ if (subscription.billing_cycle !== undefined && !["monthly", "quarterly", "yearl
 if (subscription.price !== undefined && !(Number(subscription.price) >= 0)) fail("--price must be a number >= 0");
 if (subscription.currency !== undefined && !/^[A-Z]{3}$/.test(String(subscription.currency))) fail("--currency must be a 3-letter code, e.g. EGP");
 if (subscription.contract_start !== undefined && !/^\d{4}-\d{2}-\d{2}$/.test(String(subscription.contract_start))) fail("--start must be YYYY-MM-DD");
+for (const [key, value] of Object.entries(limits)) {
+  if (!Number.isInteger(value) || Number(value) < 1) fail(`--${key.replace("_", "-")} must be a whole number >= 1`);
+}
 if (clientDetails.contact_email !== undefined && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(String(clientDetails.contact_email))) fail("--contact-email is not an email address");
 
 if (!/^[a-z0-9](?:[a-z0-9-]{1,48}[a-z0-9])$/.test(name)) {
@@ -222,6 +230,7 @@ async function main() {
         neon_project: neonProjectId,
         client: clientDetails,
         subscription,
+        limits,
       }),
       signal: AbortSignal.timeout(30_000),
     }).catch((error: Error) => fail(`Control plane unreachable at ${controlUrl}: ${error.message}`));

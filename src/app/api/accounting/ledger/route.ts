@@ -10,7 +10,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const parsed = z.object({
       fromDate: z.iso.date().optional(), toDate: z.iso.date().optional(), type: z.string().max(30).optional(),
-      sourceType: z.string().max(30).optional(), sourceId: z.uuid().optional(),
+      sourceType: z.string().max(30).optional(), sourceId: z.guid().optional(),
       limit: z.coerce.number().int().min(1).max(1000).optional(), offset: z.coerce.number().int().min(0).max(1000000).optional(),
     }).safeParse(Object.fromEntries([...searchParams.entries()].filter(([key, value]) => key !== 'summary' && value)))
     if (!parsed.success) return NextResponse.json({ error: 'Invalid ledger filters' }, { status: 400 })

@@ -12,7 +12,7 @@ export async function GET(request: Request) {
       const params = new URL(request.url).searchParams
       const input = z.object({
         currency: JournalCurrencySchema, month: JournalMonthSchema, valuation: JournalValuationSchema,
-        accountCode: z.string().regex(/^\d{1,12}$/), contactId: z.uuid().optional(),
+        accountCode: z.string().regex(/^\d{1,12}$/), contactId: z.guid().optional(),
       }).parse({ currency: params.get('currency') ?? 'EGP', month: params.get('month') ?? new Date().toISOString().slice(0, 7), valuation: params.get('valuation') ?? 'native', accountCode: params.get('accountCode'), contactId: params.get('contactId') ?? undefined })
       return NextResponse.json({ data: await getJournalAccountStatement(input.currency, input.month, input.valuation, input.accountCode, input.contactId) })
     } catch (error) { return journalError(error) }

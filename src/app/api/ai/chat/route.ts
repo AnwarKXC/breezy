@@ -18,7 +18,7 @@ export const dynamic = 'force-dynamic'
 const TURN_TIMEOUT_MS = 90_000
 
 const bodySchema = z.object({
-  conversationId: z.uuid(),
+  conversationId: z.guid(),
   message: z.string().trim().min(1).max(AI_MESSAGE_MAX_LENGTH),
   history: z
     .array(z.object({ role: z.enum(['user', 'assistant']), text: z.string().trim().min(1).max(4000) }))

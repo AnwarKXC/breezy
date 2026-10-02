@@ -32,20 +32,34 @@ them all. This document is the contract between the two.
 An EdDSA JWT signed by the control plane:
 
 ```json
-{ "iss": "breezy-control", "sub": "<instanceId>", "exp": 1798761600, "plan": "standard", "grace_days": 14 }
+{ "iss": "breezy-control", "sub": "<instanceId>", "iat": 1790950000, "exp": 1822486000, "plan": "standard",
+  "grace_days": 14, "mode": "active", "max_rooms": 40, "max_users": 5 }
 ```
 
-The token is verified offline with the public key, so a control plane outage never blocks a hotel.
+The token is verified offline with the public key, so a control plane outage never blocks a hotel. The mode and limits
+are inside the signed token, so a hotel cannot change its own. Unknown modes are treated as read-only.
 
 | State | Meaning | Effect |
 |---|---|---|
 | `unmanaged` | No public key configured | Nothing enforced |
-| `active` | Before `exp` | Normal |
-| `grace` | Past `exp`, within `grace_days` (default 14) | Warning banner |
-| `expired` / `invalid` / `missing` | Past grace, bad token, or no token | Banner, and all API writes return `403 license/read_only` |
+| `active` | `mode: active`, before `exp` | Normal |
+| `grace` | `mode: active`, past `exp`, within `grace_days` (default 14) | Warning banner |
+| `suspended` | `mode: read_only` (**Pause** in the control plane) | "Paused by your provider" banner; API writes return `403 license/read_only` |
+| `locked` | `mode: locked` (**Lock** in the control plane) | Every page redirects to `/[locale]/paused`; every API returns `423 license/locked` |
+| `expired` / `invalid` / `missing` | Past grace, bad token, or no token | Banner, and API writes return `403 license/read_only` |
 
-Even in read-only mode, users can still sign in, sign out and reset passwords, and control-plane calls still work.
-Status is cached per process for 60 seconds.
+Pause and lock take priority over the expiry date, and **Resume** restores the same term. In read-only states, users
+can still sign in, sign out and reset passwords, and control-plane calls (`/api/system/*`) always work.
+
+**Limits:** `max_rooms` counts rooms that aren't deleted, and `max_users` counts active users. Creating one beyond the
+limit returns `403` with `code: license/room_limit` or `license/user_limit` and a readable message. The check runs
+inside the insert's transaction, under a Postgres advisory lock, so concurrent creates can't overshoot. When a limit is
+absent, there is no limit. Lowering a limit never deletes anything.
+
+The health report includes the license `issuedAt`. The control plane re-delivers the newest license whenever the hotel
+reports a different one.
+
+Status is cached per process for 60 seconds, and a pushed license takes effect immediately on the instance that receives it.
 
 ## Tooling
 

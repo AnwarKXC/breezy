@@ -22,7 +22,7 @@ const amountPattern = /^\d{1,10}(\.\d{1,2})?$/
 const amount = z.string().regex(amountPattern, 'Amount must be a decimal string with at most two decimal places').default('0')
 const line = z.object({
   accountCode: z.string().regex(/^\d{1,12}$/),
-  contactId: z.uuid().nullable().optional(),
+  contactId: z.guid().nullable().optional(),
   debit: amount,
   credit: amount,
   description: z.string().trim().max(500).default(''),
@@ -56,7 +56,7 @@ export const JournalReverseSchema = z.object({ date: JournalDateSchema, reason: 
 export const JournalPeriodSchema = z.object({ month: JournalMonthSchema, action: z.enum(['close', 'reopen', 'lock']) }).strict()
 export const JournalRevaluationSchema = z.object({
   date: JournalDateSchema, currency: z.enum(['USD', 'EUR', 'GBP']), accountCode: z.enum(['1101', '1102', '1201', '2101']),
-  contactId: z.uuid().nullable().optional(), closingRate: JournalExchangeRateSchema, source: z.string().trim().min(1).max(200),
+  contactId: z.guid().nullable().optional(), closingRate: JournalExchangeRateSchema, source: z.string().trim().min(1).max(200),
 }).strict().superRefine((value, context) => {
   const control = value.accountCode === '1201' || value.accountCode === '2101'
   if (control && !value.contactId) context.addIssue({ code: 'custom', path: ['contactId'], message: 'Receivable and payable revaluations require a contact' })

@@ -105,7 +105,7 @@ export const getGuestHistory = defineTool({
   description:
     'Full stay history of one guest: every reservation with dates, status and amounts, plus totals per currency. Pass guest_id from search_guests, or a name/phone in query (returns candidates if several guests match).',
   args: z.object({
-    guest_id: z.uuid().optional(),
+    guest_id: z.guid().optional(),
     query: z.string().min(1).max(100).optional().describe('Name or phone when guest_id is unknown'),
   }),
   async run(args) {

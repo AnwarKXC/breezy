@@ -34,7 +34,7 @@ function isPublicPath(pathname: string) {
   const stripped = hasLocalePrefix(pathname) ? stripLocale(pathname) : pathname
   if (PASS_THROUGH_PATHS.some((p) => stripped.startsWith(p))) return true
   if (PASS_THROUGH_FILES.includes(stripped)) return true
-  return ['/login', '/forgot-password', '/reset-password', '/signup', '/auth/', '/unauthorized'].some((p) => stripped === p || stripped.startsWith(p))
+  return ['/login', '/forgot-password', '/reset-password', '/signup', '/auth/', '/unauthorized', '/paused'].some((p) => stripped === p || stripped.startsWith(p))
 }
 
 function getRouteKey(pathname: string) {
@@ -46,11 +46,13 @@ function getRouteKey(pathname: string) {
 const READ_ONLY_EXEMPT_API = ['/api/auth/', '/api/system/', '/api/csp-report']
 const SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
 
-async function readOnlyApiResponse(request: NextRequest) {
+async function licenseApiResponse(request: NextRequest) {
   const { pathname } = request.nextUrl
-  if (SAFE_METHODS.includes(request.method)) return null
   if (READ_ONLY_EXEMPT_API.some((p) => pathname.startsWith(p))) return null
   const license = await getLicenseStatus()
+  // Locked by the provider: nothing is served, reads included.
+  if (license.locked) return NextResponse.json({ error: 'license/locked' }, { status: 423 })
+  if (SAFE_METHODS.includes(request.method)) return null
   return license.readOnly ? NextResponse.json({ error: 'license/read_only' }, { status: 403 }) : null
 }
 
@@ -64,11 +66,16 @@ function withLocaleHeaders(response: NextResponse, locale: string, dir: string) 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
   // API routes authorize themselves; the proxy only applies the license gate.
-  if (pathname.startsWith('/api/')) return (await readOnlyApiResponse(request)) ?? NextResponse.next()
+  if (pathname.startsWith('/api/')) return (await licenseApiResponse(request)) ?? NextResponse.next()
 
   const locale = getLocale(pathname)
   const dir = dirConfig[locale] || 'ltr'
   const token = request.cookies.get(SESSION_COOKIE_NAME)?.value
+
+  // Locked by the provider: every page shows the paused notice instead of the app.
+  if (stripLocale(pathname) !== '/paused' && (await getLicenseStatus()).locked) {
+    return withLocaleHeaders(NextResponse.redirect(new URL(`/${locale}/paused`, request.url)), locale, dir)
+  }
 
   if (isPublicPath(pathname)) {
     return withLocaleHeaders(NextResponse.next(), locale, dir)

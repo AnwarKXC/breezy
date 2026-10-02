@@ -3,6 +3,7 @@ import 'server-only'
 import { ROLES } from '@/config/rbac'
 import { prisma } from '@/services/db/prisma'
 import { invalidateUserSessionCache } from '@/services/auth/sessionStore'
+import { PlanLimitError } from '@/services/fleet/limits'
 import type { UpdateUserInput, User } from '../types'
 import { tryLogUserActivity } from './activityLogService'
 import { AuthServiceError, toAuthServiceError } from './authErrors'
@@ -34,6 +35,7 @@ export async function createUser(input: CreateStaffUserInput): Promise<User> {
   assertCanManageAdmins(actor, input.role)
   return guarded('auth/create_staff_failed', async () => {
     const user = await createAuthUserDocument(input).catch((error) => {
+      if (error instanceof PlanLimitError) throw error
       throw toAuthServiceError(error, 'auth/create_staff_failed')
     })
     await tryLogUserActivity({ action: 'user_created', actor, target: user })

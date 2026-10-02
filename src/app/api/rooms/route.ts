@@ -3,6 +3,7 @@ import { validateCsrf } from '@/shared/csrf'
 import { authorizeRequest } from '@/shared/routeAuth'
 import { ACTIONS } from '@/config/actionPermissions'
 import { isUniqueViolation } from '@/services/db/errors'
+import { PlanLimitError } from '@/services/fleet/limits'
 import { createRoom, listRooms } from '@/modules/rooms/services/roomServer'
 import { rateLimit, RateLimitTier } from '@/shared/rateLimit'
 import { RoomCreateSchema, zodErrorMessage } from '@/shared/validation'
@@ -36,6 +37,9 @@ export async function POST(request: Request) {
   try {
     return NextResponse.json({ data: await createRoom(parsed.data, auth.session.id) }, { status: 201 })
   } catch (error) {
+    if (error instanceof PlanLimitError) {
+      return NextResponse.json({ error: error.message, code: error.code }, { status: 403 })
+    }
     if (isUniqueViolation(error)) {
       return NextResponse.json({ error: `Room number "${parsed.data.number}" already exists` }, { status: 409 })
     }

@@ -1,9 +1,13 @@
 import 'server-only'
 
 import { NextResponse } from 'next/server'
+import { PlanLimitError } from '@/services/fleet/limits'
 import { AuthServiceError } from './authErrors'
 
 export function errorResponse(error: unknown) {
+  if (error instanceof PlanLimitError) {
+    return NextResponse.json({ error: error.message, code: error.code }, { status: 403 })
+  }
   if (error instanceof AuthServiceError) {
     const status =
       error.code === 'auth/invalid_session' ||
