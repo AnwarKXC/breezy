@@ -18,13 +18,32 @@ interface StayRow {
   reservation_id: string
   check_in_date: string
   check_out_date: string
-  reservations: { reservation_number: string; status: string; source: string; contacts: { name: string } | null } | null
+  adults: number
+  children: number
+  rate_per_night: number
+  total_amount: number
+  reservations: {
+    reservation_number: string
+    status: string
+    source: string
+    currency: string
+    nights: number
+    total_amount: number
+    paid_amount: number
+    balance_amount: number
+    special_requests: string | null
+    contacts: { name: string } | null
+  } | null
 }
 
 interface GuestRow {
   reservation_id: string
   full_name: string
+  phone: string | null
+  is_vip: boolean
 }
+
+const NOTE_MAX = 160
 
 export async function GET(request: Request) {
   return secureReadEndpoint(request, ACTIONS.RESERVATIONS_READ, async () => {
@@ -64,7 +83,24 @@ export async function GET(request: Request) {
             reservation_id: true,
             check_in_date: true,
             check_out_date: true,
-            reservations: { select: { reservation_number: true, status: true, source: true, contacts: { select: { name: true } } } },
+            adults: true,
+            children: true,
+            rate_per_night: true,
+            total_amount: true,
+            reservations: {
+              select: {
+                reservation_number: true,
+                status: true,
+                source: true,
+                currency: true,
+                nights: true,
+                total_amount: true,
+                paid_amount: true,
+                balance_amount: true,
+                special_requests: true,
+                contacts: { select: { name: true } },
+              },
+            },
           },
         }),
       ])
@@ -74,12 +110,21 @@ export async function GET(request: Request) {
         reservation_id: s.reservation_id,
         check_in_date: day(s.check_in_date),
         check_out_date: day(s.check_out_date),
-        reservations: s.reservations,
+        adults: s.adults,
+        children: s.children,
+        rate_per_night: Number(s.rate_per_night),
+        total_amount: Number(s.total_amount),
+        reservations: s.reservations && {
+          ...s.reservations,
+          total_amount: Number(s.reservations.total_amount),
+          paid_amount: Number(s.reservations.paid_amount),
+          balance_amount: Number(s.reservations.balance_amount),
+        },
       }))
       // Only the primary guests of this year's stays (used to be every guest in the DB).
       guestRows = await prisma.reservation_guests.findMany({
         where: { is_primary: true, deleted_at: null, reservation_id: { in: [...new Set(stays.map((s) => s.reservation_id))] } },
-        select: { reservation_id: true, full_name: true },
+        select: { reservation_id: true, full_name: true, phone: true, is_vip: true },
       })
     } catch (error) {
       console.error('[year-overview]', error)
@@ -89,7 +134,7 @@ export async function GET(request: Request) {
       )
     }
 
-    const guestByReservation = new Map(guestRows.map((g) => [g.reservation_id, g.full_name]))
+    const guestByReservation = new Map(guestRows.map((g) => [g.reservation_id, g]))
 
     const typeNameByTypeId = new Map<string, string>()
     for (const room of roomRows) {
@@ -107,17 +152,36 @@ export async function GET(request: Request) {
       .filter((rt) => rooms.some((r) => r.typeId === rt.id))
       .sort((a, b) => a.name.localeCompare(b.name))
 
-    const stays = stayRows.map((row) => ({
-      roomId: row.room_id,
-      reservationId: row.reservation_id,
-      code: row.reservations?.reservation_number ?? '',
-      status: row.reservations?.status ?? '',
-      from: row.check_in_date,
-      to: row.check_out_date,
-      guestName: guestByReservation.get(row.reservation_id) ?? null,
-      source: row.reservations?.source ?? '',
-      companyName: row.reservations?.contacts?.name ?? null,
-    }))
+    const stays = stayRows.map((row) => {
+      const reservation = row.reservations
+      const guest = guestByReservation.get(row.reservation_id)
+      const note = reservation?.special_requests?.trim() || null
+      return {
+        roomId: row.room_id,
+        reservationId: row.reservation_id,
+        code: reservation?.reservation_number ?? '',
+        status: reservation?.status ?? '',
+        from: row.check_in_date,
+        to: row.check_out_date,
+        guestName: guest?.full_name ?? null,
+        source: reservation?.source ?? '',
+        companyName: reservation?.contacts?.name ?? null,
+        details: {
+          currency: reservation?.currency ?? '',
+          ratePerNight: row.rate_per_night,
+          roomTotal: row.total_amount,
+          reservationTotal: reservation?.total_amount ?? 0,
+          paid: reservation?.paid_amount ?? 0,
+          balance: reservation?.balance_amount ?? 0,
+          reservationNights: reservation?.nights ?? 0,
+          adults: row.adults,
+          children: row.children,
+          phone: guest?.phone ?? null,
+          isVip: guest?.is_vip ?? false,
+          note: note && note.length > NOTE_MAX ? `${note.slice(0, NOTE_MAX - 1)}…` : note,
+        },
+      }
+    })
 
     return NextResponse.json({ ok: true, data: { year, roomTypes, rooms, stays } })
   })

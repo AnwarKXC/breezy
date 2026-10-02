@@ -1021,7 +1021,25 @@
       "colNights": "Nights",
       "rowOccupied": "Occupied",
       "rowOccupancy": "Occupancy",
-      "print": "Print"
+      "print": "Print",
+      "card": {
+        "room": "Room",
+        "checkIn": "Check-in",
+        "checkOut": "Check-out",
+        "nights": "nights",
+        "guests": "Guests",
+        "adults": "adults",
+        "children": "children",
+        "phone": "Phone",
+        "source": "Source",
+        "ratePerNight": "Rate / night",
+        "roomTotal": "Room total",
+        "reservationTotal": "Reservation total",
+        "paid": "Paid",
+        "balance": "Balance",
+        "paidInFull": "Paid in full",
+        "notes": "Special requests"
+      }
     },
     "title": "Reservations",
     "subtitle": "Manage reservations, cancellations and room status",

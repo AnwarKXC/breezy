@@ -113,7 +113,7 @@ export async function buildYearExcelBuffer(payload: YearOverviewPayload, locale:
           if (segment.booking) {
             cell.value = stayLabel(segment.booking)
             cell.fill = solid(BAR_FILL[statusBucket(segment.booking.status)])
-            cell.alignment = { vertical: 'middle', shrinkToFit: segment.span < 3 }
+            cell.alignment = { horizontal: 'center', vertical: 'middle', shrinkToFit: segment.span < 3 }
             cell.note = `${segment.booking.code} · ${segment.booking.from} → ${segment.booking.to}`
             if (segment.span > 1) ws.mergeCells(rowNumber, col, rowNumber, col + segment.span - 1)
           } else if (month.days[segment.startIndex].isWeekend) {

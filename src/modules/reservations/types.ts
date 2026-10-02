@@ -164,6 +164,27 @@ export interface YearOverviewStay {
   guestName: string | null
   /** Company contact name when booked by a company, else null */
   companyName: string | null
+  details: YearOverviewStayDetails
+}
+
+/** Hover-card facts for one room stay. Money is in the reservation's own currency. */
+export interface YearOverviewStayDetails {
+  currency: string
+  /** This room's nightly rate and total */
+  ratePerNight: number
+  roomTotal: number
+  /** Whole reservation (all rooms) */
+  reservationTotal: number
+  paid: number
+  balance: number
+  reservationNights: number
+  adults: number
+  children: number
+  /** Primary guest */
+  phone: string | null
+  isVip: boolean
+  /** Special requests, trimmed server-side */
+  note: string | null
 }
 
 export interface YearOverviewRoom {

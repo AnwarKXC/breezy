@@ -1,4 +1,4 @@
-import type { YearOverviewStay, YearViewStatus } from '../types'
+import type { YearOverviewStay, YearOverviewStayDetails, YearViewStatus } from '../types'
 import { nextDay, statusBucket } from './occupancy'
 
 export interface DayBooking {
@@ -14,6 +14,7 @@ export interface DayBooking {
   source: string
   reservationId: string
   companyName: string | null
+  details: YearOverviewStayDetails
 }
 
 export function buildDayMap(stays: YearOverviewStay[], year: number): Map<string, DayBooking[]> {
@@ -39,6 +40,7 @@ export function buildDayMap(stays: YearOverviewStay[], year: number): Map<string
         source: stay.source,
         reservationId: stay.reservationId,
         companyName: stay.companyName,
+        details: stay.details,
       }
       const list = map.get(iso)
       if (list) list.push(booking)

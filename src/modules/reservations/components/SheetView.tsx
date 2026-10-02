@@ -6,16 +6,20 @@ import { useTranslation } from '@/i18n/hooks/useTranslation'
 import type { DayBooking } from '../utils/dayMap'
 import { monthLabel, statusBucket } from '../utils/occupancy'
 import { buildTapeMonth, occupancyPercent, stayLabel } from '../utils/tapeChart'
+import { StayHoverCard, type StayHoverTarget } from './StayHoverCard'
 import type { YearOverviewRoom, YearOverviewRoomType, YearViewStatus } from '../types'
 
 const DRAG_THRESHOLD = 4
+const ROOM_COL_PX = 72
+const DAY_COL_PX = 68
+const NIGHTS_COL_PX = 52
 
-/** Light fill + dark text stays legible on mono printers; the start marker matches the legend swatch. */
+/** Flat light fill + dark text: legible on screen and on mono printers. */
 const BAR_CLASS: Record<YearViewStatus, string> = {
-  confirmed: 'bg-blue-100 text-blue-950 border-blue-500',
-  checked_in: 'bg-emerald-100 text-emerald-950 border-emerald-500',
-  checked_out: 'bg-gray-200 text-gray-800 border-gray-400',
-  other: 'bg-amber-100 text-amber-950 border-amber-500',
+  confirmed: 'bg-blue-100 text-blue-950',
+  checked_in: 'bg-emerald-100 text-emerald-950',
+  checked_out: 'bg-gray-200 text-gray-800',
+  other: 'bg-amber-100 text-amber-950',
 }
 
 interface SheetViewProps {
@@ -47,6 +51,7 @@ export function SheetView({ year, monthIndex, locale, rooms, roomTypes, bookingI
   const scrollRef = useRef<HTMLDivElement>(null)
   const dragRef = useRef<{ x: number; y: number; left: number; top: number; moved: boolean } | null>(null)
   const [dragging, setDragging] = useState(false)
+  const [hover, setHover] = useState<StayHoverTarget | null>(null)
 
   function handlePointerDown(event: React.PointerEvent<HTMLDivElement>) {
     if (event.button !== 0 || event.pointerType !== 'mouse') return
@@ -65,6 +70,7 @@ export function SheetView({ year, monthIndex, locale, rooms, roomTypes, bookingI
       if (Math.abs(dx) < DRAG_THRESHOLD && Math.abs(dy) < DRAG_THRESHOLD) return
       drag.moved = true
       setDragging(true)
+      setHover(null)
       event.currentTarget.setPointerCapture(event.pointerId)
     }
     el.scrollLeft = drag.left - dx
@@ -112,15 +118,19 @@ export function SheetView({ year, monthIndex, locale, rooms, roomTypes, bookingI
         onPointerCancel={handlePointerUp}
         onClickCapture={handleClickCapture}
         onDragStart={(event) => event.preventDefault()}
+        onScroll={() => setHover(null)}
         className={`max-h-[70vh] overflow-auto ${dragging ? 'cursor-grabbing select-none' : 'cursor-grab'}`}
       >
-        <table className="w-full min-w-[1180px] table-fixed border-collapse text-[11px] print:min-w-0 print:text-[7.5px]">
+        <table
+          style={{ '--tape-w': `${ROOM_COL_PX + days.length * DAY_COL_PX + NIGHTS_COL_PX}px` } as React.CSSProperties}
+          className="w-(--tape-w) min-w-full table-fixed border-collapse text-[11px] print:w-full print:text-[7.5px]"
+        >
           <colgroup>
-            <col className="w-[72px] print:w-[44px]" />
+            <col style={{ width: ROOM_COL_PX }} className="print:w-[44px]!" />
             {days.map((day) => (
-              <col key={day.iso} />
+              <col key={day.iso} style={{ width: DAY_COL_PX }} className="print:w-auto!" />
             ))}
-            <col className="w-[52px] print:w-[34px]" />
+            <col style={{ width: NIGHTS_COL_PX }} className="print:w-[34px]!" />
           </colgroup>
           <thead>
             <tr>
@@ -173,13 +183,25 @@ export function SheetView({ year, monthIndex, locale, rooms, roomTypes, bookingI
                       const booking = segment.booking
                       const label = stayLabel(booking)
                       return (
-                        <td key={segment.startIndex} colSpan={segment.span} className="h-8 border-s border-t border-[#EAEAEA] p-0.5 print:h-[15px] print:p-px">
+                        <td
+                          key={segment.startIndex}
+                          colSpan={segment.span}
+                          className={`h-8 border-s border-t border-[#EAEAEA] p-0 print:h-[15px] ${BAR_CLASS[statusBucket(booking.status)]}`}
+                        >
                           <Link
                             href={`/${locale}/reservations/${booking.reservationId}`}
-                            data-tooltip={`${label} · ${booking.code} · ${booking.from} → ${booking.to}`}
-                            className={`flex h-full items-center overflow-hidden px-1.5 font-medium leading-none hover:brightness-95 print:px-0.5 ${BAR_CLASS[statusBucket(booking.status)]} ${
-                              segment.openStart ? '' : 'rounded-s-md border-s-[3px] print:border-s-2'
-                            } ${segment.openEnd ? '' : 'rounded-e-md'}`}
+                            aria-label={`${label} · ${booking.code}`}
+                            onMouseEnter={(event) => {
+                              if (dragging) return
+                              setHover({
+                                booking,
+                                roomNumber: room.number,
+                                roomTypeName: group.name,
+                                rect: event.currentTarget.getBoundingClientRect(),
+                              })
+                            }}
+                            onMouseLeave={() => setHover(null)}
+                            className="flex h-full items-center justify-center overflow-hidden px-2 text-center font-medium leading-none hover:underline print:px-0.5"
                           >
                             <span className="truncate">{label}</span>
                           </Link>
@@ -220,6 +242,7 @@ export function SheetView({ year, monthIndex, locale, rooms, roomTypes, bookingI
           </tfoot>
         </table>
       </div>
+      {hover && <StayHoverCard target={hover} locale={locale} />}
     </section>
   )
 }

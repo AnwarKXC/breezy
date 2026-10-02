@@ -1083,7 +1083,25 @@
       "colNights": "الليالي",
       "rowOccupied": "مشغولة",
       "rowOccupancy": "نسبة الإشغال",
-      "print": "طباعة"
+      "print": "طباعة",
+      "card": {
+        "room": "الغرفة",
+        "checkIn": "الوصول",
+        "checkOut": "المغادرة",
+        "nights": "ليالي",
+        "guests": "النزلاء",
+        "adults": "بالغين",
+        "children": "أطفال",
+        "phone": "الهاتف",
+        "source": "المصدر",
+        "ratePerNight": "سعر الليلة",
+        "roomTotal": "إجمالي الغرفة",
+        "reservationTotal": "إجمالي الحجز",
+        "paid": "المدفوع",
+        "balance": "المتبقي",
+        "paidInFull": "مدفوع بالكامل",
+        "notes": "طلبات خاصة"
+      }
     },
     "title": "الحجوزات",
     "subtitle": "إدارة الحجوزات والإلغاءات وحالة الغرف",

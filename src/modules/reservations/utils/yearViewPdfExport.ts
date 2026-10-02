@@ -22,7 +22,7 @@ const BAR_FILL: Record<YearViewStatus, string> = {
 
 // A4 landscape (842pt) minus margins, split between the room column, 31 day columns and nights.
 const PAGE_MARGIN = 14
-const ROOM_COL = 30
+const ROOM_COL = 36
 const NIGHTS_COL = 24
 const DAY_COL = (842 - PAGE_MARGIN * 2 - ROOM_COL - NIGHTS_COL) / 31
 const FONT_SIZE = 6
@@ -37,10 +37,21 @@ export interface YearViewPdfLabels {
 
 type Cell = Record<string, unknown>
 
-/** pdfmake wraps instead of clipping, so cut names to the bar width to keep rows one line tall. */
+const MAX_BAR_LINES = 2
+
+/**
+ * Fit a name into its bar: wrap up to two lines, and cut any single word wider than the
+ * bar. pdfmake widens a column to its longest unbreakable word, which pushed the table
+ * past the page edge, so no word may exceed one line.
+ */
 function fitToSpan(text: string, span: number) {
-  const max = Math.max(1, Math.floor((span * DAY_COL - 4) / AVG_CHAR_WIDTH))
-  return text.length <= max ? text : `${text.slice(0, Math.max(1, max - 1))}…`
+  const perLine = Math.max(2, Math.floor((span * DAY_COL - 4) / AVG_CHAR_WIDTH))
+  const cut = (value: string, max: number) => (value.length <= max ? value : `${value.slice(0, max - 1)}…`)
+  const words = text
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((word) => cut(word, perLine))
+  return cut(words.join(' '), perLine * MAX_BAR_LINES)
 }
 
 /** colSpan cells must be followed by `span - 1` empty placeholders. */
@@ -55,7 +66,8 @@ function segmentCells(segment: TapeSegment, isWeekend: boolean): Cell[] {
       text: fitToSpan(stayLabel(segment.booking), segment.span),
       fillColor: BAR_FILL[statusBucket(segment.booking.status)],
       color: TEXT,
-      noWrap: true,
+      alignment: 'center',
+      verticalAlignment: 'middle',
     },
     segment.span,
   )
@@ -118,8 +130,8 @@ export function buildYearViewPdfContent(payload: YearOverviewPayload, locale: st
       )
       for (const row of group.rows) {
         const dayCells = ordered(row.segments).flatMap((segment) => segmentCells(segment, month.days[segment.startIndex].isWeekend))
-        const roomCell = { text: row.room.number, bold: true }
-        const nightsCell = { text: row.nights ? String(row.nights) : '', alignment: 'center', color: MUTED }
+        const roomCell = { text: row.room.number, bold: true, verticalAlignment: 'middle' }
+        const nightsCell = { text: row.nights ? String(row.nights) : '', alignment: 'center', verticalAlignment: 'middle', color: MUTED }
         // Day cells are already mirrored above; only the edge columns swap here.
         body.push(isRTL ? [nightsCell, ...dayCells, roomCell] : [roomCell, ...dayCells, nightsCell])
       }
