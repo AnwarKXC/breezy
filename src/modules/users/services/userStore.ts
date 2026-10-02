@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { PlanLimitError } from '@/services/fleet/limits'
-import { AuthServiceError } from './authErrors'
+import { AuthServiceError, toAuthServiceError } from './authErrors'
 
 export async function guarded<T>(
   code: AuthServiceError['code'],
@@ -15,6 +15,7 @@ export async function guarded<T>(
       throw error
     }
 
-    throw new AuthServiceError(code)
+    // Maps unique violations (e.g. a taken email) to auth/email_already_exists.
+    throw toAuthServiceError(error, code)
   }
 }

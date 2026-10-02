@@ -8,8 +8,10 @@ import { AuthServiceError } from './authErrors'
 
 export async function syncAuthUser(id: string, data: Omit<UpdateUserInput, 'id'>) {
   const passwordHash = data.password ? await hashPassword(data.password) : null
+  const email = data.email?.trim().toLowerCase()
   const profileData = {
     ...(data.name ? { name: data.name } : {}),
+    ...(email ? { email } : {}),
     ...(data.phone !== undefined ? { phone: data.phone } : {}),
     ...(data.role ? { role: data.role } : {}),
   }
@@ -20,6 +22,10 @@ export async function syncAuthUser(id: string, data: Omit<UpdateUserInput, 'id'>
       data: { ...profileData, updated_at: new Date() },
     })
     if (count === 0) throw new AuthServiceError('auth/user_not_found')
+
+    if (email) {
+      await tx.users.update({ where: { id }, data: { email, updated_at: new Date() } })
+    }
 
     if (passwordHash) {
       await tx.users.update({ where: { id }, data: { password_hash: passwordHash, updated_at: new Date() } })

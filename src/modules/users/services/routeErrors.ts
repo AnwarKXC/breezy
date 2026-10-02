@@ -13,8 +13,14 @@ export function errorResponse(error: unknown) {
       error.code === 'auth/invalid_session' ||
       error.code === 'auth/requires_authenticated_user'
         ? 401
-        : error.code === 'auth/permission_denied'
+        : error.code === 'auth/permission_denied' ||
+            error.code === 'auth/cannot_modify_own_account' ||
+            error.code === 'auth/cannot_delete_own_account'
           ? 403
+          : error.code === 'auth/user_not_found'
+            ? 404
+          : error.code === 'auth/invalid_form'
+            ? 400
           : error.code === 'auth/email_already_exists'
             ? 409
             : 500

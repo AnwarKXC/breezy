@@ -24,6 +24,13 @@ function assertCanManageAdmins(actor: { role: string }, ...roles: (string | unde
   }
 }
 
+// Admin accounts can only be changed by their owner, never by another user (admins included).
+function assertCanManageOtherUser(target: { role: string }) {
+  if (target.role === ROLES.ADMIN) {
+    throw new AuthServiceError('auth/permission_denied')
+  }
+}
+
 async function findActiveProfile(id: string) {
   const profile = await prisma.profiles.findFirst({ where: { id, deleted_at: null } })
   if (!profile) throw new AuthServiceError('auth/user_not_found')
@@ -51,20 +58,25 @@ export async function getUserById(id: string): Promise<User | null> {
 export async function updateUser(input: UpdateUserInput): Promise<User> {
   const actor = await requireUsersUpdate()
   return guarded('auth/user_update_failed', async () => {
-    const { id, name, password, phone, role } = input
-
-    if (actor.id === id) {
-      throw new AuthServiceError('auth/cannot_modify_own_account')
-    }
+    const { id, name, email, password, phone, role } = input
 
     if (password && password.length < 8) {
       throw new AuthServiceError('auth/invalid_form')
     }
 
     const target = await findActiveProfile(id)
-    assertCanManageAdmins(actor, role, target.role)
+    if (actor.id === id) {
+      // Users may edit every detail of their own account except the role:
+      // that would allow self-escalation or an admin locking themselves out.
+      if (role && role !== target.role) {
+        throw new AuthServiceError('auth/cannot_modify_own_account')
+      }
+    } else {
+      assertCanManageOtherUser(target)
+      assertCanManageAdmins(actor, role)
+    }
 
-    await syncAuthUser(id, { name, phone, role, password })
+    await syncAuthUser(id, { name, email, phone, role: actor.id === id ? undefined : role, password })
 
     const user = await findActiveProfile(id)
     await tryLogUserActivity({ action: 'user_updated', actor, target: user })
@@ -79,7 +91,7 @@ export async function deleteUser(id: string) {
   }
   await guarded('auth/user_delete_failed', async () => {
     const user = await findActiveProfile(id)
-    assertCanManageAdmins(actor, user.role)
+    assertCanManageOtherUser(user)
 
     // Soft delete: keep the rows for audit history, block sign-in, end sessions.
     await prisma.$transaction([

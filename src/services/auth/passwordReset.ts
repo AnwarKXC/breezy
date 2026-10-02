@@ -44,7 +44,7 @@ export async function requestPasswordReset(email: string, appUrl: string, locale
     message: {
       to: account.email,
       subject: "Reset your Breezy System password",
-      text: `A password reset was requested for your account.\n\nOpen this link within 30 minutes to choose a new password:\n${link}\n\nIf you did not request this, ignore this email.`,
+      text: `A password reset was requested for your account.\n\nOpen this link within 15 minutes to choose a new password:\n${link}\n\nIf you did not request this, ignore this email.`,
     },
   });
 }

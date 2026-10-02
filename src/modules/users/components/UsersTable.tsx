@@ -12,6 +12,8 @@ interface UsersTableProps {
   labels: Record<string, string>;
   onDelete?: (id: string) => void;
   onEdit?: (user: User) => void;
+  canDeleteUser?: (user: User) => boolean;
+  canEditUser?: (user: User) => boolean;
   onRowClick?: (user: User) => void;
   selectedRowIds?: string[];
   onSelectedRowIdsChange?: (ids: string[]) => void;
@@ -40,6 +42,8 @@ export const UsersTable = memo(function UsersTable({
   labels,
   onDelete,
   onEdit,
+  canDeleteUser = () => true,
+  canEditUser = () => true,
   onRowClick,
   selectedRowIds,
   onSelectedRowIdsChange,
@@ -79,10 +83,10 @@ export const UsersTable = memo(function UsersTable({
         render: (_value, user) => (
           <TableActionsMenu
             actions={[
-              ...(onEdit
+              ...(onEdit && canEditUser(user)
                 ? [{ label: labels.edit, onSelect: () => onEdit(user) }]
                 : []),
-              ...(onDelete
+              ...(onDelete && canDeleteUser(user)
                 ? [
                     {
                       destructive: true,
@@ -99,7 +103,7 @@ export const UsersTable = memo(function UsersTable({
     }
 
     return tableColumns;
-  }, [hasActions, labels, onDelete, onEdit, locale]);
+  }, [hasActions, labels, onDelete, onEdit, canDeleteUser, canEditUser, locale]);
 
   return (
     <Table

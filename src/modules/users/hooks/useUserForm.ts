@@ -68,8 +68,8 @@ export function useUserForm({ createUser, updateUser }: UsersActions) {
       if (mode === 'create') {
         await createUser(validDraft)
       } else if (validDraft.id) {
-        const { id, name, password, phone, role } = validDraft
-        await updateUser({ id, name, ...(password ? { password } : {}), phone, role })
+        const { id, name, email, password, phone, role } = validDraft
+        await updateUser({ id, name, email, ...(password ? { password } : {}), phone, role })
       }
       setOpen(false)
     } catch (submitError) {

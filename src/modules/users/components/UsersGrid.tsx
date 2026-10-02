@@ -11,6 +11,8 @@ interface UsersGridProps {
   labels: Record<string, string>
   onDelete?: (id: string) => void
   onEdit?: (user: User) => void
+  canDeleteUser?: (user: User) => boolean
+  canEditUser?: (user: User) => boolean
 }
 
 export const UsersGrid = memo(function UsersGrid({
@@ -18,6 +20,8 @@ export const UsersGrid = memo(function UsersGrid({
   labels,
   onDelete,
   onEdit,
+  canDeleteUser = () => true,
+  canEditUser = () => true,
 }: UsersGridProps) {
   const locale = useLocale()
   const hasActions = Boolean(onDelete || onEdit)
@@ -55,7 +59,7 @@ export const UsersGrid = memo(function UsersGrid({
           </dl>
           {hasActions ? (
             <div className="mt-5 grid gap-2 sm:grid-cols-2">
-              {onEdit ? (
+              {onEdit && canEditUser(user) ? (
                 <button
                   type="button"
                   onClick={() => onEdit(user)}
@@ -64,7 +68,7 @@ export const UsersGrid = memo(function UsersGrid({
                   {labels.edit}
                 </button>
               ) : null}
-              {onDelete ? (
+              {onDelete && canDeleteUser(user) ? (
                 <button
                   type="button"
                   onClick={() => onDelete(user.id)}

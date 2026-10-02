@@ -19,6 +19,7 @@ import { UsersStateCard, UsersLoadingState } from './UsersStates'
 import { UsersTable } from './UsersTable'
 import { UsersToolbar } from './UsersToolbar'
 import { DeleteConfirmationDialog } from '@/shared/components/DeleteConfirmationDialog'
+import { useAuth } from '@/modules/auth'
 
 interface UsersPagePermissions {
   canCreateUsers: boolean
@@ -33,6 +34,11 @@ export const UsersPage = memo(function UsersPage({ permissions, initialData }: {
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([])
   const [deleteUserId, setDeleteUserId] = useState<string | null>(null)
   const navigatingRef = useRef(false)
+  const { user: actor } = useAuth()
+  // Mirrors the server: your own account is editable (except role) but not deletable;
+  // other admin accounts are neither.
+  const canEditUser = (user: User) => user.id === actor?.id || user.role !== 'admin'
+  const canDeleteUser = (user: User) => user.id !== actor?.id && user.role !== 'admin'
   const { labels, locale, paginationLabel, roleLabels } = useUsersPageLabels(view.page)
   const selectedUsers = useMemo(
     () => view.pageUsers.filter((user) => selectedUserIds.includes(user.id)),
@@ -97,6 +103,8 @@ export const UsersPage = memo(function UsersPage({ permissions, initialData }: {
                   onSelectedRowIdsChange={setSelectedUserIds}
                   onDelete={permissions.canDeleteUsers ? handleDeleteUser : undefined}
                   onEdit={permissions.canUpdateUsers ? form.openEditForm : undefined}
+                  canDeleteUser={canDeleteUser}
+                  canEditUser={canEditUser}
                   onRowClick={handleRowClick}
                 />
               ) : (
@@ -105,6 +113,8 @@ export const UsersPage = memo(function UsersPage({ permissions, initialData }: {
                   labels={labels}
                   onDelete={permissions.canDeleteUsers ? handleDeleteUser : undefined}
                   onEdit={permissions.canUpdateUsers ? form.openEditForm : undefined}
+                  canDeleteUser={canDeleteUser}
+                  canEditUser={canEditUser}
                 />
               )}
             </div>

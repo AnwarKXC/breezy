@@ -31,7 +31,9 @@ export function UserForm(props: UserFormProps) {
   useEscapeKey(props.onClose, !props.saving)
   const emailError = props.error === 'auth/email_already_exists' ? props.errorDescription : null
   const formError = props.error && props.error !== 'auth/email_already_exists' ? props.errorDescription : null
-  const { role: actorRole } = useAuth()
+  const { role: actorRole, user: actor } = useAuth()
+  // Nobody can change their own role (enforced on the server too).
+  const isSelf = isEdit && actor?.id === props.draft.id
   // Only admins can grant the admin role (enforced on the server too).
   const roleOptions = useMemo(
     () =>
@@ -78,13 +80,10 @@ export function UserForm(props: UserFormProps) {
           <div>
             <FloatingInput
               required
-              disabled={isEdit}
               label={props.labels.email}
               type="email"
               value={props.draft.email}
-              onChange={(event) => {
-                if (!isEdit) props.onUpdate('email', event.target.value)
-              }}
+              onChange={(event) => props.onUpdate('email', event.target.value)}
             />
             {emailError ? <p className="text-sm text-[#9F2F2D]">{emailError}</p> : null}
           </div>
@@ -95,15 +94,24 @@ export function UserForm(props: UserFormProps) {
             value={props.draft.phone}
             onChange={(event) => props.onUpdate('phone', event.target.value)}
           />
-          <div className="floating-field is-filled">
-            <DropdownSelect
-              ariaLabel={props.labels.role}
-              onChange={(value) => props.onUpdate('role', value)}
-              options={roleOptions}
-              value={props.draft.role}
+          {isSelf ? (
+            <FloatingInput
+              disabled
+              readOnly
+              label={props.labels.role}
+              value={props.roleLabels[props.draft.role as UserRole] ?? props.draft.role}
             />
-            <span className="floating-label">{props.labels.role}</span>
-          </div>
+          ) : (
+            <div className="floating-field is-filled">
+              <DropdownSelect
+                ariaLabel={props.labels.role}
+                onChange={(value) => props.onUpdate('role', value)}
+                options={roleOptions}
+                value={props.draft.role}
+              />
+              <span className="floating-label">{props.labels.role}</span>
+            </div>
+          )}
           {isCreate || isEdit ? (
             <div className="sm:col-span-2">
               <FloatingInput
