@@ -117,6 +117,10 @@
     "accountingTeam": "Accounting",
     "moduleComingSoon": "This module is ready in navigation and will be connected to its workspace next.",
     "poweredBy": "Powered by Step.eg",
+    "license": {
+      "grace": "Your subscription has expired. The system will switch to read-only on {date}. Please contact your provider to renew.",
+      "readOnly": "Your subscription has ended. The system is read-only: you can view data but not make changes. Please contact your provider to renew."
+    },
     "collapseSidebar": "Collapse sidebar",
     "expandSidebar": "Expand sidebar",
     "quickActions": {

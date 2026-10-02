@@ -7,6 +7,7 @@ import {
   validateSessionToken,
   type ValidatedSession,
 } from '@/services/auth/sessionStore'
+import { getLicenseStatus } from '@/services/fleet/license'
 
 const locales = ['en', 'ar'] as const
 const PASS_THROUGH_PATHS = ['/api/', '/_next/', '/static/', '/sw.js', '/offline']
@@ -40,6 +41,19 @@ function getRouteKey(pathname: string) {
   return pathname.split('/')[2]
 }
 
+// Writes still allowed when the license blocks the instance: signing in/out,
+// password resets, control-plane calls and browser CSP reports.
+const READ_ONLY_EXEMPT_API = ['/api/auth/', '/api/system/', '/api/csp-report']
+const SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
+
+async function readOnlyApiResponse(request: NextRequest) {
+  const { pathname } = request.nextUrl
+  if (SAFE_METHODS.includes(request.method)) return null
+  if (READ_ONLY_EXEMPT_API.some((p) => pathname.startsWith(p))) return null
+  const license = await getLicenseStatus()
+  return license.readOnly ? NextResponse.json({ error: 'license/read_only' }, { status: 403 }) : null
+}
+
 const dirConfig: Record<string, 'ltr' | 'rtl'> = { en: 'ltr', ar: 'rtl' }
 function withLocaleHeaders(response: NextResponse, locale: string, dir: string) {
   response.headers.set('x-locale', locale)
@@ -49,6 +63,9 @@ function withLocaleHeaders(response: NextResponse, locale: string, dir: string) 
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
+  // API routes authorize themselves; the proxy only applies the license gate.
+  if (pathname.startsWith('/api/')) return (await readOnlyApiResponse(request)) ?? NextResponse.next()
+
   const locale = getLocale(pathname)
   const dir = dirConfig[locale] || 'ltr'
   const token = request.cookies.get(SESSION_COOKIE_NAME)?.value
@@ -100,5 +117,5 @@ function redirectToLogin(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/:locale(en|ar)', '/:locale(en|ar)/((?!login).*)'],
+  matcher: ['/:locale(en|ar)', '/:locale(en|ar)/((?!login).*)', '/api/:path*'],
 }

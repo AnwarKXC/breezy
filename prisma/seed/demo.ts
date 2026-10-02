@@ -51,10 +51,10 @@ const cairoToday = () =>
 // Reference data
 // ---------------------------------------------------------------------------
 const [SINGLE, DOUBLE, TRIPLE, SUITE] = ROOM_TYPES.map((t) => t.id)
-const NIGHTLY_RATE: Record<string, Record<string, number>> = {
-  EGP: { [SINGLE]: 1200, [DOUBLE]: 1800, [TRIPLE]: 2400, [SUITE]: 4200 },
-  USD: { [SINGLE]: 30, [DOUBLE]: 45, [TRIPLE]: 60, [SUITE]: 110 },
-  EUR: { [SINGLE]: 28, [DOUBLE]: 42, [TRIPLE]: 55, [SUITE]: 100 },
+const NIGHTLY_RATE: Record<string, Record<number, number>> = {
+  EGP: { 1: 1200, 2: 1800, 3: 2400, 4: 4200 },
+  USD: { 1: 30, 2: 45, 3: 60, 4: 110 },
+  EUR: { 1: 28, 2: 42, 3: 55, 4: 100 },
 }
 const CAPACITY: Record<string, number> = { [SINGLE]: 1, [DOUBLE]: 2, [TRIPLE]: 3, [SUITE]: 4 }
 
@@ -89,6 +89,8 @@ interface RoomRow {
   id: string
   number: string
   room_type_id: string
+  room_type_slug: string
+  capacity: number
 }
 
 /** Keeps per-room booked nights so generated stays never overlap. */
@@ -107,8 +109,11 @@ class RoomCalendar {
 }
 
 async function ensureRooms(): Promise<RoomRow[]> {
-  const existing = await prisma.rooms.findMany({ where: { deleted_at: null }, select: { id: true, number: true, room_type_id: true } })
-  if (existing.length) return existing
+  const existing = await prisma.rooms.findMany({
+    where: { deleted_at: null },
+    select: { id: true, number: true, room_type_id: true, capacity: true, room_types: { select: { slug: true } } },
+  })
+  if (existing.length) return existing.map(({ room_types, ...room }) => ({ ...room, room_type_slug: room_types.slug }))
 
   const rooms: Prisma.roomsCreateManyInput[] = []
   for (const floor of [1, 2, 3]) {
@@ -118,7 +123,17 @@ async function ensureRooms(): Promise<RoomRow[]> {
     }
   }
   await prisma.rooms.createMany({ data: rooms })
-  return rooms.map((r) => ({ id: r.id!, number: r.number, room_type_id: r.room_type_id }))
+  return rooms.map((room) => {
+    const roomType = ROOM_TYPES.find((type) => type.id === room.room_type_id)
+    if (!roomType) throw new Error(`No demo room type configured for ${room.room_type_id}`)
+    return {
+      id: room.id!,
+      number: room.number,
+      room_type_id: room.room_type_id,
+      room_type_slug: roomType.slug,
+      capacity: room.capacity!,
+    }
+  })
 }
 
 async function main() {
@@ -243,9 +258,10 @@ async function main() {
 
     const reservationId = randomUUID()
     const guest = pick(guestPool)
-    const adultsPerRoom = chosen.map((room) => Math.max(1, Math.min(CAPACITY[room.room_type_id], int(1, 3))))
+    const adultsPerRoom = chosen.map((room) => Math.max(1, Math.min(room.capacity, int(1, 3))))
     const roomLines = chosen.map((room) => {
-      const rate = NIGHTLY_RATE[currency][room.room_type_id]
+      const rate = NIGHTLY_RATE[currency][room.capacity]
+      if (rate === undefined) throw new Error(`No demo rate configured for ${currency} room capacity ${room.capacity} (type "${room.room_type_slug}")`)
       return { room, rate, total: money(rate * plan.nights) }
     })
     const subtotal = money(roomLines.reduce((sum, line) => sum + line.total, 0))

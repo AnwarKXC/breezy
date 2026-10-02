@@ -11,12 +11,15 @@ import { PWAClient } from "@/app/pwa-client";
 import { CurrencyProvider } from "@/shared/contexts/CurrencyContext";
 import { TooltipLayer } from "@/shared/components/TooltipLayer";
 import { AssistantWidget } from "@/modules/assistant";
+import { LicenseNotice, type LicenseNoticeProps } from "./LicenseNotice";
 
 interface DashboardShellProps {
   children: ReactNode;
+  /** Shown above the page while the license is in grace or read-only. */
+  licenseNotice?: LicenseNoticeProps | null;
 }
 
-export function DashboardShell({ children }: DashboardShellProps) {
+export function DashboardShell({ children, licenseNotice }: DashboardShellProps) {
   return (
     <div className="h-screen overflow-hidden bg-[#FFFFFF] text-[#1A1A1A]">
       <AuthStateSync />
@@ -29,6 +32,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
           <div className="relative flex min-w-0 flex-1 flex-col bg-[#FFFFFF]">
             <Navbar />
             <main className="min-w-0 flex-1 overflow-y-auto overflow-x-hidden px-4 pb-24 pt-24 sm:px-6 lg:px-8 lg:pb-8 lg:pt-8">
+              {licenseNotice && <LicenseNotice {...licenseNotice} />}
               <Suspense fallback={<PageSkeleton />}>
                 <div className="animate-fade-in-fast">{children}</div>
               </Suspense>
