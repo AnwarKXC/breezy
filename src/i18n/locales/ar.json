@@ -1068,7 +1068,7 @@
     "yearView": {
       "open": "عرض السنة",
       "title": "حجوزات السنة",
-      "exportCsv": "تصدير CSV",
+      "exportExcel": "تصدير Excel",
       "exportPdf": "تصدير PDF",
       "legendConfirmed": "مؤكد",
       "legendInHouse": "مقيم حالياً",

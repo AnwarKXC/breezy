@@ -22,6 +22,28 @@ const BAR_CLASS: Record<YearViewStatus, string> = {
   other: 'bg-amber-100 text-amber-950',
 }
 
+/** Check-in edge: solid status-colored line (matches the legend swatch). */
+const START_MARK: Record<YearViewStatus, string> = {
+  confirmed: 'border-s-[3px] border-s-blue-500',
+  checked_in: 'border-s-[3px] border-s-emerald-500',
+  checked_out: 'border-s-[3px] border-s-gray-500',
+  other: 'border-s-[3px] border-s-amber-500',
+}
+
+/** Check-out edge: thin darker line, so back-to-back stays never blend together. */
+const END_MARK: Record<YearViewStatus, string> = {
+  confirmed: 'border-e border-e-blue-400',
+  checked_in: 'border-e border-e-emerald-400',
+  checked_out: 'border-e border-e-gray-400',
+  other: 'border-e border-e-amber-400',
+}
+
+/** Faint day separators drawn through a merged stay so nights stay countable. */
+const DAY_LINES = {
+  backgroundImage: `repeating-linear-gradient(to right, transparent 0 ${DAY_COL_PX - 1}px, rgb(0 0 0 / 0.07) ${DAY_COL_PX - 1}px ${DAY_COL_PX}px)`,
+  backgroundOrigin: 'border-box',
+} as const
+
 interface SheetViewProps {
   year: number
   monthIndex: number
@@ -182,11 +204,12 @@ export function SheetView({ year, monthIndex, locale, rooms, roomTypes, bookingI
                       }
                       const booking = segment.booking
                       const label = stayLabel(booking)
+                      const bucket = statusBucket(booking.status)
                       return (
                         <td
                           key={segment.startIndex}
                           colSpan={segment.span}
-                          className={`h-8 border-s border-t border-[#EAEAEA] p-0 print:h-[15px] ${BAR_CLASS[statusBucket(booking.status)]}`}
+                          className={`h-8 border-s border-t border-[#EAEAEA] p-0 print:h-[15px] ${BAR_CLASS[bucket]}`}
                         >
                           <Link
                             href={`/${locale}/reservations/${booking.reservationId}`}
@@ -201,7 +224,10 @@ export function SheetView({ year, monthIndex, locale, rooms, roomTypes, bookingI
                               })
                             }}
                             onMouseLeave={() => setHover(null)}
-                            className="flex h-full items-center justify-center overflow-hidden px-2 text-center font-medium leading-none hover:underline print:px-0.5"
+                            style={DAY_LINES}
+                            className={`flex h-full items-center justify-center overflow-hidden px-2 text-center font-medium leading-none hover:underline print:bg-none! print:px-0.5 ${
+                              segment.openStart ? '' : START_MARK[bucket]
+                            } ${segment.openEnd ? '' : END_MARK[bucket]}`}
                           >
                             <span className="truncate">{label}</span>
                           </Link>

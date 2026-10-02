@@ -1006,7 +1006,7 @@
     "yearView": {
       "open": "Year view",
       "title": "Reservations Year View",
-      "exportCsv": "Export CSV",
+      "exportExcel": "Export Excel",
       "exportPdf": "Export PDF",
       "legendConfirmed": "Confirmed",
       "legendInHouse": "In-house",

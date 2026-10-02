@@ -150,7 +150,7 @@ export function YearOverviewPage() {
 
   async function handleExportExcel() {
     if (!data) return
-    const buffer = await buildYearExcelBuffer(data, locale, exportLabels)
+    const buffer = await buildYearExcelBuffer(data, locale)
     const blob = new Blob([buffer], {
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     })
@@ -243,7 +243,7 @@ export function YearOverviewPage() {
               disabled={showLoading || error}
               className="inline-flex h-9 items-center rounded-lg border border-[#EAEAEA] bg-white px-3 text-sm font-medium text-[#555555] transition-colors hover:bg-accent/10 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {t('bookings.yearView.exportCsv')}
+              {t('bookings.yearView.exportExcel')}
             </button>
             <button
               type="button"

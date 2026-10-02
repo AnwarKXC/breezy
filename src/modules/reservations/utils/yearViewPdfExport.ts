@@ -20,13 +20,28 @@ const BAR_FILL: Record<YearViewStatus, string> = {
   other: '#FEF3C7',
 }
 
-// A4 landscape (842pt) minus margins, split between the room column, 31 day columns and nights.
+// A4 landscape (842pt) minus margins, split between the room column, the day columns and nights.
 const PAGE_MARGIN = 14
 const ROOM_COL = 36
 const NIGHTS_COL = 24
-const DAY_COL = (842 - PAGE_MARGIN * 2 - ROOM_COL - NIGHTS_COL) / 31
+const CELL_PAD_X = 1.5
+const LINE_WIDTH = 0.5
 const FONT_SIZE = 6
-const AVG_CHAR_WIDTH = FONT_SIZE * 0.52
+// Conservative average glyph widths (Roboto / Noto Sans Arabic) used to pre-wrap names.
+const LATIN_CHAR_WIDTH = FONT_SIZE * 0.6
+const ARABIC_CHAR_WIDTH = FONT_SIZE * 0.62
+const ARABIC = /[\u0600-\u06FF]/
+
+/**
+ * Fixed (not '*') day widths that fill the page exactly. pdfmake grows '*' columns to fit
+ * their widest unbreakable text, which pushed the table past the page edge; fixed
+ * widths never grow.
+ */
+function dayColumnWidth(dayCount: number) {
+  const columns = dayCount + 2
+  const chrome = columns * CELL_PAD_X * 2 + (columns + 1) * LINE_WIDTH
+  return (842 - PAGE_MARGIN * 2 - chrome - ROOM_COL - NIGHTS_COL) / dayCount
+}
 
 export interface YearViewPdfLabels {
   room: string
@@ -40,18 +55,27 @@ type Cell = Record<string, unknown>
 const MAX_BAR_LINES = 2
 
 /**
- * Fit a name into its bar: wrap up to two lines, and cut any single word wider than the
- * bar. pdfmake widens a column to its longest unbreakable word, which pushed the table
- * past the page edge, so no word may exceed one line.
+ * Wrap a name into at most two explicit lines that fit the bar, shortening with "…" only
+ * when it still does not fit. Lines are joined with "\n" ourselves because the Arabic font
+ * pass turns spaces into non-breaking spaces, so pdfmake can never wrap Arabic names.
  */
-function fitToSpan(text: string, span: number) {
-  const perLine = Math.max(2, Math.floor((span * DAY_COL - 4) / AVG_CHAR_WIDTH))
+function fitToSpan(text: string, span: number, dayWidth: number) {
+  const charWidth = ARABIC.test(text) ? ARABIC_CHAR_WIDTH : LATIN_CHAR_WIDTH
+  const barWidth = span * dayWidth + (span - 1) * (CELL_PAD_X * 2 + LINE_WIDTH)
+  const perLine = Math.max(2, Math.floor(barWidth / charWidth))
   const cut = (value: string, max: number) => (value.length <= max ? value : `${value.slice(0, max - 1)}…`)
-  const words = text
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((word) => cut(word, perLine))
-  return cut(words.join(' '), perLine * MAX_BAR_LINES)
+
+  const lines: string[] = []
+  for (const word of text.split(/\s+/).filter(Boolean).map((w) => cut(w, perLine))) {
+    const last = lines.at(-1)
+    if (last !== undefined && `${last} ${word}`.length <= perLine) lines[lines.length - 1] = `${last} ${word}`
+    else lines.push(word)
+  }
+  if (lines.length > MAX_BAR_LINES) {
+    lines.length = MAX_BAR_LINES
+    lines[MAX_BAR_LINES - 1] = `${lines[MAX_BAR_LINES - 1].slice(0, perLine - 1)}…`
+  }
+  return lines.join('\n')
 }
 
 /** colSpan cells must be followed by `span - 1` empty placeholders. */
@@ -59,11 +83,11 @@ function spanned(cell: Cell, span: number): Cell[] {
   return [span > 1 ? { ...cell, colSpan: span } : cell, ...Array.from({ length: span - 1 }, () => ({}))]
 }
 
-function segmentCells(segment: TapeSegment, isWeekend: boolean): Cell[] {
+function segmentCells(segment: TapeSegment, isWeekend: boolean, dayWidth: number): Cell[] {
   if (!segment.booking) return [{ text: '', fillColor: isWeekend ? WEEKEND_BG : undefined }]
   return spanned(
     {
-      text: fitToSpan(stayLabel(segment.booking), segment.span),
+      text: fitToSpan(stayLabel(segment.booking), segment.span, dayWidth),
       fillColor: BAR_FILL[statusBucket(segment.booking.status)],
       color: TEXT,
       alignment: 'center',
@@ -85,6 +109,7 @@ export function buildYearViewPdfContent(payload: YearOverviewPayload, locale: st
   for (let monthIndex = 0; monthIndex < 12; monthIndex++) {
     const month = buildTapeMonth(payload.year, monthIndex, payload.rooms, payload.roomTypes, bookingIndex, '', locale)
     const colCount = month.days.length + 2
+    const dayWidth = dayColumnWidth(month.days.length)
     const monthNights = month.totalRooms * month.days.length
 
     const edgeRow = (first: Cell, days: Cell[], last: Cell) => (isRTL ? [last, ...ordered(days), first] : [first, ...days, last])
@@ -129,7 +154,7 @@ export function buildYearViewPdfContent(payload: YearOverviewPayload, locale: st
         ),
       )
       for (const row of group.rows) {
-        const dayCells = ordered(row.segments).flatMap((segment) => segmentCells(segment, month.days[segment.startIndex].isWeekend))
+        const dayCells = ordered(row.segments).flatMap((segment) => segmentCells(segment, month.days[segment.startIndex].isWeekend, dayWidth))
         const roomCell = { text: row.room.number, bold: true, verticalAlignment: 'middle' }
         const nightsCell = { text: row.nights ? String(row.nights) : '', alignment: 'center', verticalAlignment: 'middle', color: MUTED }
         // Day cells are already mirrored above; only the edge columns swap here.
@@ -155,7 +180,7 @@ export function buildYearViewPdfContent(payload: YearOverviewPayload, locale: st
       ),
     )
 
-    const widths = [ROOM_COL, ...month.days.map(() => '*'), NIGHTS_COL]
+    const widths = [ROOM_COL, ...month.days.map(() => dayWidth), NIGHTS_COL]
     content.push({
       table: {
         headerRows: 2,
@@ -165,11 +190,11 @@ export function buildYearViewPdfContent(payload: YearOverviewPayload, locale: st
       },
       layout: {
         hLineWidth: () => 0.5,
-        vLineWidth: () => 0.5,
+        vLineWidth: () => LINE_WIDTH,
         hLineColor: () => BORDER,
         vLineColor: () => BORDER,
-        paddingLeft: () => 1.5,
-        paddingRight: () => 1.5,
+        paddingLeft: () => CELL_PAD_X,
+        paddingRight: () => CELL_PAD_X,
         paddingTop: () => 1.5,
         paddingBottom: () => 1.5,
       },
