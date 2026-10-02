@@ -1933,6 +1933,12 @@
         "disconnected": "Mailbox disconnected"
       },
       "inbox": {
+        "mailboxLabel": "Shared mailbox",
+        "backToList": "Back to list",
+        "moreActions": "More actions",
+        "messageCount": "messages",
+        "readerHint": "Choose a message to read and manage the conversation.",
+        "emptyHint": "Messages in this folder will appear here.",
         "folders": "Email folders",
         "selectAll": "Select all",
         "selected": "selected",
@@ -1961,6 +1967,12 @@
         "deletedForever": "Deleted permanently"
       },
       "compose": {
+        "sharedSender": "From the shared hotel mailbox",
+        "recipientPlaceholder": "Recipient email addresses",
+        "optional": "Optional",
+        "subjectPlaceholder": "Add a subject",
+        "bodyPlaceholder": "Write your message…",
+        "attachmentsLabel": "attachments",
         "saved": "Draft saved",
         "saveDraft": "Save draft",
         "saving": "Saving…",

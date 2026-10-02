@@ -56,6 +56,17 @@ function reset() {
   saveReplaced = true; sendDraftRemoved = true; sendFailure = false
 }
 
+/** Visual fixtures only; functional tests keep their original two-message setup. */
+function visualMailbox(locale: 'en' | 'ar') {
+  messages = [
+    { ...fixture(1, locale === 'ar' ? 'تأكيد الحجز وموعد الوصول' : 'Reservation confirmation · October stay'), from: [{ name: locale === 'ar' ? 'سارة حسن' : 'Sarah Hassan', address: 'sarah.hassan@example.test' }], text: locale === 'ar' ? 'مرحباً،\n\nنصل يوم الجمعة حوالي الساعة الثالثة مساءً. هل يمكن تأكيد الحجز وتجهيز غرفة هادئة؟\n\nشكراً لكم،\nسارة' : 'Hello team,\n\nWe will arrive on Friday around 3 pm. Could you confirm our reservation and arrange a quiet room?\n\nThank you,\nSarah', flagged: true },
+    { ...fixture(2, locale === 'ar' ? 'تحديث موعد الوصول وخدمة النقل من المطار' : 'Arrival update and airport transfer'), from: [{ name: 'Daniel Brooks', address: 'daniel.brooks@example.test' }], seen: true, date: '2026-10-01T16:30:00Z' },
+    { ...fixture(3, locale === 'ar' ? 'فاتورة الإقامة الأخيرة' : 'Invoice for our recent stay'), from: [{ name: 'Maya Patel', address: 'maya.patel@example.test' }], hasAttachments: true, attachments: [{ index: 0, filename: 'stay-details.txt', contentType: 'text/plain', size: 12, content: Buffer.from('Stay details').toString('base64') }], date: '2026-10-01T12:15:00Z' },
+    { ...fixture(4, locale === 'ar' ? 'استفسار عن حجز مجموعة وتفاصيل الغرف المتاحة خلال عطلة نهاية الأسبوع' : 'Group reservation enquiry and available rooms for the upcoming weekend'), from: [{ name: 'Alexandra Montgomery-Sullivan Group Reservations', address: 'alexandra.montgomery.sullivan.group.reservations@example.test' }], seen: true, date: '2026-09-30T10:00:00Z' },
+    { ...fixture(5, locale === 'ar' ? 'شكراً على حسن الاستقبال' : 'Thank you for a wonderful stay'), from: [{ name: 'Omar Khalil', address: 'omar.khalil@example.test' }], seen: true, date: '2026-09-29T08:00:00Z' },
+  ]
+}
+
 before(async () => {
   const componentPath = path.join(root, 'src/modules/email/components/EmailPage.tsx').replaceAll('\\', '/')
   const result = await esbuild.build({
@@ -63,7 +74,7 @@ before(async () => {
       const query=new URLSearchParams(location.search);document.documentElement.dir=query.get('locale')==='ar'?'rtl':'ltr';
       createRoot(document.getElementById('root')).render(<EmailPage canEdit={query.get('viewer')!=='1'} canConfigure={query.get('viewer')!=='1'}/>);`,
       resolveDir: root, loader: 'tsx' },
-    bundle: true, write: false, platform: 'browser', jsx: 'automatic', define: { 'process.env.NODE_ENV': '"production"' },
+    bundle: true, write: false, outfile: 'email-fixture.js', platform: 'browser', jsx: 'automatic', define: { 'process.env.NODE_ENV': '"production"' },
     plugins: [{ name: 'fixture-providers', setup(build: {
       onResolve(options: { filter: RegExp }, callback: (args: { path: string }) => { path: string; namespace: string }): void
       onLoad(options: { filter: RegExp; namespace: string }, callback: (args: { path: string }) => { contents: string; loader: string; resolveDir: string }): void
@@ -76,8 +87,9 @@ before(async () => {
       }))
     } }],
   })
-  bundle = result.outputFiles[0].text
+  bundle = result.outputFiles.find((file: { path: string }) => file.path.endsWith('.js'))!.text
   css = (await postcss([tailwind({ base: root })]).process(await readFile(path.join(root, 'src/app/globals.css'), 'utf8'), { from: path.join(root, 'src/app/globals.css') })).css
+  css += result.outputFiles.find((file: { path: string }) => file.path.endsWith('.css'))?.text ?? ''
   server = createServer(async (request, response) => {
     const url = new URL(request.url ?? '/', 'http://localhost')
     const json = (data: unknown) => { response.setHeader('Content-Type', 'application/json'); response.end(JSON.stringify({ data })) }
@@ -126,7 +138,7 @@ before(async () => {
     if (url.pathname === '/favicon.ico') { response.statusCode = 204; response.end(); return }
     response.setHeader('Content-Type', 'text/html')
     response.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'")
-    response.end('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/style.css"></head><body class="bg-page-bg"><main id="root" class="mx-auto max-w-7xl p-4 sm:p-6"></main><aside id="fixture-toasts" hidden></aside><script src="/bundle.js"></script></body></html>')
+    response.end('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/style.css"></head><body class="bg-page-bg"><div class="flex min-h-screen"><aside aria-hidden="true" class="hidden w-64 shrink-0 border-e border-line bg-white lg:block"></aside><main id="root" class="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8"></main></div><aside id="fixture-toasts" hidden></aside><script src="/bundle.js"></script></body></html>')
   })
   await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve))
   const address = server.address(); assert(address && typeof address !== 'string')
@@ -139,20 +151,35 @@ after(async () => {
   if (server) await new Promise<void>((resolve) => server.close(() => resolve()))
 })
 
-async function visit(locale: 'en' | 'ar', mobile = false, viewer = false) {
+async function visit(locale: 'en' | 'ar', mobile = false, viewer = false, visual = false) {
   reset()
+  if (visual) visualMailbox(locale)
   const page = await browser.newPage({ viewport: mobile ? { width: 390, height: 844 } : { width: 1440, height: 1000 } })
   const errors: string[] = []
   page.on('pageerror', (error) => errors.push(error.message))
   page.on('console', (message) => { if (message.type() === 'error' || message.type() === 'warning') errors.push(message.text()) })
   await page.goto(`${origin}/?locale=${locale}&viewer=${viewer ? '1' : '0'}`)
   await expect(page.getByRole('heading', { name: t('email.title', locale), exact: true })).toBeVisible()
-  await expect(page.getByRole('button', { name: /Reservation question/ })).toBeVisible()
+  await expect(page.getByRole('button', { name: visual ? new RegExp(messages[0].subject) : /Reservation question/ })).toBeVisible()
   return { page, errors }
 }
 
 async function noOverflow(page: Page) {
-  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, 'page must fit viewport')
+  const overflow = await page.evaluate(() => ({
+    width: innerWidth,
+    scrollWidth: document.documentElement.scrollWidth,
+    elements: [...document.querySelectorAll('main *')].filter((element) => {
+      const rect = element.getBoundingClientRect()
+      return rect.right > innerWidth + 1 || rect.left < -1 || element.scrollWidth > element.clientWidth + 1
+    }).slice(-6).map((element) => ({ tag: element.tagName, text: element.textContent?.slice(0, 80), className: element.className })),
+  }))
+  assert(overflow.scrollWidth <= overflow.width, `page must fit viewport: ${JSON.stringify(overflow)}`)
+}
+
+async function bulkAction(page: Page, action: string, locale: 'en' | 'ar' = 'en') {
+  const button = page.getByRole('button', { name: t(`settings.email.actions.${action}`, locale), exact: true })
+  if (!(await button.isVisible())) await page.getByLabel(t('settings.email.inbox.moreActions', locale), { exact: true }).click()
+  await button.click()
 }
 
 for (const locale of ['en', 'ar'] as const) {
@@ -167,12 +194,12 @@ for (const locale of ['en', 'ar'] as const) {
       }
       const selectAll = () => page.getByRole('checkbox', { name: t('settings.email.inbox.selectAll', locale), exact: true })
       await selectAll().check()
-      await page.getByRole('button', { name: t('settings.email.actions.read', locale), exact: true }).click()
+      await bulkAction(page, 'read', locale)
       await expect.poll(() => mutations.length).toBe(1)
       assert.deepEqual(mutations[0], { folder: 'inbox', uids: [1, 2], action: 'read' })
       await expect(selectAll()).not.toBeChecked()
       await selectAll().check()
-      await page.getByRole('button', { name: t('settings.email.actions.pin', locale), exact: true }).click()
+      await bulkAction(page, 'pin', locale)
       await expect.poll(() => mutations.length).toBe(2)
       await page.getByRole('tab', { name: t('settings.email.folders.pinned', locale), exact: true }).click()
       await expect(page.getByRole('button', { name: /Arrival update/ })).toBeVisible()
@@ -201,7 +228,7 @@ test('Pinned messages with the same UID in different folders keep distinct rows 
     await expect(page.getByRole('button', { name: /Reservation question/ })).toBeVisible()
     await expect(page.getByRole('button', { name: /Archived priority/ })).toBeVisible()
     await page.getByRole('checkbox', { name: t('settings.email.inbox.selectAll'), exact: true }).check()
-    await page.getByRole('button', { name: t('settings.email.actions.unpin'), exact: true }).click()
+    await bulkAction(page, 'unpin')
     await expect.poll(() => mutations.length).toBe(2)
     assert.deepEqual(mutations, [{ folder: 'inbox', uids: [1], action: 'unpin' }, { folder: 'archive', uids: [1], action: 'unpin' }])
     await expect(page.getByRole('button', { name: /Archived priority/ })).toHaveCount(0)
@@ -329,11 +356,13 @@ test('Permanent deletion requires native confirmation: cancel leaves mail intact
     await page.getByRole('tab', { name: t('settings.email.folders.trash'), exact: true }).click()
     await page.getByRole('checkbox', { name: t('settings.email.inbox.selectAll'), exact: true }).check()
     const remove = page.getByRole('button', { name: t('settings.email.actions.deleteForever'), exact: true })
+    await page.getByLabel(t('settings.email.inbox.moreActions'), { exact: true }).click()
     page.once('dialog', async (dialog) => { assert.equal(dialog.type(), 'confirm'); await dialog.dismiss() })
     await remove.click()
     assert.deepEqual(mutations, [])
     await expect(page.getByRole('button', { name: /Reservation question/ })).toBeVisible()
     page.once('dialog', async (dialog) => { assert.equal(dialog.message(), t('settings.email.inbox.deleteConfirm')); await dialog.accept() })
+    await page.getByLabel(t('settings.email.inbox.moreActions'), { exact: true }).click()
     await remove.click()
     await expect.poll(() => mutations.length).toBe(1)
     assert.deepEqual(mutations[0], { folder: 'trash', uids: [1], action: 'deleteForever' })
@@ -341,3 +370,98 @@ test('Permanent deletion requires native confirmation: cancel leaves mail intact
     assert.deepEqual(errors, [])
   } finally { await page.close() }
 })
+
+for (const locale of ['en', 'ar'] as const) {
+  for (const state of ['loading', 'error'] as const) {
+    test(`Email ${locale} mobile: back to list remains available while message detail is ${state}`, async () => {
+      const { page, errors } = await visit(locale, true)
+      let release: (() => void) | undefined
+      const heldRequest = new Promise<void>((resolve) => { release = resolve })
+      try {
+        await page.route(`**${api}/1?folder=inbox`, async (route) => {
+          if (state === 'loading') {
+            await heldRequest
+            await route.continue()
+          } else {
+            await route.fulfill({ status: 502, contentType: 'application/json', body: JSON.stringify({ error: 'email/imap_failed' }) })
+          }
+        })
+        await page.getByRole('button', { name: /Reservation question/ }).click()
+        if (state === 'loading') await expect(page.getByRole('status', { name: t('settings.email.inbox.loading', locale), exact: true })).toBeVisible()
+        else await expect(page.getByRole('alert')).toHaveText(t('settings.email.errors.imap_failed', locale))
+        const back = page.getByRole('button', { name: t('settings.email.inbox.backToList', locale), exact: true })
+        await expect(back).toBeVisible()
+        await expect(page.getByRole('button', { name: t('settings.email.actions.archive', locale), exact: true })).toHaveCount(0)
+        await back.click()
+        await expect(page.getByRole('button', { name: /Reservation question/ })).toBeVisible()
+        await noOverflow(page)
+        assert.deepEqual(errors.filter((error) => !(state === 'error' && error.includes('502 (Bad Gateway)'))), [], 'only the deliberate detail failure may report a browser error')
+      } finally {
+        release?.()
+        await page.close()
+      }
+    })
+  }
+
+  for (const width of [320, 390, 768, 1440]) {
+    test(`Email ${locale} ${width}px: list, long message reader and composer fit the dashboard`, async () => {
+      const { page, errors } = await visit(locale, width < 768, false, true)
+      try {
+        await page.setViewportSize({ width, height: width < 768 ? 844 : 1000 })
+        const capture = async (state: string) => {
+          if (process.env.EMAIL_BROWSER_SCREENSHOT_DIR) {
+            await mkdir(process.env.EMAIL_BROWSER_SCREENSHOT_DIR, { recursive: true })
+            await page.screenshot({ path: path.join(process.env.EMAIL_BROWSER_SCREENSHOT_DIR, `email-${locale}-${width}-${state}.png`), fullPage: true })
+          }
+          await noOverflow(page)
+        }
+        await capture('list')
+        const subject = messages[3].subject
+        await page.getByRole('button', { name: new RegExp(subject) }).click()
+        await expect(page.getByRole('heading', { name: subject, exact: true })).toBeVisible()
+        await capture('reader')
+        const compose = page.getByRole('button', { name: t('settings.email.compose.title', locale), exact: true })
+        await compose.click()
+        const dialog = page.getByRole('dialog')
+        await expect(dialog).toBeVisible()
+        const bounds = await dialog.boundingBox()
+        assert(bounds && bounds.x >= 0 && bounds.x + bounds.width <= width + 1, 'composer must fit horizontally')
+        assert(bounds.y >= 0 && bounds.y + bounds.height <= page.viewportSize()!.height + 1, 'composer must fit vertically')
+        await capture('composer')
+        assert.deepEqual(errors, [])
+      } finally { await page.close() }
+    })
+  }
+
+  test(`Email ${locale}: folders support keyboard navigation; composer traps and restores focus`, async () => {
+    const { page, errors } = await visit(locale)
+    try {
+      const inbox = page.getByRole('tab', { name: t('settings.email.folders.inbox', locale), exact: true })
+      await inbox.focus()
+      await page.keyboard.press(locale === 'ar' ? 'ArrowLeft' : 'ArrowRight')
+      const sentFolder = page.getByRole('tab', { name: t('settings.email.folders.sent', locale), exact: true })
+      await expect(sentFolder).toBeFocused()
+      await expect(sentFolder).toHaveAttribute('aria-selected', 'true')
+      await page.keyboard.press('End')
+      await expect(page.getByRole('tab', { name: t('settings.email.folders.trash', locale), exact: true })).toBeFocused()
+      await page.keyboard.press('Home')
+      await expect(inbox).toBeFocused()
+      await page.keyboard.press('ArrowDown')
+      await expect(sentFolder).toBeFocused()
+      await page.keyboard.press('ArrowUp')
+      await expect(inbox).toBeFocused()
+      const compose = page.getByRole('button', { name: t('settings.email.compose.title', locale), exact: true })
+      await compose.focus()
+      await compose.click()
+      await expect(page.getByRole('dialog')).toBeVisible()
+      for (let i = 0; i < 14; i++) {
+        await page.keyboard.press('Tab')
+        assert.equal(await page.evaluate(() => document.activeElement === document.body || !!document.activeElement?.closest('dialog')), true, 'native modal never focuses underlying app controls')
+      }
+      await page.keyboard.press('Escape')
+      await expect(page.getByRole('dialog')).toHaveCount(0)
+      await expect(compose).toBeFocused()
+      assert.deepEqual(errors, [])
+    } finally { await page.close() }
+  })
+}

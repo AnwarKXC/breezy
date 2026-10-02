@@ -1,0 +1,69 @@
+.composer {
+  width: calc(100% - 2rem);
+  max-width: 46rem;
+  margin: auto;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: white;
+  color: var(--ink);
+  box-shadow: 0 24px 80px rgb(0 0 0 / 16%);
+}
+
+.composer::backdrop {
+  background: rgb(26 26 26 / 32%);
+  backdrop-filter: blur(3px);
+}
+
+.recipientRow {
+  display: grid;
+  grid-template-columns: 3.5rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--line);
+}
+
+/* Scoped IDs keep the mail editor distinct from the app's bordered form controls. */
+.composer :global(#email-compose-to),
+.composer :global(#email-compose-cc),
+.composer :global(#email-compose-subject),
+.composer :global(#email-compose-body) {
+  min-width: 0;
+  width: 100%;
+  border: 0 !important;
+  border-radius: 0 !important;
+  padding: 0.875rem 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  font-weight: 400 !important;
+}
+
+.recipientRow:focus-within {
+  border-bottom-color: var(--app-primary-ink);
+}
+
+.composer :global(#email-compose-subject) {
+  font-weight: 600 !important;
+}
+
+.composer :global(#email-compose-body) {
+  min-height: 15rem !important;
+  resize: vertical;
+  line-height: 1.85 !important;
+}
+
+.composer :global(#email-compose-body):focus-visible {
+  outline: 2px solid var(--line) !important;
+  outline-offset: 4px !important;
+}
+
+@media (max-width: 639px) {
+  .composer {
+    width: calc(100% - 1rem);
+    border-radius: 0.875rem;
+  }
+
+  .composer :global(#email-compose-body) {
+    min-height: 10rem !important;
+  }
+}

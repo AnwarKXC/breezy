@@ -2003,6 +2003,12 @@
         "disconnected": "تم إلغاء ربط صندوق البريد"
       },
       "inbox": {
+        "mailboxLabel": "صندوق البريد المشترك",
+        "backToList": "العودة إلى القائمة",
+        "moreActions": "إجراءات إضافية",
+        "messageCount": "رسائل",
+        "readerHint": "اختر رسالة لقراءتها وإدارة المحادثة.",
+        "emptyHint": "ستظهر رسائل هذا المجلد هنا.",
         "folders": "مجلدات البريد",
         "selectAll": "تحديد الكل",
         "selected": "محددة",
@@ -2031,6 +2037,12 @@
         "deletedForever": "تم الحذف نهائيًا"
       },
       "compose": {
+        "sharedSender": "من صندوق بريد الفندق المشترك",
+        "recipientPlaceholder": "عناوين بريد المستلمين",
+        "optional": "اختياري",
+        "subjectPlaceholder": "أضف موضوعًا",
+        "bodyPlaceholder": "اكتب رسالتك…",
+        "attachmentsLabel": "مرفقات",
         "saved": "تم حفظ المسودة",
         "saveDraft": "حفظ المسودة",
         "saving": "جارٍ الحفظ…",
