@@ -1,4 +1,5 @@
 import 'server-only'
+import { logReservationActivity } from '@/modules/reservations/services/activityLogService'
 import { NextResponse } from 'next/server'
 import { ACTIONS } from '@/config/rbac'
 import { secureMutationEndpoint } from '@/shared/secureEndpoint'
@@ -13,7 +14,7 @@ import {
 type Context = { params: Promise<{ id: string; guestId: string }> }
 
 export async function PATCH(request: Request, { params }: Context) {
-  return secureMutationEndpoint(request, ACTIONS.RESERVATIONS_UPDATE_DRAFT, async () => {
+  return secureMutationEndpoint(request, ACTIONS.RESERVATIONS_UPDATE_DRAFT, async (session) => {
     const parsed = ReservationGuestUpdateSchema.safeParse(await request.json().catch(() => null))
     if (!parsed.success) {
       return NextResponse.json({ ok: false, error: { code: 'VALIDATION_ERROR', message: zodErrorMessage(parsed.error) } }, { status: 400 })
@@ -22,6 +23,7 @@ export async function PATCH(request: Request, { params }: Context) {
       const { id, guestId } = await params
       const result = await updateReservationGuest(id, guestId, parsed.data)
       if (!result.ok) return NextResponse.json({ ok: false, error: { code: result.code, message: result.message } }, { status: result.status })
+      await logReservationActivity(session, 'guestUpdated', id, { guest: parsed.data.full_name ?? null })
       return NextResponse.json({ ok: true, data: result.data })
     } catch (error) {
       if (isUniqueViolation(error)) {
@@ -33,10 +35,11 @@ export async function PATCH(request: Request, { params }: Context) {
 }
 
 export async function DELETE(request: Request, { params }: Context) {
-  return secureMutationEndpoint(request, ACTIONS.RESERVATIONS_UPDATE_DRAFT, async () => {
+  return secureMutationEndpoint(request, ACTIONS.RESERVATIONS_UPDATE_DRAFT, async (session) => {
     const { id, guestId } = await params
     const removed = await removeReservationGuest(id, guestId)
     if (!removed) return NextResponse.json({ ok: false, error: { code: 'NOT_FOUND', message: 'Guest not found' } }, { status: 404 })
+    await logReservationActivity(session, 'guestRemoved', id, { guest: removed.full_name })
     return NextResponse.json({ ok: true })
   })
 }

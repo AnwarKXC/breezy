@@ -1365,7 +1365,12 @@
         "cancelled": "Cancelled the reservation",
         "no_show": "Marked as no-show",
         "expired": "Reservation expired"
-      }
+      },
+      "noteAdded": "Added a note",
+      "edited": "Edited the reservation",
+      "guestAdded": "Added a guest",
+      "guestUpdated": "Updated a guest",
+      "guestRemoved": "Removed a guest"
     },
     "auditTrail": "Audit trail",
     "statusHistory": "Status history",
@@ -1769,6 +1774,23 @@
       "ledgerReversalCreated": "Ledger entry reversed",
       "settingUpdated": "Setting updated",
       "reportExported": "Report exported"
+    },
+    "reservations": {
+      "created": "Reservation created",
+      "updated": "Reservation edited",
+      "deleted": "Reservation deleted",
+      "checkedIn": "Guest checked in",
+      "checkedOut": "Guest checked out",
+      "cancelled": "Reservation cancelled",
+      "noShow": "Reservation marked as no-show",
+      "extended": "Stay extended",
+      "shortened": "Stay shortened",
+      "roomChanged": "Room changed",
+      "extraCharge": "Extra charge added",
+      "noteAdded": "Note added",
+      "guestAdded": "Guest added",
+      "guestUpdated": "Guest updated",
+      "guestRemoved": "Guest removed"
     }
   },
   "auth": {
@@ -1946,8 +1968,14 @@
         "trash": "Trash"
       },
       "actions": {
-        "read": "Mark read", "unread": "Mark unread", "pin": "Pin", "unpin": "Unpin",
-        "archive": "Archive", "trash": "Move to trash", "restore": "Restore to inbox", "deleteForever": "Delete permanently"
+        "read": "Mark read",
+        "unread": "Mark unread",
+        "pin": "Pin",
+        "unpin": "Unpin",
+        "archive": "Archive",
+        "trash": "Move to trash",
+        "restore": "Restore to inbox",
+        "deleteForever": "Delete permanently"
       },
       "presets": {
         "gmail": "Gmail / Google Workspace",

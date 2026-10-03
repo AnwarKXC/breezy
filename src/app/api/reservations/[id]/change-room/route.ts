@@ -1,4 +1,5 @@
 import 'server-only'
+import { logReservationActivity } from '@/modules/reservations/services/activityLogService'
 import { NextResponse } from 'next/server'
 import type { occupancy_code } from '@/generated/prisma/enums'
 import { ACTIONS } from '@/config/rbac'
@@ -102,6 +103,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       }
     }
 
+    await logReservationActivity(session, 'roomChanged', id, { newRoomNumber })
     return NextResponse.json({ ok: true })
   })
 }

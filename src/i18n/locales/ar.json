@@ -1435,7 +1435,12 @@
         "cancelled": "ألغى الحجز",
         "no_show": "سُجّل كعدم حضور",
         "expired": "انتهت صلاحية الحجز"
-      }
+      },
+      "noteAdded": "أضاف ملاحظة",
+      "edited": "عدّل الحجز",
+      "guestAdded": "أضاف ضيفًا",
+      "guestUpdated": "عدّل بيانات ضيف",
+      "guestRemoved": "أزال ضيفًا"
     },
     "auditTrail": "سجل التدقيق",
     "statusHistory": "سجل الحالة",
@@ -1839,6 +1844,23 @@
       "ledgerReversalCreated": "تم عكس قيد في دفتر الأستاذ",
       "settingUpdated": "تم تحديث إعداد",
       "reportExported": "تم تصدير تقرير"
+    },
+    "reservations": {
+      "created": "تم إنشاء الحجز",
+      "updated": "تم تعديل الحجز",
+      "deleted": "تم حذف الحجز",
+      "checkedIn": "تم تسجيل وصول الضيف",
+      "checkedOut": "تم تسجيل مغادرة الضيف",
+      "cancelled": "تم إلغاء الحجز",
+      "noShow": "تم تسجيل الحجز كعدم حضور",
+      "extended": "تم تمديد الإقامة",
+      "shortened": "تم تقصير الإقامة",
+      "roomChanged": "تم تغيير الغرفة",
+      "extraCharge": "تمت إضافة رسوم إضافية",
+      "noteAdded": "تمت إضافة ملاحظة",
+      "guestAdded": "تمت إضافة ضيف",
+      "guestUpdated": "تم تحديث بيانات ضيف",
+      "guestRemoved": "تمت إزالة ضيف"
     }
   },
   "auth": {
@@ -2016,8 +2038,14 @@
         "trash": "المحذوفات"
       },
       "actions": {
-        "read": "تعليم كمقروءة", "unread": "تعليم كغير مقروءة", "pin": "تثبيت", "unpin": "إلغاء التثبيت",
-        "archive": "أرشفة", "trash": "نقل إلى المحذوفات", "restore": "استعادة إلى الوارد", "deleteForever": "حذف نهائي"
+        "read": "تعليم كمقروءة",
+        "unread": "تعليم كغير مقروءة",
+        "pin": "تثبيت",
+        "unpin": "إلغاء التثبيت",
+        "archive": "أرشفة",
+        "trash": "نقل إلى المحذوفات",
+        "restore": "استعادة إلى الوارد",
+        "deleteForever": "حذف نهائي"
       },
       "presets": {
         "gmail": "Gmail / Google Workspace",

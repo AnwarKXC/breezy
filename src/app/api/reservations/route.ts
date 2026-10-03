@@ -1,4 +1,5 @@
 import 'server-only'
+import { logReservationActivity } from '@/modules/reservations/services/activityLogService'
 import { NextResponse } from 'next/server'
 import type { Prisma } from '@/generated/prisma/client'
 import type { reservation_status } from '@/generated/prisma/enums'
@@ -66,6 +67,7 @@ export async function POST(request: Request) {
           created_by: session.id,
         },
       })
+      await logReservationActivity(session, 'created', row.id)
       return NextResponse.json({ ok: true, data: toRow('reservations', row) }, { status: 201 })
     } catch (error) {
       return NextResponse.json({ ok: false, error: { code: 'VALIDATION_ERROR', message: error instanceof Error ? error.message : 'Create failed' } }, { status: 400 })

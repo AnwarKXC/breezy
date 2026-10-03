@@ -1,4 +1,5 @@
 import 'server-only'
+import { logReservationActivity } from '@/modules/reservations/services/activityLogService'
 import { NextResponse } from 'next/server'
 import { ACTIONS } from '@/config/rbac'
 import { secureMutationEndpoint } from '@/shared/secureEndpoint'
@@ -280,6 +281,7 @@ export async function POST(request: Request) {
           }
         }
 
+        await logReservationActivity(session, 'created', resultData.reservationId)
         try {
           await snapshotPricing(resultData.reservationId, input.contactId ?? null)
           await createReservationInvoice(resultData.reservationId, input, session.id)

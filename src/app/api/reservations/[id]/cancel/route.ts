@@ -1,4 +1,5 @@
 import 'server-only'
+import { logReservationActivity } from '@/modules/reservations/services/activityLogService'
 import { NextResponse } from 'next/server'
 import type { Prisma } from '@/generated/prisma/client'
 import { ACTIONS } from '@/config/rbac'
@@ -150,6 +151,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         return { reservation: toRow('reservations', row), invoice: createdInvoice }
       })
 
+      await logReservationActivity(session, 'cancelled', id)
       return NextResponse.json({ ok: true, data: result.reservation, invoice: result.invoice ?? undefined })
     } catch (error) {
       return NextResponse.json({ ok: false, error: { code: 'VALIDATION_ERROR', message: error instanceof Error ? error.message : 'Cancel failed' } }, { status: 400 })

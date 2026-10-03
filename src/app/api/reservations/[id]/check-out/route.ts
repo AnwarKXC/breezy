@@ -1,4 +1,5 @@
 import 'server-only'
+import { logReservationActivity } from '@/modules/reservations/services/activityLogService'
 import { NextResponse } from 'next/server'
 import type { Prisma } from '@/generated/prisma/client'
 import { ACTIONS } from '@/config/rbac'
@@ -238,6 +239,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         }
       })
 
+      await logReservationActivity(session, 'checkedOut', id)
       return NextResponse.json({
         ok: true,
         data: result.reservation,

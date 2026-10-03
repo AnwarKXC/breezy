@@ -61,7 +61,7 @@ export interface ReservationDetail extends Reservation {
 export interface ReservationActivityEvent {
   id: string
   at: string
-  kind: 'created' | 'status' | 'stay_change' | 'price_change' | 'extra_charge'
+  kind: 'created' | 'status' | 'stay_change' | 'price_change' | 'extra_charge' | 'note' | 'edited' | 'guest_added' | 'guest_updated' | 'guest_removed'
   /** Status the reservation moved to (created / status events). */
   status?: string
   /** Human-readable detail: cancellation reason, stay change, price, charge. */

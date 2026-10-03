@@ -1,4 +1,5 @@
 import 'server-only'
+import { logReservationActivity } from '@/modules/reservations/services/activityLogService'
 import { NextResponse } from 'next/server'
 import type { Prisma } from '@/generated/prisma/client'
 import { ACTIONS } from '@/config/rbac'
@@ -154,6 +155,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       console.error('post-extend invoice sync failed:', err)
     }
 
+    await logReservationActivity(session, 'extended', id, { newCheckOut })
     return NextResponse.json({ ok: true, data: toRow('reservations', updated) })
   })
 }

@@ -1,4 +1,5 @@
 import 'server-only'
+import { logReservationActivity } from '@/modules/reservations/services/activityLogService'
 import { NextResponse } from 'next/server'
 import { ACTIONS } from '@/config/rbac'
 import { secureMutationEndpoint } from '@/shared/secureEndpoint'
@@ -26,6 +27,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         await recordReservationStatus(tx, { reservationId: id, from: 'confirmed', to: 'no_show', actorId: session.id, at: now })
         return row
       })
+      await logReservationActivity(session, 'noShow', id)
       return NextResponse.json({ ok: true, data: toRow('reservations', updated) })
     } catch (error) {
       return NextResponse.json({ ok: false, error: { code: 'VALIDATION_ERROR', message: error instanceof Error ? error.message : 'No-show failed' } }, { status: 400 })

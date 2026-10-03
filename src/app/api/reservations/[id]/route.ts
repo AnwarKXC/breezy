@@ -1,4 +1,5 @@
 import 'server-only'
+import { logReservationActivity } from '@/modules/reservations/services/activityLogService'
 import { NextResponse } from 'next/server'
 import { ACTIONS } from '@/config/rbac'
 import { secureReadEndpoint, secureMutationEndpoint } from '@/shared/secureEndpoint'
@@ -441,12 +442,13 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       }, { status: 409 })
     }
 
+    await logReservationActivity(session, 'updated', id, { changedFields: Object.keys(input) })
     return NextResponse.json({ ok: true, data: updated })
   })
 }
 
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  return secureMutationEndpoint(request, ACTIONS.RESERVATIONS_UPDATE_DRAFT, async () => {
+  return secureMutationEndpoint(request, ACTIONS.RESERVATIONS_UPDATE_DRAFT, async (session) => {
     const { id } = await params
 
     const existing = await prisma.reservations.findFirst({ where: { id, deleted_at: null }, select: { status: true } })
@@ -470,6 +472,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
       return NextResponse.json({ ok: false, error: { code: 'VALIDATION_ERROR', message: error instanceof Error ? error.message : 'Delete failed' } }, { status: 400 })
     }
 
+    await logReservationActivity(session, 'deleted', id)
     return NextResponse.json({ ok: true })
   })
 }

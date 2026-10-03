@@ -1,4 +1,5 @@
 import 'server-only'
+import { logReservationActivity } from '@/modules/reservations/services/activityLogService'
 
 import { NextResponse } from 'next/server'
 import { prisma } from '@/services/db/prisma'
@@ -49,6 +50,7 @@ export async function checkInReservation(input: {
       })
       return row
     })
+    await logReservationActivity({ id: input.actorId }, 'checkedIn', input.reservationId)
     return NextResponse.json({ ok: true, data: toRow('reservations', updated) })
   } catch (error) {
     return NextResponse.json({ ok: false, error: { code: 'VALIDATION_ERROR', message: error instanceof Error ? error.message : 'Check-in failed' } }, { status: 400 })

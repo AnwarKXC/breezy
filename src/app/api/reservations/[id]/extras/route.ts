@@ -1,4 +1,5 @@
 import 'server-only'
+import { logReservationActivity } from '@/modules/reservations/services/activityLogService'
 import { NextResponse } from 'next/server'
 import { ACTIONS } from '@/config/rbac'
 import { secureMutationEndpoint } from '@/shared/secureEndpoint'
@@ -78,6 +79,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       }
     }
 
+    await logReservationActivity(session, 'extraCharge', id, { charges: charges.map((c) => ({ label: c.label, amount: c.amount })) })
     return NextResponse.json({ ok: true, data: toRows('reservation_pricing_items', created) })
   })
 }

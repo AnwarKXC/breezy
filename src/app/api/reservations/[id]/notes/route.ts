@@ -1,4 +1,5 @@
 import 'server-only'
+import { logReservationActivity } from '@/modules/reservations/services/activityLogService'
 import { NextResponse } from 'next/server'
 import { ACTIONS } from '@/config/rbac'
 import { secureMutationEndpoint, secureReadEndpoint } from '@/shared/secureEndpoint'
@@ -26,6 +27,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       const row = await prisma.reservation_notes.create({
         data: { reservation_id: id, message: parsed.data.body, visibility: parsed.data.visibility, created_by: session.id },
       })
+      await logReservationActivity(session, 'noteAdded', id)
       return NextResponse.json({ ok: true, data: toRow('reservation_notes', row) }, { status: 201 })
     } catch {
       return NextResponse.json({ ok: false, error: { code: 'VALIDATION_ERROR', message: 'Failed to add note' } }, { status: 400 })

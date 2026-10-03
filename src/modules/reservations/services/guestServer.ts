@@ -86,10 +86,16 @@ export async function updateReservationGuest(
   return { ok: true, data: toRow('reservation_guests', row) }
 }
 
-export async function removeReservationGuest(reservationId: string, guestId: string): Promise<boolean> {
+/** Soft-deletes the guest; returns the removed guest's name, or null when not found. */
+export async function removeReservationGuest(reservationId: string, guestId: string): Promise<{ full_name: string } | null> {
+  const guest = await prisma.reservation_guests.findFirst({
+    where: { id: guestId, reservation_id: reservationId, deleted_at: null },
+    select: { full_name: true },
+  })
+  if (!guest) return null
   const { count } = await prisma.reservation_guests.updateMany({
     where: { id: guestId, reservation_id: reservationId, deleted_at: null },
     data: { deleted_at: new Date() },
   })
-  return count > 0
+  return count > 0 ? guest : null
 }

@@ -7,6 +7,17 @@ import { useCan } from '@/shared/rbac/useCan'
 import { ACTIONS } from '@/config/rbac'
 import type { ReservationActivityEvent } from '@/modules/reservations/types'
 
+const KIND_LABEL: Record<Exclude<ReservationActivityEvent['kind'], 'created' | 'status'>, string> = {
+  stay_change: 'stayChanged',
+  price_change: 'priceChanged',
+  extra_charge: 'extraCharge',
+  note: 'noteAdded',
+  edited: 'edited',
+  guest_added: 'guestAdded',
+  guest_updated: 'guestUpdated',
+  guest_removed: 'guestRemoved',
+}
+
 /** Admin-only, collapsed by default: who performed each important action on this reservation. */
 export function ReservationActivity({ reservationId }: { reservationId: string }) {
   const canView = useCan(ACTIONS.RESERVATIONS_VIEW_AUDIT)
@@ -25,7 +36,7 @@ function ActivityPanel({ reservationId }: { reservationId: string }) {
   const title = (e: ReservationActivityEvent) => {
     if (e.kind === 'created') return t('reservations.activity.created')
     if (e.kind === 'status') return t(`reservations.activity.status.${e.status}`)
-    return t(`reservations.activity.${e.kind === 'stay_change' ? 'stayChanged' : e.kind === 'price_change' ? 'priceChanged' : 'extraCharge'}`)
+    return t(`reservations.activity.${KIND_LABEL[e.kind]}`)
   }
 
   return (

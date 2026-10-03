@@ -1,4 +1,5 @@
 import 'server-only'
+import { logReservationActivity } from '@/modules/reservations/services/activityLogService'
 import { NextResponse } from 'next/server'
 import { ACTIONS } from '@/config/rbac'
 import { secureMutationEndpoint } from '@/shared/secureEndpoint'
@@ -136,6 +137,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       console.error('post-shorten invoice sync failed:', err)
     }
 
+    await logReservationActivity(session, 'shortened', id, { newCheckOut })
     return NextResponse.json({ ok: true, data: toRow('reservations', updated) })
   })
 }
