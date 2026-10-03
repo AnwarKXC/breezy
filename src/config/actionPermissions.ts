@@ -68,8 +68,8 @@ export const ACTION_PERMISSIONS = Object.values(ACTIONS) as readonly ActionPermi
 // Accountant has the full reservation lifecycle like admin (DB RLS matches:
 // can_write_reservations() includes accountant since migration
 // 20260822000001, and rooms status updates since 20260822000002).
-// The AI data assistant is admin-only for now.
-const ADMIN_ONLY_ACTIONS: readonly ActionPermission[] = [ACTIONS.AI_CHAT]
+// The AI data assistant and the reservation activity trail (who did what) are admin-only.
+const ADMIN_ONLY_ACTIONS: readonly ActionPermission[] = [ACTIONS.AI_CHAT, ACTIONS.RESERVATIONS_VIEW_AUDIT]
 const ACCOUNTANT_ACTIONS: readonly ActionPermission[] = ACTION_PERMISSIONS.filter((action) => !ADMIN_ONLY_ACTIONS.includes(action))
 
 const FRONT_DESK_ACTIONS: readonly ActionPermission[] = [
@@ -93,7 +93,6 @@ const FRONT_DESK_ACTIONS: readonly ActionPermission[] = [
   ACTIONS.CONTACTS_DELETE,
   ACTIONS.ACCOUNTING_REPORTS,
   ACTIONS.ACCOUNTING_EXPORT,
-  ACTIONS.RESERVATIONS_VIEW_AUDIT,
   ACTIONS.RESERVATIONS_READ,
   ACTIONS.RESERVATIONS_CREATE,
   ACTIONS.RESERVATIONS_UPDATE_DRAFT,

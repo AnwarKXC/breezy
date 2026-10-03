@@ -8,7 +8,7 @@ import { ReservationExtrasSchema, zodErrorMessage } from '@/shared/validation'
 import { syncOpenInvoicesForReservation } from '@/modules/reservations/services/pricingService'
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  return secureMutationEndpoint(request, ACTIONS.RESERVATIONS_CHECK_OUT, async () => {
+  return secureMutationEndpoint(request, ACTIONS.RESERVATIONS_CHECK_OUT, async (session) => {
     const { id } = await params
     const body = await request.json().catch(() => null)
     const parsed = ReservationExtrasSchema.safeParse(body)
@@ -43,6 +43,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
             price_source: 'manual_override' as const,
             source_type: 'manual_override',
             manual_override_reason: charge.label,
+            manual_override_by: session.id,
           })),
         })
 

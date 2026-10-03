@@ -1346,6 +1346,27 @@
     "reservationNotFound": "Reservation not found",
     "couldNotBeLoaded": "The reservation could not be loaded. Return to the list and try again.",
     "backToReservations": "Back to reservations",
+    "activity": {
+      "title": "Activity",
+      "adminOnly": "Admin only",
+      "created": "Created the reservation",
+      "stayChanged": "Changed the stay",
+      "priceChanged": "Changed a room price",
+      "extraCharge": "Added an extra charge",
+      "unknownUser": "Unknown user",
+      "empty": "No activity recorded yet.",
+      "loadFailed": "Could not load activity.",
+      "status": {
+        "draft": "Moved to draft",
+        "held": "Put on hold",
+        "confirmed": "Confirmed the reservation",
+        "checked_in": "Checked in",
+        "checked_out": "Checked out",
+        "cancelled": "Cancelled the reservation",
+        "no_show": "Marked as no-show",
+        "expired": "Reservation expired"
+      }
+    },
     "auditTrail": "Audit trail",
     "statusHistory": "Status history",
     "noLifecycleEvents": "No lifecycle events recorded.",

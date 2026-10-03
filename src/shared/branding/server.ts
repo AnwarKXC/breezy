@@ -2,7 +2,7 @@
 // (key='organization'). No row = defaults. The logo lives in `public.files`.
 
 import 'server-only'
-import { revalidateTag, unstable_cache } from 'next/cache'
+import { cache } from 'react'
 import { prisma } from '@/services/db/prisma'
 import { deleteFile, saveImage } from '@/services/files/fileStore'
 import {
@@ -25,21 +25,12 @@ interface StoredOrganization extends OrganizationDetails {
 
 const EMPTY: StoredOrganization = { ...EMPTY_ORGANIZATION, logoFileId: null }
 
-// Read on every page render, changed only from settings. Next's data cache is
-// shared by route handlers and server components (a module-level variable is
-// not: each bundle gets its own copy, which served stale logos after uploads).
-const CACHE_TAG = 'app-settings:organization'
-
-const readRow = unstable_cache(
+// Per-request dedupe only (layout + metadata). A cross-request cache served a
+// stale logo after a later settings save, and this is a single primary-key read.
+const readRow = cache(
   async () =>
     (await prisma.app_settings.findUnique({ where: { key: ORGANIZATION_KEY }, select: { value: true } }))?.value ?? null,
-  [CACHE_TAG],
-  { tags: [CACHE_TAG], revalidate: 3600 },
 )
-
-function invalidate() {
-  revalidateTag(CACHE_TAG, { expire: 0 })
-}
 
 /** Tolerates rows written by older versions: invalid fields fall back to empty. */
 function parseStored(raw: unknown): StoredOrganization {
@@ -75,7 +66,6 @@ async function writeStored(value: StoredOrganization, userId: string) {
     create: { key: ORGANIZATION_KEY, value: json, updated_by: userId },
     update: { value: json, updated_by: userId, updated_at: new Date() },
   })
-  invalidate()
 }
 
 export async function getBranding(): Promise<PublicBranding> {
@@ -121,6 +111,5 @@ export async function removeOrganizationLogo(userId: string) {
 export async function resetOrganization() {
   const current = await readFresh()
   await prisma.app_settings.deleteMany({ where: { key: ORGANIZATION_KEY } })
-  invalidate()
   if (current.logoFileId) await deleteFile(current.logoFileId)
 }

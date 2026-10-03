@@ -31,6 +31,7 @@ function groupRooms<R extends { id: string }>(rooms: R[], solo: (r: R) => boolea
 }
 import { ReservationNotes } from './ReservationNotes'
 import { ReservationActions } from './ReservationActions'
+import { ReservationActivity } from './ReservationActivity'
 
 async function fetchReservation(id: string): Promise<ReservationDetail> {
   const res = await reservationService.getById(id)
@@ -516,30 +517,7 @@ export function ReservationDetailPage() {
           <aside className="space-y-6">
             <ReservationNotes reservationId={id} notes={detail.notes} onUpdate={refreshDetail} />
 
-            <section className="rounded-xl border border-[#EAEAEA] bg-white p-6">
-              <div className="mb-5">
-                <p className="text-xs font-medium uppercase tracking-wide text-[#787774]">{t('reservations.auditTrail')}</p>
-                <h2 className="mt-1 text-xl font-semibold tracking-tight text-[#1A1A1A]">{t('reservations.statusHistory')}</h2>
-              </div>
-              {detail.statusHistory.length > 0 ? (
-                <div className="space-y-3">
-                  {detail.statusHistory.map((h) => (
-                    <div key={h.id} className="border-b border-[#EAEAEA] pb-3 last:border-0 last:pb-0">
-                      <div className="flex items-center gap-2 text-sm font-medium text-[#333333]">
-                        <span>{h.from_status ?? t('reservations.statusNew')}</span>
-                        <span className="text-[#BBBBBB]">{t('reservations.statusTo')}</span>
-                        <span>{h.to_status}</span>
-                      </div>
-                      <p className="mt-0.5 text-xs text-[#787774]">{new Date(h.changed_at).toLocaleString()}</p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="rounded-xl border border-dashed border-[#EAEAEA] bg-[#F9F9F8] px-4 py-5 text-sm text-[#787774] text-center">
-                  {t('reservations.noLifecycleEvents')}
-                </div>
-              )}
-            </section>
+            <ReservationActivity reservationId={id} />
           </aside>
         </div>
       </div>

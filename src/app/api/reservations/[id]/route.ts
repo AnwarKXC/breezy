@@ -102,7 +102,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     }
 
     // One parallel round trip; child rows of a missing reservation are just discarded.
-    const [reservationRow, roomRows, guestRows, companyInfoRow, pricingRows, noteRows, historyRows] = await Promise.all([
+    const [reservationRow, roomRows, guestRows, companyInfoRow, pricingRows, noteRows] = await Promise.all([
       prisma.reservations.findFirst({ where: { id, deleted_at: null } }),
       prisma.reservation_rooms.findMany({
         where: { reservation_id: id, deleted_at: null },
@@ -112,7 +112,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       prisma.reservation_company_info.findFirst({ where: { reservation_id: id } }),
       prisma.reservation_pricing_items.findMany({ where: { reservation_id: id } }),
       prisma.reservation_notes.findMany({ where: { reservation_id: id } }),
-      prisma.reservation_status_history.findMany({ where: { reservation_id: id }, orderBy: { changed_at: 'asc' } }),
     ])
     if (!reservationRow) {
       return NextResponse.json({ ok: false, error: { code: 'NOT_FOUND', message: 'Reservation not found' } }, { status: 404 })
@@ -153,7 +152,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
         contact: contact ?? null,
         pricingItems: toRows('reservation_pricing_items', pricingRows),
         notes: toRows('reservation_notes', noteRows),
-        statusHistory: toRows('reservation_status_history', historyRows),
       },
     })
   })

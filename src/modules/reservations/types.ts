@@ -55,7 +55,18 @@ export interface ReservationDetail extends Reservation {
   contact?: ReservationContact | null
   pricingItems: ReservationPricingItem[]
   notes: ReservationNote[]
-  statusHistory: ReservationStatusHistory[]
+}
+
+/** One admin-facing entry in a reservation's activity trail. */
+export interface ReservationActivityEvent {
+  id: string
+  at: string
+  kind: 'created' | 'status' | 'stay_change' | 'price_change' | 'extra_charge'
+  /** Status the reservation moved to (created / status events). */
+  status?: string
+  /** Human-readable detail: cancellation reason, stay change, price, charge. */
+  detail?: string | null
+  actor: { name: string; role: string } | null
 }
 
 export interface AvailabilityQuery {

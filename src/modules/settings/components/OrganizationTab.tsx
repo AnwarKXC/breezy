@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useTranslation } from '@/i18n/hooks/useTranslation'
 import { toast } from '@/shared/toast/toastEvents'
 import { useBranding, useSetBranding } from '@/shared/branding/BrandingContext'
-import { MAX_PHONES, SOCIAL_PLATFORMS, documentQr, type OrganizationDetails, type PublicBranding } from '@/shared/branding/branding'
+import { DEFAULT_LOGO_URL, MAX_PHONES, SOCIAL_PLATFORMS, documentQr, type OrganizationDetails, type PublicBranding } from '@/shared/branding/branding'
 import { isValidPhone, normalizePhone } from '@/shared/phone'
 
 const inputClass =
@@ -45,21 +45,38 @@ export function OrganizationTab({ canEdit }: { canEdit: boolean }) {
   const setBranding = useSetBranding()
   const [form, setForm] = useState<OrganizationDetails>(() => toForm(branding))
   const [busy, setBusy] = useState(false)
+  // Logo changes are staged locally and sent with Save: a File to upload, 'remove', or null (unchanged).
+  const [pendingLogo, setPendingLogo] = useState<{ file: File; preview: string } | 'remove' | null>(null)
   const fileInput = useRef<HTMLInputElement>(null)
   const disabled = !canEdit || busy
   const qr = documentQr(form)
+  const logoPreview = pendingLogo === 'remove' ? DEFAULT_LOGO_URL : (pendingLogo?.preview ?? branding.logoUrl)
+  const hasLogo = pendingLogo === 'remove' ? false : Boolean(pendingLogo) || branding.hasCustomLogo
 
   const set = <K extends keyof OrganizationDetails>(key: K, value: OrganizationDetails[K]) =>
     setForm((prev) => ({ ...prev, [key]: value }))
 
-  const request = async (url: string, init: RequestInit, successKey: string, resetForm = false) => {
+  const stageLogo = (next: typeof pendingLogo) => {
+    if (pendingLogo && pendingLogo !== 'remove') URL.revokeObjectURL(pendingLogo.preview)
+    setPendingLogo(next)
+  }
+
+  const send = async (url: string, init: RequestInit) => {
+    const res = await fetch(url, init)
+    const body = (await res.json().catch(() => ({}))) as { data?: PublicBranding; error?: string }
+    if (!res.ok || !body.data) throw new Error(body.error ?? 'request failed')
+    return body.data
+  }
+
+  const request = async (steps: Array<[string, RequestInit]>, successKey: string) => {
     setBusy(true)
     try {
-      const res = await fetch(url, init)
-      const body = (await res.json().catch(() => ({}))) as { data?: PublicBranding; error?: string }
-      if (!res.ok || !body.data) throw new Error(body.error ?? 'request failed')
-      setBranding(body.data)
-      if (resetForm) setForm(toForm(body.data))
+      let data: PublicBranding | undefined
+      for (const [url, init] of steps) data = await send(url, init)
+      if (!data) return
+      stageLogo(null)
+      setBranding(data)
+      setForm(toForm(data))
       router.refresh()
       toast.success(t(successKey))
     } catch (error) {
@@ -81,25 +98,34 @@ export function OrganizationTab({ canEdit }: { canEdit: boolean }) {
       phones,
       socials: Object.fromEntries(Object.entries(form.socials).filter(([, v]) => v?.trim())),
     }
-    void request(
+    const steps: Array<[string, RequestInit]> = []
+    if (pendingLogo === 'remove') {
+      steps.push(['/api/settings/organization/logo', { method: 'DELETE' }])
+    } else if (pendingLogo) {
+      const body = new FormData()
+      body.append('file', pendingLogo.file)
+      steps.push(['/api/settings/organization/logo', { method: 'POST', body }])
+    }
+    steps.push([
       '/api/settings/organization',
       { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) },
-      'settings.organization.saved',
-      true,
-    )
+    ])
+    void request(steps, 'settings.organization.saved')
   }
 
   const reset = () => {
     if (!window.confirm(t('settings.organization.resetConfirm'))) return
-    void request('/api/settings/organization', { method: 'DELETE' }, 'settings.organization.resetDone', true)
+    void request([['/api/settings/organization', { method: 'DELETE' }]], 'settings.organization.resetDone')
   }
 
-  const uploadLogo = (file: File | undefined) => {
-    if (!file) return
-    const body = new FormData()
-    body.append('file', file)
-    void request('/api/settings/organization/logo', { method: 'POST', body }, 'settings.organization.logoSaved')
+  const pickLogo = (file: File | undefined) => {
     if (fileInput.current) fileInput.current.value = ''
+    if (!file) return
+    if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
+      toast.error(t('settings.organization.logoInvalid'))
+      return
+    }
+    stageLogo({ file, preview: URL.createObjectURL(file) })
   }
 
   return (
@@ -109,24 +135,25 @@ export function OrganizationTab({ canEdit }: { canEdit: boolean }) {
           <div className="flex shrink-0 flex-col items-center gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element -- DB-served logo, preview only */}
             <img
-              src={branding.logoUrl}
+              src={logoPreview}
               alt={branding.displayName}
-              className="h-24 w-24 rounded-xl border border-line bg-surface-muted object-contain p-2"
+              className={`h-24 w-24 rounded-xl border bg-surface-muted object-contain p-2 ${pendingLogo ? 'border-accent border-dashed' : 'border-line'}`}
             />
             {canEdit && (
               <div className="flex gap-2">
                 <button type="button" disabled={busy} onClick={() => fileInput.current?.click()} className={`${secondaryButton} h-9 px-3 text-xs`}>
                   {t('settings.organization.uploadLogo')}
                 </button>
-                {branding.hasCustomLogo && (
-                  <button
-                    type="button"
-                    disabled={busy}
-                    onClick={() => void request('/api/settings/organization/logo', { method: 'DELETE' }, 'settings.organization.logoRemoved')}
-                    className={`${secondaryButton} h-9 px-3 text-xs`}
-                  >
-                    {t('settings.organization.removeLogo')}
+                {pendingLogo ? (
+                  <button type="button" disabled={busy} onClick={() => stageLogo(null)} className={`${secondaryButton} h-9 px-3 text-xs`}>
+                    {t('settings.theme.discard')}
                   </button>
+                ) : (
+                  hasLogo && (
+                    <button type="button" disabled={busy} onClick={() => stageLogo('remove')} className={`${secondaryButton} h-9 px-3 text-xs`}>
+                      {t('settings.organization.removeLogo')}
+                    </button>
+                  )
                 )}
               </div>
             )}
@@ -135,7 +162,7 @@ export function OrganizationTab({ canEdit }: { canEdit: boolean }) {
               type="file"
               accept="image/png,image/jpeg,image/webp"
               className="hidden"
-              onChange={(e) => uploadLogo(e.target.files?.[0])}
+              onChange={(e) => pickLogo(e.target.files?.[0])}
             />
           </div>
           <div className="min-w-0 flex-1">

@@ -1416,6 +1416,27 @@
     "reservationNotFound": "الحجز غير موجود",
     "couldNotBeLoaded": "تعذر تحميل الحجز. عد إلى القائمة وحاول مرة أخرى.",
     "backToReservations": "رجوع إلى الحجوزات",
+    "activity": {
+      "title": "النشاط",
+      "adminOnly": "للمسؤول فقط",
+      "created": "أنشأ الحجز",
+      "stayChanged": "عدّل الإقامة",
+      "priceChanged": "عدّل سعر غرفة",
+      "extraCharge": "أضاف رسومًا إضافية",
+      "unknownUser": "مستخدم غير معروف",
+      "empty": "لا يوجد نشاط مسجل بعد.",
+      "loadFailed": "تعذر تحميل النشاط.",
+      "status": {
+        "draft": "نُقل إلى مسودة",
+        "held": "وُضع قيد الانتظار",
+        "confirmed": "أكّد الحجز",
+        "checked_in": "سجّل الوصول",
+        "checked_out": "سجّل المغادرة",
+        "cancelled": "ألغى الحجز",
+        "no_show": "سُجّل كعدم حضور",
+        "expired": "انتهت صلاحية الحجز"
+      }
+    },
     "auditTrail": "سجل التدقيق",
     "statusHistory": "سجل الحالة",
     "noLifecycleEvents": "لم يتم تسجيل أحداث دورة حياة.",
